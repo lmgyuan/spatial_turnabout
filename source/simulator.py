@@ -4,11 +4,16 @@ import json
 WRONG_EVIDENCE_RESPONSE = open("../case_data/wrong_evidence_response.txt", "r").read()
 
 def simulate(case_data):
+    court_record = {"objects": [], "people": []}
     for turn, turn_data in case_data.items():
         print("Turn: {}".format(turn) + "\n" + "-"*10 + "\n")
         print(turn_data["context"])
-        #if turn_data["category"] == "multiple_choice":
-        if False:
+        for add_object in turn_data["court_record"]["add"]["objects"]:
+            court_record["objects"].append(add_object)
+        for add_person in turn_data["court_record"]["add"]["people"]:
+            court_record["people"].append(add_person)
+        # TODO: logic for modify is TBD
+        if turn_data["category"] == "multiple_choice":
             can_proceed = False
             while not can_proceed:
                 print("\n===Multiple Choice===\n")
@@ -16,6 +21,9 @@ def simulate(case_data):
                     print(action_data["choice"])
                 print("\n> ")
                 user_input = input()
+                if user_input == "court record":
+                    print(court_record)
+                    continue
                 for action_data in turn_data["actions"]:
                     if user_input == action_data["choice"]:
                         print(action_data["response"])
@@ -24,8 +32,7 @@ def simulate(case_data):
                         break
                 else:
                     print("Invalid input")
-        if False:
-        #elif turn_data["category"] == "cross_examination":
+        elif turn_data["category"] == "cross_examination":
             can_proceed = False
             while not can_proceed:
                 print("\n===Cross Examination===\n")
@@ -34,6 +41,9 @@ def simulate(case_data):
                         print(action_data["testimony"])
                 print("\n> ")
                 user_input = input()
+                if user_input == "court record":
+                    print(court_record)
+                    continue
                 user_action = user_input.split("@")[0]
                 user_testimony = user_input.split("@")[-1]
                 if user_action == "present":
@@ -59,6 +69,9 @@ def simulate(case_data):
             while not can_proceed:
                 print("\n===Present===\n")
                 print("\n> ")
+                if user_input == "court record":
+                    print(court_record)
+                    continue
                 user_input = input()
                 user_evidence = user_input
                 for action_data in turn_data["actions"]:
@@ -71,6 +84,7 @@ def simulate(case_data):
                     # present incorrect evidence
                     elif action_data["evidence"] == "WRONG_EVIDENCE":
                         print(action_data["response"])
+                        break
                 else:
                     print("Invalid input")
         #break
