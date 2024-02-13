@@ -1,13 +1,52 @@
 import argparse
 import json
+from run_gpt import run_chatgpt
 
 WRONG_EVIDENCE_RESPONSE = open("../case_data/wrong_evidence_response.txt", "r").read()
 
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('--case', type=str, help='Identifier of the case in the format of X-Y')
+parser.add_argument('--player', type=str, help='human, or an OpenAI model name')
+args = parser.parse_args()
+
+def get_input(past_dialogs, turn_data):
+    if args.player == "human":
+        return input()
+    else:
+        prompt = turn_data["context"]
+        if turn_data["category"] == "multiple_choice":
+            prompt += "Select one of the following choices:\n"
+            for action_data in turn_data["actions"]:
+                prompt += action_data["choice"] + "\n"
+            prompt += 'Answer the question with a JSON object in the format of {"answer": <verbatim of the choice>}'
+        #print(prompt)
+        prompt_dict = {"role": "user", "content": prompt}
+        past_dialogs.append(prompt_dict)
+        gen_json = run_chatgpt(past_dialogs, args.player, force_json=True)
+        gen_text = json.loads(gen_json)["answer"]
+        response_dict = {"role": "assistant", "content": gen_text}
+        past_dialogs.append(response_dict)
+        print(past_dialogs)
+        return gen_text, past_dialogs
+    
+def list_court_record(court_record):
+    output = ""
+    output += "===Court Record===\n"
+    output += "Objects:\n"
+    for obj in court_record["objects"]:
+        output += obj["name"] + "\n"
+        output += "  " + obj["description"] + "\n"
+    output += "\nPeople:\n"
+    for person in court_record["people"]:
+        output += person["name"] + "\n"
+        output += "  " + person["description"] + "\n"
+
 def simulate(case_data):
     court_record = {"objects": [], "people": []}
+    past_dialogs = [{"role": "system", "content": "You will play a text-based game of Ace Attorney. You will be given a scenario and you will have to make choices to proceed. You can type 'court record' to view the court record at any time."}]
     for turn, turn_data in case_data.items():
-        print("Turn: {}".format(turn) + "\n" + "-"*10 + "\n")
-        print(turn_data["context"])
+        #print("Turn: {}".format(turn) + "\n" + "-"*10 + "\n")
+        #print(turn_data["context"])
         for add_object in turn_data["court_record"]["add"]["objects"]:
             court_record["objects"].append(add_object)
         for add_person in turn_data["court_record"]["add"]["people"]:
@@ -20,9 +59,10 @@ def simulate(case_data):
                 for action_data in turn_data["actions"]:
                     print(action_data["choice"])
                 print("\n> ")
-                user_input = input()
+                user_input, past_dialogs = get_input(past_dialogs, turn_data)
                 if user_input == "court record":
-                    print(court_record)
+                    print(list_court_record(court_record))
+                    past_dialogs.append({"role": "user", "content": list_court_record(court_record)})
                     continue
                 for action_data in turn_data["actions"]:
                     if user_input == action_data["choice"]:
@@ -90,10 +130,6 @@ def simulate(case_data):
         #break
 
 def main():
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--case', type=str, help='Identifier of the case in the format of X-Y')
-    args = parser.parse_args()
-
     with open("../case_data/{}.json".format(args.case), 'r') as file:
         case_data = json.load(file)
 
