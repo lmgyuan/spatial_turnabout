@@ -10,7 +10,7 @@ def run_chatgpt(message, model, temperature=0):
     ret = openai.ChatCompletion.create(
         model=model,
         messages=message,
-        max_tokens = 30,
+        max_tokens = 100,
         #response_format = {"type": output_format}
     )
     gen_text = dict(ret["choices"][0]["message"])["content"]

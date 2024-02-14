@@ -13,7 +13,7 @@ def get_input(past_dialogs, turn_data, court_record):
     if args.player == "human":
         return input()
     else:
-        context = turn_data["context"] + "\n"
+        context = turn_data["context"][-100:] + "\n"
         if turn_data["category"] == "multiple_choice":
             prompt = "Select one of the following choices:\n"
             choices = []
@@ -64,8 +64,12 @@ def get_input(past_dialogs, turn_data, court_record):
             gen_text = evidences[json.loads(gen_json)["evidence"]]
         response_dict = {"role": "assistant", "content": gen_json}
         past_dialogs.append(response_dict)
-        print(past_dialogs)
         print(gen_text)
+        #explanation_prompt = "Please explain your reasoning."
+        #explanation_dict = {"role": "user", "content": explanation_prompt}
+        #gen_explanation = run_chatgpt(past_dialogs + [explanation_dict], args.player)
+        #print("Explanation: ", gen_explanation)
+        #print(past_dialogs)
         return gen_text, past_dialogs
     
 def list_court_record(court_record):
@@ -108,7 +112,7 @@ def simulate(case_data):
                     continue
                 for action_data in turn_data["actions"]:
                     if user_input == action_data["choice"]:
-                        print(action_data["response"])
+                        #print(action_data["response"])
                         if action_data["is_correct"] == 1:
                             can_proceed = True
                         break
@@ -135,13 +139,13 @@ def simulate(case_data):
                 for action_data in turn_data["actions"]:
                     # press any testimony
                     if user_action == "press" and user_testimony == action_data["testimony"] and action_data["action"] == "press":
-                        print(action_data["response"])
+                        #print(action_data["response"])
                         break
                     # present correct evidence on correct testimony
                     elif user_action == "present" and user_testimony == action_data["testimony"] and action_data["action"] == "present" and user_evidence == action_data["evidence"]:
                         assert action_data["is_correct"] == 1
                         can_proceed = True
-                        print(action_data["response"])
+                        #print(action_data["response"])
                         break
                     # present incorrect evidence or on incorrect testimony
                     elif user_action == "present" and user_testimony == action_data["testimony"] and action_data["action"] == "present":
@@ -164,11 +168,11 @@ def simulate(case_data):
                     if action_data["evidence"] == user_evidence:
                         assert action_data["is_correct"] == 1
                         can_proceed = True
-                        print(action_data["response"])
+                        #print(action_data["response"])
                         break
                     # present incorrect evidence
                     elif action_data["evidence"] == "WRONG_EVIDENCE":
-                        print(action_data["response"])
+                        #print(action_data["response"])
                         break
                 else:
                     print("Invalid input")
