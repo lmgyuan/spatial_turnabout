@@ -9,24 +9,63 @@ parser.add_argument('--case', type=str, help='Identifier of the case in the form
 parser.add_argument('--player', type=str, help='human, or an OpenAI model name')
 args = parser.parse_args()
 
-def get_input(past_dialogs, turn_data):
+def get_input(past_dialogs, turn_data, court_record):
     if args.player == "human":
         return input()
     else:
-        prompt = turn_data["context"]
+        context = turn_data["context"] + "\n"
         if turn_data["category"] == "multiple_choice":
-            prompt += "Select one of the following choices:\n"
-            for action_data in turn_data["actions"]:
-                prompt += action_data["choice"] + "\n"
-            prompt += 'Answer the question with a JSON object in the format of {"answer": <verbatim of the choice>}'
+            prompt = "Select one of the following choices:\n"
+            choices = []
+            for i, action_data in enumerate(turn_data["actions"]):
+                prompt += str(i) + " " + action_data["choice"] + "\n"
+                choices.append(action_data["choice"])
+            prompt += 'Answer the question with a JSON object in the format of {"answer": <number of the choice>}, for example {"answer": 0}. Otherwise, you could view the court record by answering with a JSON object in the format of {"action": "court record"}.'
+        elif turn_data["category"] == "cross_examination":
+            prompt = "Below are the witness' testimonies:\n"
+            testimonies = []
+            for i, action_data in enumerate(turn_data["actions"]):
+                if action_data["action"] == "press":
+                    prompt += str(i) + " " + action_data["testimony"] + "\n"
+                    testimonies.append(action_data["testimony"])
+            prompt += "Below are the evidences you have:\n"
+            evidences = []
+            for i, obj in enumerate(court_record["objects"]):
+                prompt += str(i) + " " + obj["name"] + "\n"
+                evidences.append(obj["name"])
+            prompt += 'You may either press the witness about a specific testimony or present evidence at a testimony to show a contradiction. To press, answer the question with a JSON object in the format of {"action": "press", "testimony": <number of the testimony>}, for example {"action": "press", "testimony": 3}. To present evidence, answer the question with a JSON object in the format of {"action": "present", "testimony": <number of the testimony>, "evidence": <number of the evidence>}, for example {"action": "present", "testimony": 5, "evidence": 2}. Otherwise, you could view the court record by answering with a JSON object in the format of {"action": "court record"}.'
+        elif turn_data["category"] == "present":
+            prompt = "Below are the evidences you have:\n"
+            evidences = []
+            for i, obj in enumerate(court_record["objects"]):
+                prompt += str(i) + " " + obj["name"] + "\n"
+                evidences.append(obj["name"])
+            prompt += 'You will present evidence at a testimony to show a contradiction. Do so by answering the question with a JSON object in the format of {"action": "present", "evidence": <name of the evidence>}, for example {"action": "present", "evidence": Broken Clock}. Otherwise, you could view the court record by answering with a JSON object in the format of {"action": "court record"}.'
         #print(prompt)
-        prompt_dict = {"role": "user", "content": prompt}
+        prompt_dict = {"role": "user", "content": context + prompt}
+        if prompt_dict in past_dialogs:
+            prompt_dict = {"role": "user", "content": prompt}
         past_dialogs.append(prompt_dict)
-        gen_json = run_chatgpt(past_dialogs, args.player, force_json=True)
-        gen_text = json.loads(gen_json)["answer"]
-        response_dict = {"role": "assistant", "content": gen_text}
+        gen_json = run_chatgpt(past_dialogs, args.player)
+        print(gen_json)
+        if turn_data["category"] == "multiple_choice":
+            gen_text = choices[json.loads(gen_json)["answer"]]
+        elif turn_data["category"] == "cross_examination":
+            if json.loads(gen_json)["action"] == "press":
+                gen_text = "press@" + testimonies[json.loads(gen_json)["testimony"]]
+            elif json.loads(gen_json)["action"] == "present":
+                gen_text = "present@" + evidences[json.loads(gen_json)["evidence"]] + "@" + testimonies[json.loads(gen_json)["testimony"]]
+            elif json.loads(gen_json)["action"] == "court record":
+                gen_text = "court record"
+            else:
+                print(gen_json)
+                raise ValueError("Invalid action")
+        elif turn_data["category"] == "present":
+            gen_text = evidences[json.loads(gen_json)["evidence"]]
+        response_dict = {"role": "assistant", "content": gen_json}
         past_dialogs.append(response_dict)
         print(past_dialogs)
+        print(gen_text)
         return gen_text, past_dialogs
     
 def list_court_record(court_record):
@@ -40,6 +79,8 @@ def list_court_record(court_record):
     for person in court_record["people"]:
         output += person["name"] + "\n"
         output += "  " + person["description"] + "\n"
+    output += "This is the end of the court record. Please resume your task above."
+    return output
 
 def simulate(case_data):
     court_record = {"objects": [], "people": []}
@@ -52,6 +93,7 @@ def simulate(case_data):
         for add_person in turn_data["court_record"]["add"]["people"]:
             court_record["people"].append(add_person)
         # TODO: logic for modify is TBD
+        #if False:
         if turn_data["category"] == "multiple_choice":
             can_proceed = False
             while not can_proceed:
@@ -59,7 +101,7 @@ def simulate(case_data):
                 for action_data in turn_data["actions"]:
                     print(action_data["choice"])
                 print("\n> ")
-                user_input, past_dialogs = get_input(past_dialogs, turn_data)
+                user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
                 if user_input == "court record":
                     print(list_court_record(court_record))
                     past_dialogs.append({"role": "user", "content": list_court_record(court_record)})
@@ -72,6 +114,7 @@ def simulate(case_data):
                         break
                 else:
                     print("Invalid input")
+        #if False:
         elif turn_data["category"] == "cross_examination":
             can_proceed = False
             while not can_proceed:
@@ -80,9 +123,10 @@ def simulate(case_data):
                     if action_data["action"] == "press":
                         print(action_data["testimony"])
                 print("\n> ")
-                user_input = input()
+                user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
                 if user_input == "court record":
-                    print(court_record)
+                    print(list_court_record(court_record))
+                    past_dialogs.append({"role": "user", "content": list_court_record(court_record)})
                     continue
                 user_action = user_input.split("@")[0]
                 user_testimony = user_input.split("@")[-1]
@@ -109,10 +153,11 @@ def simulate(case_data):
             while not can_proceed:
                 print("\n===Present===\n")
                 print("\n> ")
+                user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
                 if user_input == "court record":
-                    print(court_record)
+                    print(list_court_record(court_record))
+                    past_dialogs.append({"role": "user", "content": list_court_record(court_record)})
                     continue
-                user_input = input()
                 user_evidence = user_input
                 for action_data in turn_data["actions"]:
                     # present correct evidence
