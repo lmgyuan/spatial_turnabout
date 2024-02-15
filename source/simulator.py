@@ -55,6 +55,7 @@ def get_input(past_dialogs, turn_data, court_record):
                 except openai.error.InvalidRequestError:
                     print("Input too long, truncating past dialogs")
                     past_dialogs = past_dialogs[2:]
+                    continue
                 gpt_run_success = True
             print(gen_json)
             response_dict = {"role": "assistant", "content": gen_json}
@@ -192,7 +193,7 @@ def simulate(case_data):
                     past_dialogs.append({"role": "user", "content": turn_data["present"]["wrong_present_response"]})
 
 def main():
-    with open("../case_data/{}.json".format(args.case), 'r') as file:
+    with open("../case_data/hand_coded/{}.json".format(args.case), 'r') as file:
         case_data = json.load(file)
 
     simulate(case_data)
