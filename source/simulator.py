@@ -1,6 +1,7 @@
 import argparse
 import json
 from run_gpt import run_chatgpt
+import openai
 
 WRONG_EVIDENCE_RESPONSE = open("../case_data/wrong_evidence_response.txt", "r").read()
 TRUNCATE_PAST_DIALOGS = 6
@@ -18,7 +19,7 @@ def get_input(past_dialogs, turn_data, court_record):
         if turn_data["category"] == "multiple_choice":
             prompt = "Select one of the following choices:\n"
             choices = []
-            for i, action_data in enumerate(turn_data["actions"]):
+            for i, action_data in enumerate(turn_data["choices"]):
                 prompt += str(i) + " " + action_data["choice"] + "\n"
                 choices.append(action_data["choice"])
             prompt += 'Answer the question with a JSON object in the format of {"answer": <number of the choice>}, for example {"answer": 0}. Otherwise, you could view the court record by answering with a JSON object in the format of {"action": "court record"}.'
@@ -46,8 +47,15 @@ def get_input(past_dialogs, turn_data, court_record):
         #if len(past_dialogs) > TRUNCATE_PAST_DIALOGS:
         #    past_dialogs = past_dialogs[-TRUNCATE_PAST_DIALOGS:]
         is_json_well_formed = False
-        while not is_json_well_formed:   
-            gen_json = run_chatgpt(past_dialogs, args.player)
+        while not is_json_well_formed:
+            gpt_run_success = False
+            while not gpt_run_success:
+                try:
+                    gen_json = run_chatgpt(past_dialogs, args.player)
+                except openai.error.InvalidRequestError:
+                    print("Input too long, truncating past dialogs")
+                    past_dialogs = past_dialogs[2:]
+                gpt_run_success = True
             print(gen_json)
             response_dict = {"role": "assistant", "content": gen_json}
             past_dialogs.append(response_dict)
@@ -65,7 +73,7 @@ def get_input(past_dialogs, turn_data, court_record):
                         print(gen_json)
                         raise ValueError("Invalid action")
                 elif turn_data["category"] == "present":
-                    gen_text = evidences[json.loads(gen_json)["evidence"]]
+                    gen_text = json.loads(gen_json)["evidence"]
             except json.decoder.JSONDecodeError:
                 past_dialogs.append({"role": "user", "content": "Your previous input was not a well-formed JSON. Please try again."})
                 continue
@@ -107,12 +115,12 @@ def simulate(case_data):
         for add_person in turn_data["court_record"]["add"]["people"]:
             court_record["people"].append(add_person)
         # TODO: logic for modify is TBD
-        if False:
-        #if turn_data["category"] == "multiple_choice":
+        #if False:
+        if turn_data["category"] == "multiple_choice":
             can_proceed = False
             while not can_proceed:
                 print("\n===Multiple Choice===\n")
-                for action_data in turn_data["actions"]:
+                for action_data in turn_data["choices"]:
                     print(action_data["choice"])
                 print("\n> ")
                 user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
@@ -120,17 +128,18 @@ def simulate(case_data):
                     print(list_court_record(court_record))
                     past_dialogs.append({"role": "user", "content": list_court_record(court_record)})
                     continue
-                for action_data in turn_data["actions"]:
-                    if user_input == action_data["choice"]:
-                        #print(action_data["response"])
-                        past_dialogs.append({"role": "user", "content": action_data["response"]})
-                        if action_data["is_correct"] == 1:
-                            can_proceed = True
-                        break
-                else:
-                    print("Invalid input")
+                user_choice_index = user_input
+                try:
+                    action_data = turn_data["choices"][int(user_choice_index)]
+                except IndexError:
+                    print("Index out of range")
+                    continue
+                #print(action_data["response"])
+                past_dialogs.append({"role": "user", "content": action_data["response"]})
+                if action_data["is_correct"] == 1:
+                    can_proceed = True
         #if False:
-        if turn_data["category"] == "cross_examination":
+        elif turn_data["category"] == "cross_examination":
             can_proceed = False
             while not can_proceed:
                 print("\n===Cross Examination===\n")
@@ -149,7 +158,7 @@ def simulate(case_data):
                 action_data = turn_data["testimonies"][int(user_testimony_index)]
                 # press any testimony
                 if user_action == "press":
-                    print(action_data["press_response"])
+                    #print(action_data["press_response"])
                     past_dialogs.append({"role": "user", "content": action_data["press_response"]})
                     if action_data["critical_press"] == 1:
                         pass # TODO: modify the testimony
@@ -157,13 +166,13 @@ def simulate(case_data):
                 elif user_action == "present":
                     if "correct_present" in action_data and user_evidence in action_data["correct_present"]:
                         can_proceed = True
-                        print(action_data["present_response"])
+                        #print(action_data["present_response"])
                         past_dialogs.append({"role": "user", "content": action_data["present_response"]})
                     else:
-                        print(WRONG_EVIDENCE_RESPONSE)
+                        #print(WRONG_EVIDENCE_RESPONSE)
                         past_dialogs.append({"role": "user", "content": WRONG_EVIDENCE_RESPONSE})
-        if False:
-        #elif turn_data["category"] == "present":
+        #if False:
+        elif turn_data["category"] == "present":
             can_proceed = False
             while not can_proceed:
                 print("\n===Present===\n")
@@ -173,23 +182,14 @@ def simulate(case_data):
                     print(list_court_record(court_record))
                     past_dialogs.append({"role": "user", "content": list_court_record(court_record)})
                     continue
-                user_choice = user_input
-                for action_data in turn_data["actions"]:
-                    # present correct evidence
-                    if action_data["evidence"] == user_evidence:
-                        assert action_data["is_correct"] == 1
-                        can_proceed = True
-                        #print(action_data["response"])
-                        past_dialogs.append({"role": "user", "content": action_data["response"]})
-                        break
-                    # present incorrect evidence
-                    elif action_data["evidence"] == "WRONG_EVIDENCE":
-                        #print(action_data["response"])
-                        past_dialogs.append({"role": "user", "content": action_data["response"]})
-                        break
+                user_evidence = court_record["objects"][int(user_input)]["name"]
+                if user_evidence in turn_data["present"]["correct_present"]:
+                    can_proceed = True
+                    #print(turn_data["present"]["correct_present_response"])
+                    past_dialogs.append({"role": "user", "content": turn_data["present"]["correct_present_response"]})
                 else:
-                    print("Invalid input")
-        #break
+                    #print(turn_data["present"]["wrong_present_response"])
+                    past_dialogs.append({"role": "user", "content": turn_data["present"]["wrong_present_response"]})
 
 def main():
     with open("../case_data/{}.json".format(args.case), 'r') as file:
