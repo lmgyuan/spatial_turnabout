@@ -93,12 +93,12 @@ def list_court_record(court_record):
     count = 0
     for obj in court_record["objects"]:
         output += str(count) + " " + obj["name"] + "\n"
-        output += "  " + obj["description"] + "\n"
+        output += ":  " + obj["description"] + "\n"
         count += 1
     output += "\nPeople:\n"
     for person in court_record["people"]:
         output += str(count) + " " + person["name"] + "\n"
-        output += "  " + person["description"] + "\n"
+        output += ":  " + person["description"] + "\n"
         count += 1
     output += "This is the end of the court record. Please resume your task above."
     return output
@@ -120,8 +120,8 @@ def simulate(case_data):
             can_proceed = False
             while not can_proceed:
                 print("\n===Multiple Choice===\n")
-                for action_data in turn_data["choices"]:
-                    print(action_data["choice"])
+                for i, action_data in enumerate(turn_data["choices"]):
+                    print(str(i) + ": " + action_data["choice"])
                 print("\n> ")
                 user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
                 if user_input == "court record":
