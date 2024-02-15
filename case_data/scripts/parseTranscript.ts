@@ -27,11 +27,9 @@ async function main() {
     return;
   }
 
-  // let $: cheerio.CheerioAPI;
   let dom: JSDOM;
   try {
     dom = new JSDOM(rawTranscript);
-    // $ = cheerio.load(rawTranscript);
   } catch (e) {
     consola.fatal("Malformed HTML in case_data/generated/raw/1-1.html");
     consola.log(e);
