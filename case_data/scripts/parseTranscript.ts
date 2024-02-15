@@ -83,35 +83,33 @@ function parseRawHtmlCaseTranscript(contentWrapper: Element) {
     // of context is the question.
     const context = contextBufferLines.map((line) => line.trim()).join("\n");
 
-    // Find all the actions for this question (they're all table children)
-    const actionTables = [child];
+    // Find all the choices for this question (they're all table children)
+    const choicesTables = [child];
     childIndex += 1;
     for (; childIndex < contentWrapper.children.length; ++childIndex) {
       if (contentWrapper.children[childIndex].tagName !== "TABLE") {
         break;
       }
-      actionTables.push(contentWrapper.children[childIndex]);
+      choicesTables.push(contentWrapper.children[childIndex]);
     }
 
-    const actions = actionTables.map((actionTable) => {
-      const actionTableRows = actionTable.querySelectorAll("tr");
-      if (actionTableRows.length !== 2) {
+    const choices = choicesTables.map((choiceTable) => {
+      const choiceTableRows = choiceTable.querySelectorAll("tr");
+      if (choiceTableRows.length !== 2) {
         throw new Error(
-          `Unexpected action table format, got an action table with ${actionTableRows.length} rows`
+          `Unexpected choice table format, got an action table with ${choiceTableRows.length} rows`
         );
       }
-      const choice = actionTableRows[0].textContent.trim();
-      const response = actionTableRows[1].textContent.trim();
+      const choice = choiceTableRows[0].textContent.trim();
+      const response = choiceTableRows[1].textContent.trim();
       if (response.includes("Leads to")) {
         return {
-          action: "choose",
           choice,
           is_correct: 1,
           response: "",
         };
       }
       return {
-        action: "choose",
         choice,
         is_correct: 0,
         response,
@@ -121,7 +119,7 @@ function parseRawHtmlCaseTranscript(contentWrapper: Element) {
     caseData.push({
       context,
       type: "multiple_choice",
-      actions,
+      choices,
     });
 
     ++childIndex;
