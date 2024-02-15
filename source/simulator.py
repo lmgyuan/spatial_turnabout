@@ -3,7 +3,7 @@ import json
 from run_gpt import run_chatgpt
 import openai
 
-WRONG_EVIDENCE_RESPONSE = open("../case_data/wrong_evidence_response.txt", "r").read()
+WRONG_EVIDENCE_RESPONSE = open("../case_data/hand_coded/wrong_evidence_response.txt", "r").read()
 TRUNCATE_PAST_DIALOGS = 6
 
 parser = argparse.ArgumentParser(description='')
