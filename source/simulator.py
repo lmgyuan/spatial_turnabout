@@ -110,7 +110,7 @@ def simulate(case_data):
     past_dialogs = []
     for turn, turn_data in case_data.items():
         #print("Turn: {}".format(turn) + "\n" + "-"*10 + "\n")
-        #print(turn_data["context"])
+        print(turn_data["context"])
         for add_object in turn_data["court_record"]["add"]["objects"]:
             court_record["objects"].append(add_object)
         for add_person in turn_data["court_record"]["add"]["people"]:
