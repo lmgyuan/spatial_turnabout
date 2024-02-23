@@ -121,6 +121,7 @@ def simulate(case_data):
             can_proceed = False
             while not can_proceed:
                 print("\n===Multiple Choice===\n")
+                print("\nTo choose, enter '<number of the choice>'.\n")
                 for i, action_data in enumerate(turn_data["choices"]):
                     print(str(i) + ": " + action_data["choice"])
                 print("\n> ")
@@ -146,6 +147,7 @@ def simulate(case_data):
                 print("\n===Cross Examination===\n")
                 for i, action_data in enumerate(turn_data["testimonies"]):
                     print(str(i) + ": " + action_data["testimony"])
+                print("\nTo press, enter 'press@<number of the testimony>'. To present evidence, enter 'present@<number of the evidence>@<number of the testimony>'.\n")
                 print("\n> ")
                 user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
                 if user_input == "court record":
@@ -177,6 +179,7 @@ def simulate(case_data):
             can_proceed = False
             while not can_proceed:
                 print("\n===Present===\n")
+                print("\nTo present evidence, enter '<number of the evidence>'.\n")
                 print("\n> ")
                 user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
                 if user_input == "court record":
