@@ -15,6 +15,8 @@ const CASE_DATA_PARSED_DIRECTORY = path.join(
   "parsed"
 );
 
+let document: Document = null;
+
 async function main() {
   consola.start("Parsing transcript for 1-1");
 
@@ -36,7 +38,7 @@ async function main() {
     return;
   }
 
-  const document = dom.window.document;
+  document = dom.window.document;
 
   // const contentWrapper = $('.mw-parser-output');
   const contentWrapper = document.querySelector(".mw-parser-output");
@@ -71,7 +73,7 @@ function parseRawHtmlCaseTranscript(contentWrapper: Element) {
     // Normal case: Grab the text and append to the temporary "context"
     // buffer
     if (child.tagName !== "TABLE") {
-      contextBufferLines.push(child.textContent);
+      contextBufferLines.push(getTextContentFromElement(child));
       ++childIndex;
       continue;
     }
@@ -81,7 +83,7 @@ function parseRawHtmlCaseTranscript(contentWrapper: Element) {
 
     // If we see a table, then we're at a decision point. The last line
     // of context is the question.
-    const context = contextBufferLines.map((line) => line.trim()).join("\n");
+    const context = contextBufferLines.join("\n").trim();
 
     // Find all the choices for this question (they're all table children)
     const choicesTables = [child];
@@ -100,25 +102,18 @@ function parseRawHtmlCaseTranscript(contentWrapper: Element) {
           `Unexpected choice table format, got an action table with ${choiceTableRows.length} rows`
         );
       }
-      const choice = choiceTableRows[0].textContent.trim();
-      const response = choiceTableRows[1].textContent.trim();
-      if (response.includes("Leads to")) {
-        return {
-          choice,
-          is_correct: 1,
-          response: "",
-        };
-      }
+      const choice = getTextContentFromElement(choiceTableRows[0]);
+      const { isCorrect, responseText } = getResponseText(choiceTableRows[1]);
       return {
         choice,
-        is_correct: 0,
-        response,
+        is_correct: isCorrect ? 1 : 0,
+        response: responseText,
       };
     });
 
     caseData.push({
       context,
-      type: "multiple_choice",
+      category: "multiple_choice",
       choices,
     });
 
@@ -129,6 +124,37 @@ function parseRawHtmlCaseTranscript(contentWrapper: Element) {
   const finalCaseData = {};
   caseData.forEach((caseStep, i) => (finalCaseData[i.toString()] = caseStep));
   return finalCaseData;
+}
+
+function getTextContentFromElement(el: Element): string {
+  // First replace all <br /> with "\n"
+  el.querySelectorAll("br").forEach((lineBreakEl) => {
+    const newLineEl = document.createElement("span");
+    newLineEl.textContent = "\n";
+    lineBreakEl.replaceWith(newLineEl);
+  });
+  return el.textContent.trim();
+}
+
+function getResponseText(el: Element): {
+  isCorrect: boolean;
+  responseText: string;
+} {
+  const isCorrect = Array.from(el.querySelectorAll("i")).some((iEl) =>
+    iEl.textContent.includes("Leads to")
+  );
+  let responseText = getTextContentFromElement(el);
+  if (isCorrect) {
+    // Remove everything after "Leads to:" since they'll be part of the next
+    // segment's context.
+    responseText = responseText.replaceAll(/Leads (back )?to[\s\S]*\n/gm, "");
+  } else {
+    // Remove the "Leads back to:", but retain the next lines since they
+    // have leading questions from the judge/prosecutor.
+    // (`.` does not match newlines.)
+    responseText = responseText.replaceAll(/Leads (back )?to.*\n/gm, "");
+  }
+  return { isCorrect, responseText };
 }
 
 main();
