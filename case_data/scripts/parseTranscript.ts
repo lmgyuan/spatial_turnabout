@@ -70,55 +70,57 @@ function parseRawHtmlCaseTranscript(contentWrapper: Element) {
   while (childIndex < contentWrapper.children.length) {
     const child = contentWrapper.children[childIndex];
 
-    // Normal case: Grab the text and append to the temporary "context"
+    // CASE 1: MULTIPLE CHOICE QUESTION
+    if (child.tagName === "TABLE") {
+      // If we see a table, then we're at a decision point. The last line
+      // of context is the question.
+      const context = contextBufferLines.join("\n").trim();
+
+      // Find all the choices for this question (they're all table children)
+      const choicesTables = [child];
+      childIndex += 1;
+      for (; childIndex < contentWrapper.children.length; ++childIndex) {
+        if (contentWrapper.children[childIndex].tagName !== "TABLE") {
+          break;
+        }
+        choicesTables.push(contentWrapper.children[childIndex]);
+      }
+
+      const choices = choicesTables.map((choiceTable) => {
+        const choiceTableRows = choiceTable.querySelectorAll("tr");
+        if (choiceTableRows.length !== 2) {
+          throw new Error(
+            `Unexpected choice table format, got an action table with ${choiceTableRows.length} rows`
+          );
+        }
+        const choice = getTextContentFromElement(choiceTableRows[0]);
+        const { isCorrect, responseText } = getResponseText(choiceTableRows[1]);
+        return {
+          choice,
+          is_correct: isCorrect ? 1 : 0,
+          response: responseText,
+        };
+      });
+
+      caseData.push({
+        context,
+        category: "multiple_choice",
+        choices,
+      });
+
+      ++childIndex;
+      contextBufferLines = [];
+    }
+    // TODO: This script assumes that a transcript contains ONLY MCQs
+    // (Can't handle cross-examinations yet.)
+    //
+    // DEFAULT CASE: Grab the text and append to the temporary "context"
     // buffer
-    if (child.tagName !== "TABLE") {
+    else {
       contextBufferLines.push(getTextContentFromElement(child));
       ++childIndex;
       continue;
     }
-
-    // TODO: This script assumes that a transcript contains ONLY MCQs
-    // (Can't handle cross-examinations yet.)
-
-    // If we see a table, then we're at a decision point. The last line
-    // of context is the question.
-    const context = contextBufferLines.join("\n").trim();
-
-    // Find all the choices for this question (they're all table children)
-    const choicesTables = [child];
-    childIndex += 1;
-    for (; childIndex < contentWrapper.children.length; ++childIndex) {
-      if (contentWrapper.children[childIndex].tagName !== "TABLE") {
-        break;
-      }
-      choicesTables.push(contentWrapper.children[childIndex]);
-    }
-
-    const choices = choicesTables.map((choiceTable) => {
-      const choiceTableRows = choiceTable.querySelectorAll("tr");
-      if (choiceTableRows.length !== 2) {
-        throw new Error(
-          `Unexpected choice table format, got an action table with ${choiceTableRows.length} rows`
-        );
-      }
-      const choice = getTextContentFromElement(choiceTableRows[0]);
-      const { isCorrect, responseText } = getResponseText(choiceTableRows[1]);
-      return {
-        choice,
-        is_correct: isCorrect ? 1 : 0,
-        response: responseText,
-      };
-    });
-
-    caseData.push({
-      context,
-      category: "multiple_choice",
-      choices,
-    });
-
-    ++childIndex;
-    contextBufferLines = [];
   }
 
   const finalCaseData = {};
