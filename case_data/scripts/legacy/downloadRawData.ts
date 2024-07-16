@@ -3,12 +3,20 @@ import { existsSync } from "fs";
 import { mkdir, writeFile } from "fs/promises";
 import * as path from "path";
 import fetch from "node-fetch";
-import { CASE_DATA_ROOT_DIRECTORY } from "./utils";
+// @ts-ignore
+import { CASE_DATA_ROOT_DIRECTORY } from "./utils.ts";
 
 // Follow-up: Download transcripts linked from category page:
 // https://aceattorney.fandom.com/wiki/Category:Transcripts
-const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGE =
-  "https://aceattorney.fandom.com/wiki/The_First_Turnabout_-_Transcript";
+const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
+    "https://aceattorney.fandom.com/wiki/The_First_Turnabout_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Sisters_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Sisters_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Sisters_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Sisters_-_Transcript_-_Part_4",
+];
+
+
 
 const CASE_DATA_RAW_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "raw");
 
@@ -16,17 +24,21 @@ async function main() {
   consola.start("Downloading raw transcript data to case_data/generated/raw");
 
   if (!existsSync(CASE_DATA_RAW_DIRECTORY)) {
-    await mkdir(CASE_DATA_RAW_DIRECTORY);
+    await mkdir(CASE_DATA_RAW_DIRECTORY, { recursive: true });
   }
 
   consola.log("Downloading First Turnabout...");
   try {
-    const categoryResult = await fetch(FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGE);
-    const categoryText = await categoryResult.text();
-    await writeFile(
-      path.join(CASE_DATA_RAW_DIRECTORY, "1-1.html"),
-      categoryText
-    );
+    for (let i = 0; i < FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES.length; i++) {
+      const PAGE = FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES[i];
+      const categoryResult = await fetch(PAGE);
+      const categoryText = await categoryResult.text();
+      const pageName = PAGE.split("/").pop();
+          await writeFile(
+              path.join(CASE_DATA_RAW_DIRECTORY, pageName + ".html"),
+              categoryText
+          );
+    }
   } catch (e) {
     consola.fatal("Failed to download category page", e);
     return;
@@ -35,4 +47,4 @@ async function main() {
   consola.success("Downloaded 1-1.hml");
 }
 
-void main();
+main();
