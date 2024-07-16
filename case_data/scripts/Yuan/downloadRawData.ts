@@ -4,7 +4,7 @@ import { mkdir, writeFile } from "fs/promises";
 import * as path from "path";
 import fetch from "node-fetch";
 // @ts-ignore
-import { CASE_DATA_ROOT_DIRECTORY } from "./utils.ts";
+import { CASE_DATA_ROOT_DIRECTORY } from "../legacy/utils.ts";
 
 // Follow-up: Download transcripts linked from category page:
 // https://aceattorney.fandom.com/wiki/Category:Transcripts
