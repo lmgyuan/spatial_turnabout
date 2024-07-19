@@ -14,6 +14,18 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     "https://aceattorney.fandom.com/wiki/Turnabout_Sisters_-_Transcript_-_Part_2",
     "https://aceattorney.fandom.com/wiki/Turnabout_Sisters_-_Transcript_-_Part_3",
     "https://aceattorney.fandom.com/wiki/Turnabout_Sisters_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Samurai_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Samurai_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Samurai_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Samurai_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Samurai_-_Transcript_-_Part_5",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Samurai_-_Transcript_-_Part_6",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_5",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_6",
 ];
 
 
