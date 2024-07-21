@@ -26,10 +26,11 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_4",
     "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_5",
     "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_6",
+    "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_Phoenix_Wright:_Ace_Attorney"
 ];
 
 
-
+const CASE_OBJECT_RAW_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "objects_raw");
 const CASE_DATA_RAW_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "raw");
 
 async function main() {
@@ -39,6 +40,10 @@ async function main() {
     await mkdir(CASE_DATA_RAW_DIRECTORY, { recursive: true });
   }
 
+    if (!existsSync(CASE_OBJECT_RAW_DIRECTORY)) {
+        await mkdir(CASE_OBJECT_RAW_DIRECTORY, { recursive: true });
+    }
+
   consola.log("Downloading First Turnabout...");
   try {
     for (let i = 0; i < FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES.length; i++) {
@@ -46,10 +51,17 @@ async function main() {
       const categoryResult = await fetch(PAGE);
       const categoryText = await categoryResult.text();
       const pageName = PAGE.split("/").pop();
-          await writeFile(
-              path.join(CASE_DATA_RAW_DIRECTORY, pageName + ".html"),
-              categoryText
-          );
+      if (pageName.startsWith("List_of_Evidence")) {
+        await writeFile(
+            path.join(CASE_OBJECT_RAW_DIRECTORY, pageName + ".html"),
+            categoryText
+        );
+      } else {
+        await writeFile(
+            path.join(CASE_DATA_RAW_DIRECTORY, pageName + ".html"),
+            categoryText
+        );
+      }
     }
   } catch (e) {
     consola.fatal("Failed to download category page", e);
