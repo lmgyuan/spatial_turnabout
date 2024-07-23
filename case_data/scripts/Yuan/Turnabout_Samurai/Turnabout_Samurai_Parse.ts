@@ -7,8 +7,8 @@ import { existsSync } from "fs";
 const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
 const HTML_FILE_PATHS = [];
 for (let i = 1; i <= 4; i++) {
-    HTML_FILE_PATHS.push(path.join(CASE_DATA_ROOT_DIRECTORY, `raw/Turnabout_Sisters_-_Transcript_-_Part_${i}.html`));
-    }
+    HTML_FILE_PATHS.push(path.join(CASE_DATA_ROOT_DIRECTORY, `raw/Turnabout_Samurai_-_Transcript_-_Part_${i}.html`));
+}
 const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "parsed");
 
 
@@ -51,12 +51,17 @@ async function main() {
 
         const parsedData = parseHtmlContent(contentWrapper, document, context, objects);
         consola.log("Writing parsed data to JSON file");
+        if (parsedData) {
+            console.log("Parsed data succeeded");
+        } else {
+            console.log("Parsed data failed");
+        }
         if (!existsSync(OUTPUT_DIRECTORY)) {
             await mkdir(OUTPUT_DIRECTORY);
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `Turnabout_Sisters_Parsed${i+1}.json`),
+            path.join(OUTPUT_DIRECTORY, `Turnabout_Samurai_Parsed${i+1}.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }
