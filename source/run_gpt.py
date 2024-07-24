@@ -1,7 +1,7 @@
 import openai
 import backoff
 
-@backoff.on_exception(backoff.expo, (openai.error.RateLimitError, openai.error.APIError, openai.error.Timeout, openai.error.ServiceUnavailableError))
+# @backoff.on_exception(backoff.expo, (openai.error.RateLimitError, openai.error.APIError, openai.error.Timeout, openai.error.ServiceUnavailableError))
 #def run_chatgpt(message, model, force_json=False, temperature=0):
 def run_chatgpt(message, model, temperature=0):
     if model == "gpt-4":
