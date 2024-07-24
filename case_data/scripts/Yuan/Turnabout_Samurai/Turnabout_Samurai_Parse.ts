@@ -1,6 +1,6 @@
 import * as path from "path";
 import consola from "consola";
-import { mkdir, readFile, writeFile } from "fs/promises";
+import {mkdir, readdir, readFile, writeFile} from "fs/promises";
 import { JSDOM } from "jsdom";
 import { existsSync } from "fs";
 
@@ -13,10 +13,20 @@ FULL_EVIDENCES.forEach((e, index) => {
     }
 })
 const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
-const HTML_FILE_PATHS = [];
-for (let i = 1; i <= 4; i++) {
-    HTML_FILE_PATHS.push(path.join(CASE_DATA_ROOT_DIRECTORY, `raw/Turnabout_Samurai_-_Transcript_-_Part_${i}.html`));
+
+// dynamically include all the Turnabout Samurai html files in the raw directory
+let HTML_FILE_PATHS = [];
+try {
+    // @ts-ignore
+    const files = await readdir(path.join(CASE_DATA_ROOT_DIRECTORY, "raw"));
+    HTML_FILE_PATHS = files
+        .filter(file => file.startsWith("Turnabout_Samurai") && file.endsWith(".html"))
+        .map(file => path.join(CASE_DATA_ROOT_DIRECTORY, "raw", file));
+} catch (e) {
+    consola.fatal("Could not read the directory or filter HTML files.");
+    consola.log(e);
 }
+
 const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "parsed");
 
 
@@ -97,13 +107,13 @@ function parseHtmlContent(contentWrapper: Element, document: Document, context, 
 }
 function findInitialListOfEvidence(contentWrapper: Element, initialEvidences: any[]) {
     let childIndex = 0;
-    let evidences = initialEvidences
+    let evidences = [...initialEvidences]
 
     while (childIndex < contentWrapper.children.length) {
         const child = contentWrapper.children[childIndex];
         if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
             if (child.textContent.toLowerCase().includes("added to the court record")) {
-                const objectName = child.textContent.split("added to the Court Record")[0].trim();
+                const objectName = child.textContent.split("added to the court record")[0].trim();
                 evidences.forEach((e, index) => {
                     if (e.name.trim().toLowerCase() === objectName.toLowerCase()) {
                         evidences.splice(index, 1); // Delete the item from the array

@@ -26,7 +26,11 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_4",
     "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_5",
     "https://aceattorney.fandom.com/wiki/Turnabout_Goodbyes_-_Transcript_-_Part_6",
-    "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_Phoenix_Wright:_Ace_Attorney"
+    "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_Phoenix_Wright:_Ace_Attorney",
+    "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_1:_The_First_Turnabout",
+    "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_2:_Turnabout_Sisters",
+    "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_3:_Turnabout_Samurai",
+    "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_4:_Turnabout_Goodbyes"
 ];
 
 
@@ -50,7 +54,10 @@ async function main() {
       const PAGE = FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES[i];
       const categoryResult = await fetch(PAGE);
       const categoryText = await categoryResult.text();
-      const pageName = PAGE.split("/").pop().replace(":", "");
+      let pageName = PAGE.split("/").pop().replace(":", "");
+      if (pageName.startsWith("Episode")) {
+          pageName = "List_of_People_in_" + pageName;
+      }
       if (pageName.startsWith("List_of_Evidence")) {
         await writeFile(
             path.join(CASE_OBJECT_RAW_DIRECTORY, pageName + ".html"),
