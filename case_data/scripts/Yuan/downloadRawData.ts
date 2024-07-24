@@ -50,7 +50,7 @@ async function main() {
       const PAGE = FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES[i];
       const categoryResult = await fetch(PAGE);
       const categoryText = await categoryResult.text();
-      const pageName = PAGE.split("/").pop();
+      const pageName = PAGE.split("/").pop().replace(":", "");
       if (pageName.startsWith("List_of_Evidence")) {
         await writeFile(
             path.join(CASE_OBJECT_RAW_DIRECTORY, pageName + ".html"),

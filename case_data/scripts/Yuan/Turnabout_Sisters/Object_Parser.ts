@@ -6,10 +6,10 @@ import { existsSync } from "fs";
 
 const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated/objects_raw";  // Define your root directory
 const OBJECT_FILES_NAMES = [
-    "List_of_Evidence_in_Phoenix_Wright:_Ace_Attorney.html"
+    "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html"
 ];
 const OBJECTS_HTML_FILE_PATHS = OBJECT_FILES_NAMES.map((fileName) => path.join(CASE_DATA_ROOT_DIRECTORY, fileName));
-const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "objects_parsed");
+const OUTPUT_DIRECTORY = "./case_data/scripts/generated/objects_parsed";
 
 type ObjectData = {
     currentChapter: string;
@@ -19,12 +19,8 @@ type ObjectData = {
     [key: `description${number}`]: string;
 };
 
-
 async function main() {
     consola.start("Parsing HTML file");
-
-    let context = "";
-    const objects = [];
 
     for (let i = 0; i < OBJECTS_HTML_FILE_PATHS.length; i++) {
         let rawHtml: string;
@@ -49,9 +45,7 @@ async function main() {
         }
 
         const document = dom.window.document;
-        console.log("Document object: ", document.documentElement);
         const contentWrapper = document.querySelector(".mw-parser-output");
-        console.log("contentWrapper: ", contentWrapper);
         if (!contentWrapper) {
             consola.fatal("Could not find the content wrapper element");
             return;
@@ -64,7 +58,7 @@ async function main() {
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `Turnabout_Sisters_Parsed${i+1}.json`),
+            path.join(OUTPUT_DIRECTORY, `Turnabout_Attorney_1_List_of_Evidence.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }
@@ -74,12 +68,16 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
     let data = [];
     let childIndex = 0;
     let currentChapter = "";
+    let chapterData = { chapter: "", evidences: [] };
 
-    while(childIndex < contentWrapper.children.length) {
+    while (childIndex < contentWrapper.children.length) {
         const child = contentWrapper.children[childIndex];
         if (child.tagName === "H2") {
+            if (chapterData.chapter) {
+                data.push(chapterData);
+            }
             currentChapter = child.querySelector("span").textContent.trim();
-            data.push({ chapter: currentChapter, content: "" });
+            chapterData = { chapter: currentChapter, evidences: [] };
         } else if (
             child.getAttribute('style') === 'color:#000;' +
             'border:3px solid #000;' +
@@ -91,12 +89,15 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
             '-icab-border-radius: 10px; ' +
             '-o-border-radius: 10px') {
             let tableData = parseTable(child, currentChapter);
-            if (tableData.description1.includes("↳")){
+            if (tableData.description1.includes("↳")) {
                 tableData = parseDescription(tableData);
             }
-            data.push(tableData)
+            chapterData.evidences.push(tableData);
         }
         ++childIndex;
+    }
+    if (chapterData.chapter) {
+        data.push(chapterData);
     }
     return data;
 }
@@ -112,7 +113,7 @@ function parseDescription(tableData: ObjectData): ObjectData {
 
 function parseTable(table: Element, currentChapter: string) {
     const rows = table.querySelectorAll("td");
-    let object:ObjectData = {currentChapter: currentChapter, name: "", type: "", obtained: "", description1: ""};
+    let object: ObjectData = { currentChapter: currentChapter, name: "", type: "", obtained: "", description1: "" };
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         if (i === 0) {
@@ -121,103 +122,11 @@ function parseTable(table: Element, currentChapter: string) {
             object.type = row.textContent.split(":").slice(1).join(" ").trim();
         } else if (i === 2) {
             object.obtained = row.textContent.split(":").slice(1).join(" ").trim();
-        }
-        else {
+        } else {
             object.description1 = row.textContent.trim();
         }
     }
-    // console.log("table object: ", object)
     return object;
 }
-//
-// function parseObjectTables(tables: NodeListOf<Element>) {
-//     let data = []
-//     for (let i = 0; i < tables.length; i ++) {
-//         data.push(parseTable(tables[i]));
-//     }
-//     console.log(data)
-//     return data
-// }
-//
-// function parseCrossExamination(contentWrapper: Element, startIndex: number, document: Document, context: string, objects: any[]) {
-//     const testimonies = [];
-//     let childIndex = startIndex;
-//     let secondBarIndex = startIndex;
-//
-//     // Skip the cross-examination text and move to testimonies
-//     while (secondBarIndex < contentWrapper.children.length) {
-//         const child = contentWrapper.children[secondBarIndex] as HTMLElement;
-//         if (child.tagName === "HR") {
-//             ++secondBarIndex; // Move past the <hr> tag
-//             break;
-//         }
-//         context += child.textContent.trim();
-//
-//         if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
-//             if (child.textContent.toLowerCase().includes("added to the court record")) {
-//                 const objectName = child.textContent.split("added to the Court Record")[0];
-//                 objects.push({ name: objectName, description: "TODO" });
-//             }
-//         }
-//
-//         ++secondBarIndex;
-//     }
-//
-//     for (; childIndex < contentWrapper.children.length; ++childIndex) {
-//         const child = contentWrapper.children[childIndex] as HTMLElement;
-//         if (child.tagName === "HR") break;
-//
-//         if (child.tagName === "P" && child.querySelector("span[style*='color:green']")) {
-//             const name = child.textContent.split('\n')[0].replace(":", "").trim();
-//             const comment = child.textContent.split('\n')[1].trim()
-//             const presentEvidence = getPresentEvidence(contentWrapper, childIndex, document, secondBarIndex);
-//             testimonies.push({ testimony: comment, person: name, present: presentEvidence });
-//         }
-//     }
-//
-//     return {
-//         category: "cross_examination",
-//         context: context,
-//         court_record: { objects },
-//         testimonies,
-//     };
-// }
-//
-// function getPresentEvidence(contentWrapper: Element, index: number, document: Document, secondBarIndex: number) {
-//     let evidence = [];
-//     index++;
-//     let child = contentWrapper.children[index] as HTMLElement;
-//
-//     while (child.tagName === "TABLE") {
-//         child = contentWrapper.children[index] as HTMLElement;
-//         /* TODO:
-//             Look at the relevant html codes about the evidence and extract the evidence name
-//             Also think about how to extract the present evidence response. It's a number of children down the html page.
-//          */
-//         const boxText = child.textContent.trim();
-//         if (boxText.includes("Present ")) {
-//             const texts = boxText.split("\n");
-//             for (let i = 0; i < texts.length; i++) {
-//                 if (texts[i].includes("Present ")) {
-//                     evidence.push(texts[i].replace("Present ", "").trim());
-//                 }
-//                 break;
-//             }
-//         }
-//
-//         index++;
-//     }
-//     return evidence;
-// }
-//
-// function getTextContentFromElement(el: Element, document: Document): string {
-//     el.querySelectorAll("br").forEach((br) => {
-//         const newLine = document.createElement("span");
-//         newLine.textContent = "\n";
-//         br.replaceWith(newLine);
-//     });
-//     return el.textContent.trim();
-// }
 
 main();
-
