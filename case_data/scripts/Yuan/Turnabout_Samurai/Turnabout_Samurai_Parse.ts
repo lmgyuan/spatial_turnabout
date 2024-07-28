@@ -12,6 +12,16 @@ FULL_EVIDENCES.forEach((e, index) => {
         CURR_CHAPTER_EVIDENCES = e.evidences;
     }
 })
+// @ts-ignore
+let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/scripts/generated/characters_parsed/Turnabout_Attorney_1_List_of_Characters.json", "utf-8"));
+let CURR_CHAPTER_CHARACTERS;
+FULL_CHARACTERS.forEach((e, index) => {
+    if (e.chapter == "Turnabout Samurai") {
+        CURR_CHAPTER_CHARACTERS = e.characters;
+    }
+})
+
+
 const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
 
 // dynamically include all the Turnabout Samurai html files in the raw directory
@@ -205,6 +215,7 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
     return {
         category: "cross_examination",
         context: context,
+        characters: CURR_CHAPTER_CHARACTERS,
         newContext: newContext,
         court_record: { evidence_objects },
         testimonies,

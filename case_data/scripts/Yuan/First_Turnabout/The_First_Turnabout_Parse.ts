@@ -13,6 +13,15 @@ FULL_EVIDENCES.forEach((e, index) => {
     }
 })
 
+// @ts-ignore
+let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/scripts/generated/characters_parsed/Turnabout_Attorney_1_List_of_Characters.json", "utf-8"));
+let CURR_CHAPTER_CHARACTERS;
+FULL_CHARACTERS.forEach((e, index) => {
+    if (e.chapter.trim() == "The First Turnabout") {
+        CURR_CHAPTER_CHARACTERS = e.characters;
+    }
+})
+
 const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
 let HTML_FILE_PATHS = [];
 // for (let i = 1; i <= 4; i++) {
@@ -126,6 +135,7 @@ function parseHtmlContent(contentWrapper: Element, document: Document, context, 
 
         if (child.tagName === "CENTER" && child.querySelector("span[style*='color:red']") && child.textContent.trim() === "Cross Examination") {
             const crossExamination = parseCrossExamination(contentWrapper, childIndex, document, context, evidence_objects, newContext);
+            console.log("Cross Examination: ", crossExamination);
             data.push(crossExamination);
             newContext = "";
         }
@@ -215,13 +225,12 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
         }
     }
 
-    /* TODO:
-         add the newContext variable to store the new context in other parsers
-    */
+
     return {
         category: "cross_examination",
         context: context,
-        newContext: newContext,
+        new_context: newContext,
+        characters: CURR_CHAPTER_CHARACTERS,
         court_record: { evidence_objects },
         testimonies,
     };
