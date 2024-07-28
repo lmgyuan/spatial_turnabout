@@ -30,7 +30,8 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_1:_The_First_Turnabout",
     "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_2:_Turnabout_Sisters",
     "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_3:_Turnabout_Samurai",
-    "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_4:_Turnabout_Goodbyes"
+    "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_4:_Turnabout_Goodbyes",
+    "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_Phoenix_Wright:_Ace_Attorney"
 ];
 
 
