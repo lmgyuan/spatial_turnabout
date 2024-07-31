@@ -2,13 +2,12 @@ import * as path from "path";
 import consola from "consola";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
-import { existsSync } from "fs";
+import fs from "fs"
 
-const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated/objects_raw";  // Define your root directory
-const OBJECT_FILES_NAMES = [
-    "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html"
-];
-const OBJECTS_HTML_FILE_PATHS = OBJECT_FILES_NAMES.map((fileName) => path.join(CASE_DATA_ROOT_DIRECTORY, fileName));
+const OBJECT_RAW_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated/objects_raw";  // Define your root directory
+const OBJECT_FILES_NAMES = fs.readdirSync(OBJECT_RAW_DATA_ROOT_DIRECTORY).filter((fileName) => fileName.endsWith(".html"));
+
+const OBJECTS_HTML_FILE_PATHS = OBJECT_FILES_NAMES.map((fileName) => path.join(OBJECT_RAW_DATA_ROOT_DIRECTORY, fileName));
 const OUTPUT_DIRECTORY = "./case_data/scripts/generated/objects_parsed";
 
 type ObjectData = {
@@ -53,12 +52,12 @@ async function main() {
 
         const parsedData = parseHTMLContent(contentWrapper, document);
         consola.log("Writing parsed data to JSON file");
-        if (!existsSync(OUTPUT_DIRECTORY)) {
+        if (!fs.existsSync(OUTPUT_DIRECTORY)) {
             await mkdir(OUTPUT_DIRECTORY);
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `Turnabout_Attorney_1_List_of_Evidence.json`),
+            path.join(OUTPUT_DIRECTORY, `${OBJECT_FILES_NAMES[i].split(".html")[0]}.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }

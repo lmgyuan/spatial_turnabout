@@ -2,11 +2,11 @@ import * as path from "path";
 import consola from "consola";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
-import { existsSync } from "fs";
+import fs from "fs";
 
 const OUTPUT_DIRECTORY = "./case_data/scripts/generated/characters_parsed/";
 const CHARACTERS_HTML_FILE_DIRECTORY = "./case_data/scripts/generated/raw/";
-const CHARACTERS_HTML_FILE_NAMES = [ "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html"]
+const CHARACTERS_HTML_FILE_NAMES = fs.readdirSync(CHARACTERS_HTML_FILE_DIRECTORY).filter((fileName) => fileName.startsWith("List_of_Profiles_in"));
 const CHARACTERS_HTML_FILE_PATHS = CHARACTERS_HTML_FILE_NAMES.map((fileName) => path.join(CHARACTERS_HTML_FILE_DIRECTORY, fileName));
 
 mkdir(OUTPUT_DIRECTORY).catch((e) => {
@@ -60,12 +60,12 @@ async function main() {
 
         const parsedData = parseHTMLContent(contentWrapper, document);
         consola.log("Writing parsed data to JSON file");
-        if (!existsSync(OUTPUT_DIRECTORY)) {
+        if (!fs.existsSync(OUTPUT_DIRECTORY)) {
             await mkdir(OUTPUT_DIRECTORY);
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `Turnabout_Attorney_1_List_of_Characters.json`),
+            path.join(OUTPUT_DIRECTORY, `${CHARACTERS_HTML_FILE_NAMES[i].split(".html")[0]}.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }
