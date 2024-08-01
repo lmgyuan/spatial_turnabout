@@ -32,6 +32,11 @@ async function main() {
     for (let i = 0; i < CHARACTERS_HTML_FILE_PATHS.length; i++) {
         let rawHtml: string;
         const HTML_FILE_PATH = CHARACTERS_HTML_FILE_PATHS[i];
+        if (path.join(CHARACTERS_HTML_FILE_DIRECTORY, "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html") === HTML_FILE_PATH) {
+            console.log("Skipping List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html");
+            continue;
+        }
+
         try {
             rawHtml = await readFile(HTML_FILE_PATH, "utf-8");
             console.log("Raw HTML content read successfully.");
@@ -83,7 +88,14 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
             if (chapterData.chapter) {
                 data.push(chapterData);
             }
-            currentChapter = child.querySelector("span").textContent.trim();
+
+            // split by [ to remove the [] at the end of the chapter name
+            currentChapter = child.textContent.split("[")[0].trim();
+            // handle a special character. If the chapter name includes a special character, replace it with a space
+            // Found it when parsing the List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_Justice_For_All.html
+            if (currentChapter.includes(" ")) {
+                currentChapter = currentChapter.replace(" ", " ");
+            }
             chapterData = { chapter: currentChapter, characters: [] };
         } else if (
             child.getAttribute('style') === 'color:#000;' +

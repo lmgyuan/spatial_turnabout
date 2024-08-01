@@ -34,7 +34,19 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     "https://strategywiki.org/wiki/Phoenix_Wright:_Ace_Attorney/Episode_4:_Turnabout_Goodbyes",
     "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_Phoenix_Wright:_Ace_Attorney",
     "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_Phoenix_Wright:_Ace_Attorney_-_Justice_for_All",
-    "https://aceattorney.fandom.com/wiki/The_Lost_Turnabout_-_Transcript"
+    "https://aceattorney.fandom.com/wiki/The_Lost_Turnabout_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/Reunion,_and_Turnabout_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Reunion,_and_Turnabout_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Reunion,_and_Turnabout_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Reunion,_and_Turnabout_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Big_Top_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Big_Top_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Big_Top_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Big_Top_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Farewell,_My_Turnabout_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Farewell,_My_Turnabout_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Farewell,_My_Turnabout_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Farewell,_My_Turnabout_-_Transcript_-_Part_4",
 ];
 
 
@@ -56,9 +68,13 @@ async function main() {
     for (let i = 0; i < FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES.length; i++) {
       consola.log("Downloading " + FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES[i] + "...");
       const PAGE = FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES[i];
+      let pageName = PAGE.split("/").pop().replace(":", "");
+      if (existsSync(path.join(CASE_DATA_RAW_DIRECTORY, pageName + ".html"))) {
+        consola.log("File already exists, skipping...");
+        continue;
+      }
       const categoryResult = await fetch(PAGE);
       const categoryText = await categoryResult.text();
-      let pageName = PAGE.split("/").pop().replace(":", "");
       if (pageName.startsWith("Episode")) {
           pageName = "List_of_People_in_" + pageName;
       }
