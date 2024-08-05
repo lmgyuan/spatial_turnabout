@@ -2,29 +2,41 @@ import * as path from "path";
 import consola from "consola";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
-import { existsSync } from "fs";
+import fs from "fs";
 
-const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated/objects_raw";  // Define your root directory
-const OBJECT_FILES_NAMES = [
-    "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html"
-];
-const OBJECTS_HTML_FILE_PATHS = OBJECT_FILES_NAMES.map((fileName) => path.join(CASE_DATA_ROOT_DIRECTORY, fileName));
-const OUTPUT_DIRECTORY = "./case_data/scripts/generated/objects_parsed";
+const OUTPUT_DIRECTORY = "./case_data/scripts/generated/characters_parsed/";
+const CHARACTERS_HTML_FILE_DIRECTORY = "./case_data/scripts/generated/raw/";
+const CHARACTERS_HTML_FILE_NAMES = fs.readdirSync(CHARACTERS_HTML_FILE_DIRECTORY).filter((fileName) => fileName.startsWith("List_of_Profiles_in"));
+const CHARACTERS_HTML_FILE_PATHS = CHARACTERS_HTML_FILE_NAMES.map((fileName) => path.join(CHARACTERS_HTML_FILE_DIRECTORY, fileName));
 
-type ObjectData = {
+mkdir(OUTPUT_DIRECTORY).catch((e) => {
+    if (e.code !== "EEXIST") {
+        consola.fatal("Could not create output directory");
+        consola.log(e);
+        process.exit(1);
+    }
+})
+
+type CharacterData = {
     currentChapter: string;
     name: string;
-    type: string;
-    obtained: string;
+    age: string;
     [key: `description${number}`]: string;
+    gender: string;
 };
+
 
 async function main() {
     consola.start("Parsing HTML file");
 
-    for (let i = 0; i < OBJECTS_HTML_FILE_PATHS.length; i++) {
+    for (let i = 0; i < CHARACTERS_HTML_FILE_PATHS.length; i++) {
         let rawHtml: string;
-        const HTML_FILE_PATH = OBJECTS_HTML_FILE_PATHS[i];
+        const HTML_FILE_PATH = CHARACTERS_HTML_FILE_PATHS[i];
+        if (path.join(CHARACTERS_HTML_FILE_DIRECTORY, "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html") === HTML_FILE_PATH) {
+            console.log("Skipping List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html");
+            continue;
+        }
+
         try {
             rawHtml = await readFile(HTML_FILE_PATH, "utf-8");
             console.log("Raw HTML content read successfully.");
@@ -53,12 +65,12 @@ async function main() {
 
         const parsedData = parseHTMLContent(contentWrapper, document);
         consola.log("Writing parsed data to JSON file");
-        if (!existsSync(OUTPUT_DIRECTORY)) {
+        if (!fs.existsSync(OUTPUT_DIRECTORY)) {
             await mkdir(OUTPUT_DIRECTORY);
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `Turnabout_Attorney_1_List_of_Evidence.json`),
+            path.join(OUTPUT_DIRECTORY, `${CHARACTERS_HTML_FILE_NAMES[i].split(".html")[0]}.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }
@@ -68,7 +80,7 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
     let data = [];
     let childIndex = 0;
     let currentChapter = "";
-    let chapterData = { chapter: "", evidences: [] };
+    let chapterData = { chapter: "", characters: [] };
 
     while (childIndex < contentWrapper.children.length) {
         const child = contentWrapper.children[childIndex];
@@ -76,8 +88,15 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
             if (chapterData.chapter) {
                 data.push(chapterData);
             }
-            currentChapter = child.querySelector("span").textContent.trim();
-            chapterData = { chapter: currentChapter, evidences: [] };
+
+            // split by [ to remove the [] at the end of the chapter name
+            currentChapter = child.textContent.split("[")[0].trim();
+            // handle a special character. If the chapter name includes a special character, replace it with a space
+            // Found it when parsing the List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_Justice_For_All.html
+            if (currentChapter.includes(" ")) {
+                currentChapter = currentChapter.replace(" ", " ");
+            }
+            chapterData = { chapter: currentChapter, characters: [] };
         } else if (
             child.getAttribute('style') === 'color:#000;' +
             'border:3px solid #000;' +
@@ -92,7 +111,7 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
             if (tableData.description1.includes("↳")) {
                 tableData = parseDescription(tableData);
             }
-            chapterData.evidences.push(tableData);
+            chapterData.characters.push(tableData);
         }
         ++childIndex;
     }
@@ -102,7 +121,7 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
     return data;
 }
 
-function parseDescription(tableData: ObjectData): ObjectData {
+function parseDescription(tableData: CharacterData): CharacterData {
     let description = tableData.description1;
     let descriptions = description.split("↳");
     descriptions.forEach((desc, index) => {
@@ -113,15 +132,15 @@ function parseDescription(tableData: ObjectData): ObjectData {
 
 function parseTable(table: Element, currentChapter: string) {
     const rows = table.querySelectorAll("td");
-    let object: ObjectData = { currentChapter: currentChapter, name: "", type: "", obtained: "", description1: "" };
+    let object: CharacterData = { currentChapter: currentChapter, name: "", age: "", gender: "", description1: "" };
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         if (i === 0) {
             object.name = row.textContent.trim();
         } else if (i === 1) {
-            object.type = row.textContent.split(":").slice(1).join(" ").trim();
+            object.age = row.textContent.split(":").slice(1).join(" ").trim();
         } else if (i === 2) {
-            object.obtained = row.textContent.split(":").slice(1).join(" ").trim();
+            object.gender = row.textContent.split(":").slice(1).join(" ").trim();
         } else {
             object.description1 = row.textContent.trim();
         }

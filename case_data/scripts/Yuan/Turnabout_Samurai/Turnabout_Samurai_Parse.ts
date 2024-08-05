@@ -12,6 +12,16 @@ FULL_EVIDENCES.forEach((e, index) => {
         CURR_CHAPTER_EVIDENCES = e.evidences;
     }
 })
+// @ts-ignore
+let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/scripts/generated/characters_parsed/Turnabout_Attorney_1_List_of_Characters.json", "utf-8"));
+let CURR_CHAPTER_CHARACTERS;
+FULL_CHARACTERS.forEach((e, index) => {
+    if (e.chapter == "Turnabout Samurai") {
+        CURR_CHAPTER_CHARACTERS = e.characters;
+    }
+})
+
+
 const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
 
 // dynamically include all the Turnabout Samurai html files in the raw directory
@@ -34,6 +44,7 @@ async function main() {
     consola.start("Parsing HTML file");
 
     let context = "";
+    let newContext = "";
 
     for (let i = 0; i < HTML_FILE_PATHS.length; i++) {
         let rawHtml: string;
@@ -68,7 +79,9 @@ async function main() {
 
         const initialEvidences = findInitialListOfEvidence(contentWrapper, CURR_CHAPTER_EVIDENCES);
 
-        const parsedData = parseHtmlContent(contentWrapper, document, context, initialEvidences);
+        let parsedData = parseHtmlContent(contentWrapper, document, context, initialEvidences, newContext);
+        parsedData = parsedDataHandling(parsedData);
+
         consola.log("Writing parsed data to JSON file");
         if (!existsSync(OUTPUT_DIRECTORY)) {
             await mkdir(OUTPUT_DIRECTORY);
@@ -81,16 +94,44 @@ async function main() {
     }
 }
 
-function parseHtmlContent(contentWrapper: Element, document: Document, context, evidence_objects) {
+
+function parsedDataHandling(parsedData: any) {
+    // flag cross examinations that do not require players to present anything
+    if (!parsedData) {
+        return parsedData
+    }
+
+    // check if the cross examination has any present evidence
+    // if it does, set the no_present flag to false
+    // otherwise, set it to true
+    parsedData.forEach((data, index) => {
+        data['no_present'] = true;
+
+        for (let i = 0; i < data.testimonies.length; i++) {
+            if (data.testimonies[i].present.length > 0) {
+                data['no_present'] = false;
+                break;
+            }
+        }
+    })
+
+    return parsedData
+}
+
+function parseHtmlContent(contentWrapper: Element, document: Document, context, evidence_objects, newContext: string) {
     const data = [];
     let childIndex = 0;
 
     while (childIndex < contentWrapper.children.length) {
         const child = contentWrapper.children[childIndex];
 
+        context += child.textContent.trim();
+        newContext += child.textContent.trim();
+
         if (child.tagName === "CENTER" && child.querySelector("span[style*='color:red']") && child.textContent.trim() === "Cross Examination") {
-            const crossExamination = parseCrossExamination(contentWrapper, childIndex, document, context, evidence_objects);
+            const crossExamination = parseCrossExamination(contentWrapper, childIndex, document, context, evidence_objects, newContext);
             data.push(crossExamination);
+            newContext = "";
         }
 
         if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
@@ -98,7 +139,6 @@ function parseHtmlContent(contentWrapper: Element, document: Document, context, 
                 addEvidenceToCourtRecord(child.textContent.toLowerCase(), evidence_objects);
             }
         }
-        context += child.textContent.trim();
 
         ++childIndex;
     }
@@ -138,7 +178,7 @@ function addEvidenceToCourtRecord(childTextContent: string, evidence_objects: an
     };
 }
 
-function parseCrossExamination(contentWrapper: Element, startIndex: number, document: Document, context: string, evidence_objects: any[]) {
+function parseCrossExamination(contentWrapper: Element, startIndex: number, document: Document, context: string, evidence_objects: any[], newContext: string) {
     const testimonies = [];
     let childIndex = startIndex;
     let secondBarIndex = startIndex;
@@ -150,7 +190,6 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
             ++secondBarIndex; // Move past the <hr> tag
             break;
         }
-        context += child.textContent.trim();
 
         if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
             if (child.textContent.toLowerCase().includes(" added to the court record")) {
@@ -176,6 +215,8 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
     return {
         category: "cross_examination",
         context: context,
+        characters: CURR_CHAPTER_CHARACTERS,
+        newContext: newContext,
         court_record: { evidence_objects },
         testimonies,
     };
