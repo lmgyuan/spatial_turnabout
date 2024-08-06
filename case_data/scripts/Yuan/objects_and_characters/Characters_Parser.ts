@@ -4,8 +4,8 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
 import fs from "fs";
 
-const OUTPUT_DIRECTORY = "./case_data/scripts/generated/characters_parsed/";
-const CHARACTERS_HTML_FILE_DIRECTORY = "./case_data/scripts/generated/raw/";
+const OUTPUT_DIRECTORY = "./case_data/generated/characters_parsed/";
+const CHARACTERS_HTML_FILE_DIRECTORY = "./case_data/generated/raw/";
 const CHARACTERS_HTML_FILE_NAMES = fs.readdirSync(CHARACTERS_HTML_FILE_DIRECTORY).filter((fileName) => fileName.startsWith("List_of_Profiles_in"));
 const CHARACTERS_HTML_FILE_PATHS = CHARACTERS_HTML_FILE_NAMES.map((fileName) => path.join(CHARACTERS_HTML_FILE_DIRECTORY, fileName));
 

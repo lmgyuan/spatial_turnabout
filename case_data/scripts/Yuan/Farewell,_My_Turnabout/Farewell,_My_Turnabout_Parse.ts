@@ -5,7 +5,7 @@ import { JSDOM } from "jsdom";
 import { existsSync, readdirSync, readFileSync } from "fs";
 
 
-let FULL_EVIDENCES = JSON.parse(readFileSync("./case_data/scripts/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
+let FULL_EVIDENCES = JSON.parse(readFileSync("./case_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
 let CURR_CHAPTER_EVIDENCES;
 // TODO: Change the chapter name to the correct chapter name when copying the code
 FULL_EVIDENCES.forEach((e, index) => {
@@ -13,10 +13,10 @@ FULL_EVIDENCES.forEach((e, index) => {
 		CURR_CHAPTER_EVIDENCES = e.evidences;
 	}
 })
-const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
+const CASE_DATA_ROOT_DIRECTORY = "./case_data/generated";  // Define your root directory
 let HTML_FILE_PATHS = [];
 
-let FULL_CHARACTERS = JSON.parse(readFileSync("./case_data/scripts/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
+let FULL_CHARACTERS = JSON.parse(readFileSync("./case_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
 let CURR_CHAPTER_CHARACTERS;
 
 // TODO: Change the chapter name to the correct chapter name when copying the code
@@ -104,7 +104,7 @@ async function main() {
 		}
 
 		await writeFile(
-				path.join(OUTPUT_DIRECTORY, `Farewell,_My_Turnabout${i+1}.json`),
+				path.join(OUTPUT_DIRECTORY, `9-${i+1}_Farewell,_My_Turnabout.json`),
 				JSON.stringify(parsedData, null, 2)
 		);
 	}

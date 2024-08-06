@@ -5,18 +5,18 @@ import { JSDOM } from "jsdom";
 import { existsSync } from "fs";
 
 // @ts-ignore
-let FULL_EVIDENCES = JSON.parse(await readFile("./case_data/scripts/generated/objects_parsed/Turnabout_Attorney_1_List_of_Evidence.json", "utf-8"));
+let FULL_EVIDENCES = JSON.parse(await readFile("./case_data/generated/objects_parsed/Turnabout_Attorney_1_List_of_Evidence.json", "utf-8"));
 let CURR_CHAPTER_EVIDENCES;
 FULL_EVIDENCES.forEach((e, index) => {
     if (e.chapter == "Turnabout Sisters") {
         CURR_CHAPTER_EVIDENCES = e.evidences;
     }
 })
-const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
+const CASE_DATA_ROOT_DIRECTORY = "./case_data/generated";  // Define your root directory
 let HTML_FILE_PATHS = [];
 
 // @ts-ignore
-let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/scripts/generated/characters_parsed/Turnabout_Attorney_1_List_of_Characters.json", "utf-8"));
+let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/generated/characters_parsed/Turnabout_Attorney_1_List_of_Characters.json", "utf-8"));
 let CURR_CHAPTER_CHARACTERS;
 FULL_CHARACTERS.forEach((e, index) => {
     if (e.chapter == "Turnabout Sisters") {
@@ -88,7 +88,7 @@ async function main() {
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `Turnabout_Sisters_Parsed${i+1}.json`),
+            path.join(OUTPUT_DIRECTORY, `2-${i+1}_Turnabout_Sisters_Parsed${i+1}.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }
