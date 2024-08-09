@@ -5,18 +5,18 @@ import { JSDOM } from "jsdom";
 import { existsSync } from "fs";
 
 // @ts-ignore
-let FULL_EVIDENCES = JSON.parse(await readFile("./case_data/scripts/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
+let FULL_EVIDENCES = JSON.parse(await readFile("./case_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
 let CURR_CHAPTER_EVIDENCES;
 FULL_EVIDENCES.forEach((e, index) => {
 	if (e.chapter == "The Lost Turnabout") {
 		CURR_CHAPTER_EVIDENCES = e.evidences;
 	}
 })
-const CASE_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated";  // Define your root directory
+const CASE_DATA_ROOT_DIRECTORY = "./case_data/generated";  // Define your root directory
 let HTML_FILE_PATHS = [];
 
 // @ts-ignore
-let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/scripts/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
+let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
 let CURR_CHAPTER_CHARACTERS;
 FULL_CHARACTERS.forEach((e, index) => {
 	if (e.chapter == "The Lost Turnabout") {
@@ -87,7 +87,7 @@ async function main() {
 		}
 
 		await writeFile(
-				path.join(OUTPUT_DIRECTORY, `The_Lost_Turnabout_Parsed${i+1}.json`),
+				path.join(OUTPUT_DIRECTORY, `2-1-${i+1}_The_Lost_Turnabout_Parsed.json`),
 				JSON.stringify(parsedData, null, 2)
 		);
 	}

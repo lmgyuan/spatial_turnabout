@@ -4,11 +4,11 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
 import fs from "fs"
 
-const OBJECT_RAW_DATA_ROOT_DIRECTORY = "./case_data/scripts/generated/objects_raw";  // Define your root directory
+const OBJECT_RAW_DATA_ROOT_DIRECTORY = "./case_data/generated/objects_raw";  // Define your root directory
 const OBJECT_FILES_NAMES = fs.readdirSync(OBJECT_RAW_DATA_ROOT_DIRECTORY).filter((fileName) => fileName.endsWith(".html"));
 
 const OBJECTS_HTML_FILE_PATHS = OBJECT_FILES_NAMES.map((fileName) => path.join(OBJECT_RAW_DATA_ROOT_DIRECTORY, fileName));
-const OUTPUT_DIRECTORY = "./case_data/scripts/generated/objects_parsed";
+const OUTPUT_DIRECTORY = "./case_data/generated/objects_parsed";
 
 type ObjectData = {
     currentChapter: string;
