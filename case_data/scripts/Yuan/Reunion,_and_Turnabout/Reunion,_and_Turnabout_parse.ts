@@ -106,7 +106,7 @@ async function main() {
 
 		await writeFile(
 				// TODO: Change the chapter name to the correct chapter name when copying the code
-				path.join(OUTPUT_DIRECTORY, `7-${i+1}_Reunion,_and_Turnabout.json`),
+				path.join(OUTPUT_DIRECTORY, `2-2-${i+1}_Reunion,_and_Turnabout.json`),
 				JSON.stringify(parsedData, null, 2)
 		);
 	}

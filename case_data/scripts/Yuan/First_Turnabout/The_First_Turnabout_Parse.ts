@@ -91,7 +91,7 @@ async function main() {
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `1-${i+1}_The_First_Turnabout.json`),
+            path.join(OUTPUT_DIRECTORY, `1-1-${i+1}_The_First_Turnabout.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }

@@ -99,7 +99,7 @@ async function main() {
 		}
 
 		await writeFile(
-				path.join(OUTPUT_DIRECTORY, `8-${i+1}_Turnabout_Big_Top_Parsed.json`),
+				path.join(OUTPUT_DIRECTORY, `2-3-${i+1}_Turnabout_Big_Top_Parsed.json`),
 				JSON.stringify(parsedData, null, 2)
 		);
 	}

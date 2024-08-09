@@ -88,7 +88,7 @@ async function main() {
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `3-${i+1}_Turnabout_Samurai_Parsed.json`),
+            path.join(OUTPUT_DIRECTORY, `1-3-${i+1}_Turnabout_Samurai_Parsed.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }

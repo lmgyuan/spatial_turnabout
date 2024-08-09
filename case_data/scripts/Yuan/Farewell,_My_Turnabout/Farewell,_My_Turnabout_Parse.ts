@@ -104,7 +104,7 @@ async function main() {
 		}
 
 		await writeFile(
-				path.join(OUTPUT_DIRECTORY, `9-${i+1}_Farewell,_My_Turnabout.json`),
+				path.join(OUTPUT_DIRECTORY, `2-4-${i+1}_Farewell,_My_Turnabout.json`),
 				JSON.stringify(parsedData, null, 2)
 		);
 	}
