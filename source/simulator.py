@@ -63,12 +63,14 @@ def list_court_record(court_record):
     count = 0
     for obj in court_record["objects"]:
         output += str(count) + " " + obj["name"] + "\n"
-        output += ":  " + obj["description"] + "\n"
+        output += ":  " + (obj.get("description2") or obj["description1"]) + "\n"
         count += 1
     output += "\nPeople:\n"
     for person in court_record["people"]:
         output += str(count) + " " + person["name"] + "\n"
-        output += ":  " + person["description"] + "\n"
+        output += ":  " + person["age"] + "\n"
+        output += ":  " + person["gender"] + "\n"
+        output += ":  " + (person.get("description2") or person["description1"]) + "\n"
         count += 1
     output += "This is the end of the court record. Please resume your task above."
     return output
@@ -80,13 +82,14 @@ def simulate(case_data):
         #print("Turn: {}".format(turn) + "\n" + "-"*10 + "\n")
         print(turn_data["context"])
         court_record["objects"] = turn_data["court_record"]["evidence_objects"]
+        court_record["people"] = turn_data["characters"]
         if turn_data["category"] == "cross_examination":
             can_proceed = False
             while not can_proceed:
                 print("\n===Cross Examination===\n")
                 for i, action_data in enumerate(turn_data["testimonies"]):
                     print(str(i) + ": " + action_data["testimony"])
-                print("\nTo present evidence, enter 'present@<number of the evidence>@<number of the testimony>'.\n")
+                print("\nTo present evidence or a person, enter 'present@<number of the evidence or number of the person>@<number of the testimony>'.\n")
                 print("\n> ")
                 user_input, past_dialogs = get_input(past_dialogs, turn_data, court_record)
                 if user_input == "court record":
@@ -97,10 +100,11 @@ def simulate(case_data):
                 user_testimony_index = user_input.split("@")[-1]
                 if user_action == "present":
                     user_evidence = court_record["objects"][int(user_input.split("@")[1])]["name"]
+                    user_profile = court_record["people"][int(user_input.split("@")[1])]["name"]
                 action_data = turn_data["testimonies"][int(user_testimony_index)]
                 # present correct evidence on correct testimony
                 if user_action == "present":
-                    if user_evidence in action_data["present"]:
+                    if user_evidence in action_data["present"] or user_profile in action_data["present"]:
                         can_proceed = True
                         #print(action_data["present_response"])
                         # past_dialogs.append({"role": "user", "content": action_data["present_response"]})
