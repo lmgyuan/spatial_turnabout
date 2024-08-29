@@ -47,6 +47,20 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     "https://aceattorney.fandom.com/wiki/Farewell,_My_Turnabout_-_Transcript_-_Part_2",
     "https://aceattorney.fandom.com/wiki/Farewell,_My_Turnabout_-_Transcript_-_Part_3",
     "https://aceattorney.fandom.com/wiki/Farewell,_My_Turnabout_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Memories_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/The_Stolen_Turnabout_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/The_Stolen_Turnabout_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/The_Stolen_Turnabout_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/The_Stolen_Turnabout_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Recipe_for_Turnabout_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Recipe_for_Turnabout_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Recipe_for_Turnabout_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Recipe_for_Turnabout_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Beginnings_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/Bridge_to_the_Turnabout_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Bridge_to_the_Turnabout_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Bridge_to_the_Turnabout_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/Bridge_to_the_Turnabout_-_Transcript_-_Part_4"
 ];
 
 
