@@ -28,6 +28,10 @@ async function main() {
             console.log("Skipping List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html");
             continue;
         }
+        if (HTML_FILE_PATH.split("/").pop() == "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.html") {
+            console.log("Skipping List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.html");
+            continue;
+        }
         try {
             rawHtml = await readFile(HTML_FILE_PATH, "utf-8");
             console.log("Raw HTML content read successfully.");
