@@ -1,52 +1,37 @@
 import * as path from "path";
 import consola from "consola";
-import {mkdir, readdir, writeFile} from "fs/promises";
+import {mkdir, readdir, readFile, writeFile} from "fs/promises";
 import { JSDOM } from "jsdom";
-import { existsSync, readdirSync, readFileSync } from "fs";
+import { existsSync } from "fs";
 
-
-let FULL_EVIDENCES = JSON.parse(readFileSync("./case_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
+// @ts-ignore
+let FULL_EVIDENCES = JSON.parse(await readFile("./case_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Trials_and_Tribulations.json", "utf-8"));
 let CURR_CHAPTER_EVIDENCES;
-// TODO: Change the chapter name to the correct chapter name when copying the code
 FULL_EVIDENCES.forEach((e, index) => {
-	if (e.chapter == "Farewell, My Turnabout") {
+	if (e.chapter == "Turnabout Beginnings") {
 		CURR_CHAPTER_EVIDENCES = e.evidences;
 	}
 })
-const CASE_DATA_ROOT_DIRECTORY = "./case_data/generated";  // Define your root directory
-let HTML_FILE_PATHS = [];
-
-let FULL_CHARACTERS = JSON.parse(readFileSync("./case_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.json", "utf-8"));
+// @ts-ignore
+let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Trials_and_Tribulations.json", "utf-8"));
 let CURR_CHAPTER_CHARACTERS;
-
-// TODO: Change the chapter name to the correct chapter name when copying the code
 FULL_CHARACTERS.forEach((e, index) => {
-	if (e.chapter == "Farewell, My Turnabout") {
+	if (e.chapter == "Turnabout Beginnings") {
 		CURR_CHAPTER_CHARACTERS = e.characters;
 	}
 })
 
-// include all the Turnabout Goodbyes html files in the raw directory
+
+const CASE_DATA_ROOT_DIRECTORY = "./case_data/generated";  // Define your root directory
+
+// dynamically include all the Turnabout Samurai html files in the raw directory
+let HTML_FILE_PATHS = [];
 try {
-	const dirPath = path.join(CASE_DATA_ROOT_DIRECTORY, "raw");
-	console.log("Attempting to read directory:", dirPath);
-
-	const files = readdirSync(dirPath);
-	console.log("Files read:", files);
-
-	if (!files || !Array.isArray(files)) {
-		consola.fatal("No files found or `files` is not an array.");
-	}
-
+	// @ts-ignore
+	const files = await readdir(path.join(CASE_DATA_ROOT_DIRECTORY, "raw"));
 	HTML_FILE_PATHS = files
-			.filter(file => file.startsWith("Farewell,_My_Turnabout") && file.endsWith(".html"))
-			.map(file => {
-				const fullPath = path.join(CASE_DATA_ROOT_DIRECTORY, "raw", file);
-				console.log("Found matching file:", fullPath);
-				return fullPath;
-			});
-
-	console.log("Final HTML_FILE_PATHS:", HTML_FILE_PATHS);
+			.filter(file => file.startsWith("Turnabout_Beginnings") && file.endsWith(".html"))
+			.map(file => path.join(CASE_DATA_ROOT_DIRECTORY, "raw", file));
 } catch (e) {
 	consola.fatal("Could not read the directory or filter HTML files.");
 	consola.log(e);
@@ -65,7 +50,7 @@ async function main() {
 		let rawHtml: string;
 		const HTML_FILE_PATH = HTML_FILE_PATHS[i];
 		try {
-			rawHtml = readFileSync(HTML_FILE_PATH, "utf-8");
+			rawHtml = await readFile(HTML_FILE_PATH, "utf-8");
 			console.log("Raw HTML content read successfully.");
 		} catch (e) {
 			consola.fatal(`Could not read file at ${HTML_FILE_PATH}`);
@@ -92,7 +77,6 @@ async function main() {
 			return;
 		}
 
-		console.log("Check current chapter evidences", CURR_CHAPTER_EVIDENCES);
 		const initialEvidences = findInitialListOfEvidence(contentWrapper, CURR_CHAPTER_EVIDENCES);
 
 		let parsedData = parseHtmlContent(contentWrapper, document, context, initialEvidences, newContext);
@@ -104,11 +88,12 @@ async function main() {
 		}
 
 		await writeFile(
-				path.join(OUTPUT_DIRECTORY, `2-4-${i+1}_Farewell,_My_Turnabout.json`),
+				path.join(OUTPUT_DIRECTORY, `3-4-${i+1}_Turnabout_Beginnings_Parsed.json`),
 				JSON.stringify(parsedData, null, 2)
 		);
 	}
 }
+
 
 function parsedDataHandling(parsedData: any) {
 	// flag cross examinations that do not require players to present anything
@@ -132,8 +117,6 @@ function parsedDataHandling(parsedData: any) {
 
 	return parsedData
 }
-
-
 
 function parseHtmlContent(contentWrapper: Element, document: Document, context, evidence_objects, newContext: string) {
 	const data = [];
@@ -173,7 +156,6 @@ function findInitialListOfEvidence(contentWrapper: Element, initialEvidences: an
 				const objectName = child.textContent.split("added to the court record")[0].trim();
 				evidences.forEach((e, index) => {
 					if (e.name.trim().toLowerCase() === objectName.toLowerCase()) {
-						console.log("Deleting ", e.name);
 						evidences.splice(index, 1); // Delete the item from the array
 					}
 				});
@@ -233,8 +215,8 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
 	return {
 		category: "cross_examination",
 		context: context,
-		newContext: newContext,
 		characters: CURR_CHAPTER_CHARACTERS,
+		newContext: newContext,
 		court_record: { evidence_objects },
 		testimonies,
 	};
