@@ -33,7 +33,7 @@ async def run_closed_source_model(model: str, messages: List[Dict[str, str]], pr
 
 def load_prompt(prompt_name: str) -> str:
     """Load the prompt from a file."""
-    prompt_path = os.path.join('source', 'prompts', f'{prompt_name}.txt')
+    prompt_path = os.path.join('source', 'prompts/system_prompts', f'{prompt_name}.txt')
     with open(prompt_path, 'r') as file:
         return file.read().strip()
 

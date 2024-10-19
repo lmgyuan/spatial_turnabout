@@ -16,7 +16,7 @@ parser.add_argument('--case', type=str, required=True, help='Identifier of the c
 
 def load_prompt(prompt_name: str) -> str:
     """Load the prompt from a file."""
-    prompt_path = os.path.join(os.getcwd(), 'prompts', f'{prompt_name}.txt')
+    prompt_path = os.path.join(os.getcwd(), 'prompts/system_prompts', f'{prompt_name}.txt')
     print(f"Loading prompt from: {prompt_path}")
     with open(prompt_path, 'r') as file:
         prompt = file.read().strip()
