@@ -1,6 +1,6 @@
 import * as path from "path";
 import consola from "consola";
-import {mkdir, readdir, readFile, writeFile} from "fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
 import { existsSync } from "fs";
 
@@ -21,10 +21,9 @@ FULL_CHARACTERS.forEach((e, index) => {
 	}
 })
 
-
 const CASE_DATA_ROOT_DIRECTORY = "./case_data/generated";  // Define your root directory
 
-// dynamically include all the Turnabout Samurai html files in the raw directory
+// dynamically include all the Recipe for Turnabout html files in the raw directory
 let HTML_FILE_PATHS = [];
 try {
 	// @ts-ignore
@@ -37,14 +36,14 @@ try {
 	consola.log(e);
 }
 
-const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "parsed");
-
+// Updated output directory
+const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "parsed_full_context");
 
 async function main() {
 	consola.start("Parsing HTML file");
 
-	let context = "";
-	let newContext = "";
+	// Use contextObj to manage context and newContext together
+	let contextObj = { context: "", newContext: "" };
 
 	for (let i = 0; i < HTML_FILE_PATHS.length; i++) {
 		let rawHtml: string;
@@ -79,7 +78,8 @@ async function main() {
 
 		const initialEvidences = findInitialListOfEvidence(contentWrapper, CURR_CHAPTER_EVIDENCES);
 
-		let parsedData = parseHtmlContent(contentWrapper, document, context, initialEvidences, newContext);
+		// Pass contextObj instead of separate context and newContext
+		let parsedData = parseHtmlContent(contentWrapper, document, contextObj, initialEvidences);
 		parsedData = parsedDataHandling(parsedData);
 
 		consola.log("Writing parsed data to JSON file");
@@ -94,11 +94,10 @@ async function main() {
 	}
 }
 
-
 function parsedDataHandling(parsedData: any) {
 	// flag cross examinations that do not require players to present anything
 	if (!parsedData) {
-		return parsedData
+		return parsedData;
 	}
 
 	// check if the cross examination has any present evidence
@@ -115,23 +114,25 @@ function parsedDataHandling(parsedData: any) {
 		}
 	})
 
-	return parsedData
+	return parsedData;
 }
 
-function parseHtmlContent(contentWrapper: Element, document: Document, context, evidence_objects, newContext: string) {
+function parseHtmlContent(contentWrapper: Element, document: Document, contextObj, evidence_objects) {
 	const data = [];
 	let childIndex = 0;
 
 	while (childIndex < contentWrapper.children.length) {
 		const child = contentWrapper.children[childIndex];
 
-		context += child.textContent.trim();
-		newContext += child.textContent.trim();
+		// Update both context and newContext within contextObj
+		contextObj.context += child.textContent.trim();
+		contextObj.newContext += child.textContent.trim();
 
 		if (child.tagName === "CENTER" && child.querySelector("span[style*='color:red']") && child.textContent.trim() === "Cross Examination") {
-			const crossExamination = parseCrossExamination(contentWrapper, childIndex, document, context, evidence_objects, newContext);
+			const crossExamination = parseCrossExamination(contentWrapper, childIndex, document, contextObj, evidence_objects);
 			data.push(crossExamination);
-			newContext = "";
+			// Reset newContext after parsing a cross-examination
+			contextObj.newContext = "";
 		}
 
 		if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
@@ -145,9 +146,10 @@ function parseHtmlContent(contentWrapper: Element, document: Document, context, 
 
 	return data;
 }
+
 function findInitialListOfEvidence(contentWrapper: Element, initialEvidences: any[]) {
 	let childIndex = 0;
-	let evidences = [...initialEvidences]
+	let evidences = [...initialEvidences];
 
 	while (childIndex < contentWrapper.children.length) {
 		const child = contentWrapper.children[childIndex];
@@ -164,7 +166,7 @@ function findInitialListOfEvidence(contentWrapper: Element, initialEvidences: an
 		++childIndex;
 	}
 
-	return evidences; // Return the modified array if needed
+	return evidences;
 }
 
 function addEvidenceToCourtRecord(childTextContent: string, evidence_objects: any[]) {
@@ -174,11 +176,11 @@ function addEvidenceToCourtRecord(childTextContent: string, evidence_objects: an
 			if (e.name.trim().toLowerCase() === objectName.toLowerCase()) {
 				evidence_objects.push(e);
 			}
-		})
-	};
+		});
+	}
 }
 
-function parseCrossExamination(contentWrapper: Element, startIndex: number, document: Document, context: string, evidence_objects: any[], newContext: string) {
+function parseCrossExamination(contentWrapper: Element, startIndex: number, document: Document, contextObj, evidence_objects: any[]) {
 	const testimonies = [];
 	let childIndex = startIndex;
 	let secondBarIndex = startIndex;
@@ -206,7 +208,7 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
 
 		if (child.tagName === "P" && child.querySelector("span[style*='color:green']")) {
 			const name = child.textContent.split('\n')[0].replace(":", "").trim();
-			const comment = child.textContent.split('\n')[1].trim()
+			const comment = child.textContent.split('\n')[1].trim();
 			const presentEvidence = getPresentEvidence(contentWrapper, childIndex, document, secondBarIndex);
 			testimonies.push({ testimony: comment, person: name, present: presentEvidence });
 		}
@@ -214,9 +216,9 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
 
 	return {
 		category: "cross_examination",
-		context: context,
+		context: contextObj.context,
+		new_context: contextObj.newContext,
 		characters: CURR_CHAPTER_CHARACTERS,
-		newContext: newContext,
 		court_record: { evidence_objects },
 		testimonies,
 	};
