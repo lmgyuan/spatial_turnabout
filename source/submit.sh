@@ -12,4 +12,4 @@
 #SBATCH --constraint=48GBgpu
 
 # Run the Python script
-srun python simulator_closedLLM.py --model gpt-4o --prompt default --case 1-2-2_Turnabout_Sisters_Parsed2
+python simulator_closedLLM.py --model gpt-4o --prompt default --case 1-2-4_Turnabout_Sisters --cot_few_shot --log_file text_log_new_cot2

@@ -55,26 +55,10 @@ openai_client = OpenAI(
 # meta_ai_client = MetaAIClient()
 
 
-async def run_model(model_name: str, prompt: str) -> str:
+async def run_model(model_name: str, messages: List[Dict[str, str]]) -> str:
     """
     Runs the specified LLM model with the given prompt and returns the response.
     """
-    messages = [{"role": "user", "content": prompt}]
-
-    # if model_name == "mixtral":
-    #     response = await mistral_client.chat_completions_create(
-    #         model="mistral-large-latest",
-    #         messages=messages
-    #     )
-    #     return response["choices"][0]["message"]["content"]
-    #
-    # elif model_name == "llama":
-    #     response = await meta_ai_client.chat_completions_create(
-    #         model="llama-3-8b",
-    #         messages=messages
-    #     )
-    #     return response["choices"][0]["message"]["content"]
-
     if model_name in ["gpt-3.5-turbo", "gpt-4", "gpt-4o"]:
         response = openai_client.chat.completions.create(
             model=model_name,

@@ -2,6 +2,7 @@ import argparse
 import json
 import asyncio
 import os
+from datetime import datetime
 import logging
 from typing import List, Dict, Any
 
@@ -19,6 +20,7 @@ parser.add_argument('--cot_few_shot', action='store_true', help='Enable chain-of
 parser.add_argument('--log_level', type=str, default='DEBUG', help='Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)')
 # Add an option to specify a log file
 parser.add_argument('--log_file', type=str, help='File path to save logs')
+parser.add_argument('--summary', action='store_true', help='Enable summarization before cot')
 
 
 def setup_logging(log_level: str, log_file: str = None):
@@ -58,7 +60,7 @@ def setup_logging(log_level: str, log_file: str = None):
 def load_prompt(prompt_name: str) -> str:
     """Load the prompt from a file."""
     prompt_path = os.path.join(os.getcwd(), 'prompts/system_prompts', f'{prompt_name}.txt')
-    logging.debug(f"Loading prompt from: {prompt_path}")
+    logging.info(f"Loading prompt from: {prompt_path}")
     with open(prompt_path, 'r') as file:
         prompt = file.read().strip()
     logging.info(f"Prompt loaded successfully. Length: {len(prompt)} characters")
@@ -164,81 +166,95 @@ async def get_model_action(model: str, prompt: str, turn_data: Dict[str, Any],
             )
 
         full_prompt = prompt + context
+        messages = [{"role": "user", "content": full_prompt}]
 
-    while True:
-        logging.debug("Attempting to get model action")
-        # Use the run_model function from run_llm_model.py
-        response = await run_model(model, full_prompt)
-        logging.info(f"Model response received. Length: {len(response)} characters")
-        logging.debug("Model response content: %s", response)
+        while True:
+            logging.info("Attempting to get model action")
+            # Use the run_model function from run_llm_model.py
+            response = await run_model(model, messages)
+            logging.info(f"Model response received. Length: {len(response)} characters")
+            logging.info("Model response content: %s", response)
 
-        if cot:
-            # Try to extract the JSON object from the response
-            json_str = extract_json_from_response(response)
-            if json_str:
+            if cot:
+                # Try to extract the JSON object from the response
+                json_str = extract_json_from_response(response)
+                if json_str:
+                    try:
+                        json_str = json_str.strip()
+                        # Remove Markdown code block markers if present
+                        if json_str.startswith('```'):
+                            json_str = json_str.strip('`').strip()
+                        # Remove the 'json' label if present
+                        if json_str.startswith('json'):
+                            json_str = json_str[len('json'):].strip()
+                        # Parse the JSON string
+                        action = json.loads(json_str)
+                        if action.get("action") == "present" and "testimony" in action and "evidence" in action:
+                            logging.info(f"Valid action received: {action}")
+                            return {
+                                "action": f"present@{action['evidence']}@{action['testimony']}",
+                                "response": response
+                            }
+                        else:
+                            logging.warning(f"Invalid action received: {action}")
+                            # update messages with the gpt response and revision suggestions
+                            messages.append({"role": "assistant", "content": response})
+                            messages.append({
+                                "role": "user", 
+                                "content": "Your previous response was in an incorrect format. Please provide a valid JSON " +
+                                "object with 'action', 'testimony', and 'evidence' fields. " +
+                                "The 'action' must be 'present'. Remember to explain your reasoning step by step before providing the JSON object."
+                                })
+
+                    except json.JSONDecodeError:
+                        logging.error("JSON decode error: extracted string is not a valid JSON object\n")
+                        logging.info(f"Extracted JSON string: {json_str}")
+                        # update messages with the gpt response and revision suggestions
+                        messages.append({"role": "assistant", "content": response})
+                        messages.append({
+                            "role": "user", 
+                            "content": "Your previous response was not a valid JSON object. Please provide your reasoning and then a valid JSON response."
+                        })
+
+                else:
+                    logging.warning("No JSON object found in the response")
+                    # update messages with the gpt response and revision suggestions
+                    messages.append({"role": "assistant", "content": response})
+                    messages.append({
+                        "role": "user", 
+                        "content": "Your previous response did not contain a JSON object. Please explain your reasoning step by step and then provide a valid JSON response."
+                    })
+            else:
                 try:
-                    json_str = json_str.strip()
-                    # Remove Markdown code block markers if present
+                    json_str = response.strip()
+                    # Clean up the response if it contains Markdown code block markers
                     if json_str.startswith('```'):
                         json_str = json_str.strip('`').strip()
-                    # Remove the 'json' label if present
                     if json_str.startswith('json'):
                         json_str = json_str[len('json'):].strip()
-                    # Parse the JSON string
                     action = json.loads(json_str)
                     if action.get("action") == "present" and "testimony" in action and "evidence" in action:
                         logging.info(f"Valid action received: {action}")
-                        return f"present@{action['evidence']}@{action['testimony']}"
+                        return {
+                                "action": f"present@{action['evidence']}@{action['testimony']}",
+                                "response": response
+                            }
                     else:
                         logging.warning(f"Invalid action received: {action}")
-                        # Add an error message to prompt the model to give a valid response
-                        full_prompt += (
-                            "\n\nYour previous response was in an incorrect format. Please provide a valid JSON "
-                            "object with 'action', 'testimony', and 'evidence' fields. "
-                            "The 'action' must be 'present'. Remember to explain your reasoning step by step before providing the JSON object."
-                        )
+                        # update messages with the gpt response and revision suggestions
+                        messages.append({"role": "assistant", "content": response})
+                        messages.append({"role": "user", "content": "Your previous response was in an incorrect format. Please provide a valid JSON " +
+                            "object with 'action', 'testimony', and 'evidence' fields. " +
+                            "The 'action' must be 'present'."})
+                    
                 except json.JSONDecodeError:
-                    logging.error("JSON decode error: extracted string is not a valid JSON object\n")
-                    logging.debug(f"Extracted JSON string: {json_str}")
-                    # Add an error message to prompt the model to give a valid response
-                    full_prompt += (
-                        "\n\nYour previous response did not contain a valid JSON object. "
-                        "Please provide your reasoning and then a valid JSON response."
-                    )
-            else:
-                logging.warning("No JSON object found in the response")
-                # Add an error message to prompt the model to give a valid response
-                full_prompt += (
-                    "\n\nYour previous response did not contain a JSON object. "
-                    "Please explain your reasoning step by step and then provide a valid JSON response."
-                )
-        else:
-            try:
-                json_str = response.strip()
-                # Clean up the response if it contains Markdown code block markers
-                if json_str.startswith('```'):
-                    json_str = json_str.strip('`').strip()
-                if json_str.startswith('json'):
-                    json_str = json_str[len('json'):].strip()
-                action = json.loads(json_str)
-                if action.get("action") == "present" and "testimony" in action and "evidence" in action:
-                    logging.info(f"Valid action received: {action}")
-                    return f"present@{action['evidence']}@{action['testimony']}"
-                else:
-                    logging.warning(f"Invalid action received: {action}")
-                    # Add an error message to prompt the model to give a valid response
-                    full_prompt += (
-                        "\n\nYour previous response was in an incorrect format. Please provide a valid JSON "
-                        "object with 'action', 'testimony', and 'evidence' fields. "
-                        "The 'action' must be 'present'."
-                    )
-            except json.JSONDecodeError:
-                logging.error("JSON decode error: response is not a valid JSON object")
-                # Add an error message to prompt the model to give a valid response
-                full_prompt += (
-                    "\n\nYour previous response was not a valid JSON object. "
-                    "Please provide a valid JSON response."
-                )
+                    logging.error("JSON decode error: response is not a valid JSON object")
+                    # update messages with the gpt response and revision suggestions
+                    messages.append({"role": "assistant", "content": response})
+                    messages.append({"role": "user", "content": "Your previous response was not a valid JSON object. Please provide a valid JSON response."})
+    else:
+        logging.warning("No action generated for this turn which is not cross-examination")
+        raise ValueError("No action generated for this turn which is not cross-examination")
 
 
 async def simulate(model: str, prompt: str, case_data: List[Dict[str, Any]], cot: bool) -> List[Dict[str, Any]]:
@@ -249,17 +265,20 @@ async def simulate(model: str, prompt: str, case_data: List[Dict[str, Any]], cot
         logging.info(f"Processing turn {turn_number}")
         # No present available in this turn
         if turn_data.get("no_present"):
-            logging.debug("No present available in this turn. Skipping.")
+            logging.info("No present available in this turn. Skipping.")
             continue
 
         court_record = {"objects": turn_data["court_record"]["evidence_objects"],
                         "characters": turn_data["characters"]}
 
         if turn_data["category"] == "cross_examination":
-            action = await get_model_action(model, prompt, turn_data, court_record, cot)
+            results = await get_model_action(model, prompt, turn_data, court_record, cot)
+            action = results["action"]
+            response = results["response"]
             outputs.append({
                 "turn": turn_data,
-                "action": action
+                "action": action,
+                "response": response
             })
             logging.info(f"Action for turn {turn_number}: {action}")
 
@@ -271,23 +290,25 @@ async def main():
     args = parser.parse_args()
     # Setup logging with optional log file
     cot_few_shot_suffix = "_cot_few_shot" if args.cot_few_shot else ""
+    # Get current date and time in the desired format (e.g., YYYYMMDD_HHMMSS)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     # Setup logging with log file
     if args.log_file:
-        log_file = os.getcwd() + f"/logs/close_llm/log_{args.model}_{args.prompt}{cot_few_shot_suffix}_{args.log_file}.log"
+        log_file = os.getcwd() + f"/logs/close_llm/job_{args.model}_{args.prompt}{cot_few_shot_suffix}_{args.log_file}.log"
     else:
-        log_file = os.getcwd() + f"/logs/close_llm/log_{args.model}_{args.prompt}{cot_few_shot_suffix}_default_log.log"
+        log_file = os.getcwd() + f"/logs/close_llm/job_{args.model}_{args.prompt}{cot_few_shot_suffix}_default_log_{timestamp}.log"
 
     setup_logging(args.log_level, log_file)
     logging.info(f"Starting script with arguments: model={args.model}, prompt={args.prompt}, case={args.case}, cot={args.cot_few_shot}")
 
     # Load the case data
-    case_file_path = f"../case_data/generated/parsed/{args.case}.json"
-    logging.debug(f"Loading case data from: {case_file_path}")
+    case_file_path = f"../case_data/final_full_context/{args.case}.json"
+    logging.info(f"Loading case data from: {case_file_path}")
     with open(case_file_path, 'r') as file:
         case_data = json.load(file)
     logging.info(f"Case data loaded successfully. Number of turns: {len(case_data)}")
 
-    # Load the prompt
+    # Load the system prompt
     prompt = load_prompt(args.prompt)
 
     # Run the simulation
@@ -299,7 +320,7 @@ async def main():
     # Include 'cot' in the output filename if enabled
     cot_few_shot_suffix = "_cot_few_shot" if args.cot_few_shot else ""
     output_file = os.path.join(output_dir, f"{args.case}_output{cot_few_shot_suffix}.json")
-    logging.debug(f"Saving output to: {output_file}")
+    logging.info(f"Saving output to: {output_file}")
     with open(output_file, 'w') as file:
         json.dump(outputs, file, indent=2)
 
