@@ -20,7 +20,7 @@ with open("../html/_truth_bullets.html") as f:
             if not line.endswith("</td>"):
                 line = line + "</td>"
             soup = BeautifulSoup(line, 'html.parser')
-            current_bullet_desc[1] = text = soup.get_text().strip()
+            current_bullet_desc[1] = soup.get_text().strip()
             chapter_bullets[current_chapter].append({"name": current_bullet_desc[0], "description": current_bullet_desc[1]})
             look_for_description = False
             #print(chapter_bullets)
