@@ -83,7 +83,7 @@ def parse_debate(txt_lines, out_json, context_before_trial):
                     "newContext": pre_debate_context,
                     "testimonies": testimonies
                 }
-                out_json.append(debate_dict)
+                out_json["events"].append(debate_dict)
                 pre_debate_context = ""
                 debate_start = False 
 
@@ -91,10 +91,14 @@ def parse_debate(txt_lines, out_json, context_before_trial):
             
         
 
-for chapter in [1,7]:
-#for chapter in [4]:
+#for chapter in [1,7]:
+for chapter in [4]:
+    evidence_list = json.load(open("../json/_truth_bullets.json"))[f"Chapter {chapter}"]
+    court_record_dict = {
+        "evidence_objects": evidence_list
+    }
     out_fname = f"../json/1-{chapter}.json"
-    out_json = []
+    out_json = {"court_record": court_record_dict, "events": []}
     context_before_trial = get_context_before_trial(chapter)
     # parse debates
     pt = 1
