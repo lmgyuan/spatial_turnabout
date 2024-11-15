@@ -97,9 +97,9 @@ for chapter in [4]:
     court_record_dict = {
         "evidence_objects": evidence_list
     }
-    out_fname = f"../json/1-{chapter}.json"
-    out_json = {"court_record": court_record_dict, "events": []}
     context_before_trial = get_context_before_trial(chapter)
+    out_fname = f"../json/1-{chapter}.json"
+    out_json = {"previousContext": context_before_trial, "court_record": court_record_dict, "events": []}
     # parse debates
     pt = 1
     while True:
