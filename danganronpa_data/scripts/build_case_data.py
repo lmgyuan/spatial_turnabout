@@ -7,7 +7,7 @@ def get_context_before_trial(ch):
     for life in ["Daily-Life", "Deadly-Life"]:
         pt = 1
         while True:
-            fname = f"../text/Chapter-{ch}_{life}_Part-{pt}.txt"
+            fname = f"../text_fixed/Chapter-{ch}_{life}_Part-{pt}.txt"
             try:
                 with open(fname) as f:
                     txt_content = f.read()
@@ -38,7 +38,7 @@ def parse_debate(txt_lines, out_json, context_before_trial):
             pre_debate_context += line + "\n"
         else:
             # 7-Hina16.png
-            if line[0].isnumeric():
+            if line[0].isnumeric() and '-' in line:
                 # flush
                 if testimony:
                     testimony_dict = {"testimony": testimony, "person": speaker, "present": []}
@@ -63,10 +63,14 @@ def parse_debate(txt_lines, out_json, context_before_trial):
                 one_more_line = False
             # There's got to be some reason why Hina feels so strongly... is ignored
             # > Shoot "the only reason you have" with "Aoi's Account"
-            elif line[0] == ">":
-                keyword = line.split("Shoot ")[1].split(" with ")[0].strip('"')
-                correct_evidence_name = line.split("Shoot ")[1].split(" with ")[1].strip('"')
-                # TODO: parse present
+            elif line.startswith("> Shoot"):
+                print(line)
+                try:
+                    keyword = line.split("Shoot ")[1].split(" with ")[0].strip('"')
+                    correct_evidence_name = line.split("Shoot ")[1].split(" with ")[1].strip('"')
+                except IndexError:
+                    keyword = "N/A"
+                    correct_evidence_name = "N/A"
                 # flush
                 if testimony:
                     testimony_dict = {"testimony": testimony, "person": speaker, "present": []}
@@ -91,8 +95,7 @@ def parse_debate(txt_lines, out_json, context_before_trial):
             
         
 
-#for chapter in [1,7]:
-for chapter in [4]:
+for chapter in [6]:
     evidence_list = json.load(open("../json/_truth_bullets.json"))[f"Chapter {chapter}"]
     court_record_dict = {
         "evidence_objects": evidence_list
@@ -104,7 +107,8 @@ for chapter in [4]:
     pt = 1
     while True:
         try:
-            with open (f"../text/Chapter-{chapter}_Class-Trial_Part-{pt}.txt") as f:
+            with open (f"../text_fixed/Chapter-{chapter}_Class-Trial_Part-{pt}.txt") as f:
+                print(pt)
                 txt_lines = f.readlines()
                 parse_debate(txt_lines, out_json, context_before_trial)
             pt += 1
