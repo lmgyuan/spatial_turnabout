@@ -1,0 +1,18 @@
+cpu-bind=MASK - nlpgpu10, task  0  0 [42338]: mask 0x300000003 set
+cpu-bind=MASK - nlpgpu10, task  0  0 [42362]: mask 0x300000003 set
+Traceback (most recent call last):
+  File "/mnt/nlpgridio3/data/aceAttorney/kani_mixtral.py", line 12, in <module>
+    engine = LlamaEngine(
+             ^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/kani/engines/huggingface/llama2.py", line 95, in __init__
+    super().__init__(model_id, *args, **kwargs)
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/kani/engines/huggingface/base.py", line 75, in __init__
+    self.model = AutoModelForCausalLM.from_pretrained(model_id, **model_load_kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/modeling_utils.py", line 3199, in from_pretrained
+    raise ImportError(
+ImportError: Using `low_cpu_mem_usage=True` or a `device_map` requires Accelerate: `pip install accelerate`
+srun: error: nlpgpu10: task 0: Exited with exit code 1

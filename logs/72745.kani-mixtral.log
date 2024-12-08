@@ -1,0 +1,37 @@
+cpu-bind=MASK - nlpgpu04, task  0  0 [45942]: mask 0xff000000ff set
+cpu-bind=MASK - nlpgpu04, task  0  0 [45956]: mask 0xff000000ff set
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:04,  1.48s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:02<00:02,  1.49s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:04<00:01,  1.48s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:04<00:00,  1.04s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:04<00:00,  1.20s/it]
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.
+Traceback (most recent call last):
+  File "/mnt/nlpgridio3/data/aceAttorney/kani_mixtral.py", line 63, in <module>
+    asyncio.run(main())
+  File "/home1/m/manvik/miniconda3/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/mnt/nlpgridio3/data/aceAttorney/kani_mixtral.py", line 59, in main
+    resp = await query_one(query)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/nlpgridio3/data/aceAttorney/kani_mixtral.py", line 39, in query_one
+    inputs = tokenizer(query, return_tensors="pt", padding=True, truncation=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2945, in __call__
+    encodings = self._call_one(text=text, text_pair=text_pair, **all_kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 3053, in _call_one
+    return self.encode_plus(
+           ^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 3118, in encode_plus
+    padding_strategy, truncation_strategy, max_length, kwargs = self._get_padding_truncation_strategies(
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2849, in _get_padding_truncation_strategies
+    raise ValueError(
+ValueError: Asking to pad but the tokenizer does not have a padding token. Please select a token to use as `pad_token` `(tokenizer.pad_token = tokenizer.eos_token e.g.)` or add a new pad token via `tokenizer.add_special_tokens({'pad_token': '[PAD]'})`.
+srun: error: nlpgpu04: task 0: Exited with exit code 1

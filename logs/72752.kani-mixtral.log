@@ -1,0 +1,44 @@
+cpu-bind=MASK - nlpgpu04, task  0  0 [48813]: mask 0xff000000ff set
+cpu-bind=MASK - nlpgpu04, task  0  0 [48835]: mask 0xff000000ff set
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:03,  1.20s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:02<00:02,  1.21s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:03<00:01,  1.21s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.18it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.02it/s]
+Traceback (most recent call last):
+  File "/mnt/nlpgridio3/data/aceAttorney/kani_mixtral.py", line 53, in <module>
+    asyncio.run(main())
+  File "/home1/m/manvik/miniconda3/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/mnt/nlpgridio3/data/aceAttorney/kani_mixtral.py", line 49, in main
+    resp = await query_one(query)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/nlpgridio3/data/aceAttorney/kani_mixtral.py", line 40, in query_one
+    resp = await ai.chat_round_str(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/kani/kani.py", line 229, in chat_round_str
+    msg = await self.chat_round(query, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/kani/kani.py", line 224, in chat_round
+    completion = await self.get_model_completion(**kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/kani/kani.py", line 376, in get_model_completion
+    completion = await self.engine.predict(messages=messages, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/kani/engines/huggingface/base.py", line 220, in predict
+    output = self.model.generate(input_toks, **hyperparams)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 115, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/generation/utils.py", line 1640, in generate
+    self._validate_model_kwargs(model_kwargs.copy())
+  File "/home1/m/manvik/miniconda3/lib/python3.12/site-packages/transformers/generation/utils.py", line 1238, in _validate_model_kwargs
+    raise ValueError(
+ValueError: The following `model_kwargs` are not used by the model: ['temprature'] (note: typos in the generate arguments will also show up in this list)
+srun: error: nlpgpu04: task 0: Exited with exit code 1

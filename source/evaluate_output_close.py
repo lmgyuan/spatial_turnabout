@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import logging
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description='Evaluate the output of an LLM model on a given case')
 parser.add_argument('--model', type=str, required=True, help='Name of the LLM model used')
@@ -13,7 +14,7 @@ parser.add_argument('--cot_few_shot', action='store_true', help='Enable chain-of
 parser.add_argument('--log_level', type=str, default='INFO', help='Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)')
 # Add an option to specify a log file
 parser.add_argument('--log_file', type=str, help='File path to save logs')
-
+parser.add_argument('--summary', action='store_true', help='Enable context summary')
 
 def setup_logging(log_level: str, log_file: str = None):
     """Set up logging configuration."""
@@ -57,11 +58,12 @@ def load_case_data(case: str) -> dict:
     return data
 
 
-def load_model_output(model: str, prompt: str, case: str, cot_few_shot: bool) -> dict:
+def load_model_output(model: str, prompt: str, case: str, cot_few_shot: bool, summary: bool) -> dict:
     """Load the model's output for the given case."""
     # Include 'cot_few_shot' suffix if enabled
     cot_few_shot_suffix = "_cot_few_shot" if cot_few_shot else ""
-    output_file = os.path.join("closed_model_output", model, prompt, f"{case}_output{cot_few_shot_suffix}.json")
+    summary_suffix = "_context_summary" if summary else ""
+    output_file = os.path.join("closed_model_output", model, prompt, f"{case}_output{cot_few_shot_suffix}{summary_suffix}.json")
     logging.debug(f"Loading model output from: {output_file}")
     with open(output_file, 'r') as file:
         data = json.load(file)
@@ -148,18 +150,19 @@ def save_evaluation_results(evaluation_output_file: str, new_results: list):
 def main():
     args = parser.parse_args()
     cot_few_shot_suffix = "_cot_few_shot" if args.cot_few_shot else ""
+    summary_suffix = "_context_summary" if args.summary else ""
     # Setup logging with log file
     if args.log_file:
-        log_file = os.getcwd() + f"/logs/close_llm/evaluate_log_{args.model}_{args.prompt}{cot_few_shot_suffix}_{args.log_file}.log"
+        log_file = os.getcwd() + f"/logs/close_llm/evaluate_log_{args.model}_{args.prompt}{cot_few_shot_suffix}{summary_suffix}_{args.log_file}.log"
     else:
-        log_file = os.getcwd() + f"/logs/close_llm/evaluate_log_{args.model}_{args.prompt}{cot_few_shot_suffix}_log.log"
+        log_file = os.getcwd() + f"/logs/close_llm/evaluate_log_{args.model}_{args.prompt}{cot_few_shot_suffix}{summary_suffix}.log"
 
     setup_logging(args.log_level, log_file)
     logging.info(
         f"Starting evaluation for Model: {args.model}, Prompt: {args.prompt}, Case: {args.case}, Metric: {args.metric}"
     )
 
-    model_output = load_model_output(args.model, args.prompt, args.case, args.cot_few_shot)
+    model_output = load_model_output(args.model, args.prompt, args.case, args.cot_few_shot, args.summary)
 
     if args.metric == 'accuracy':
         evaluation_results, result = calculate_accuracy(model_output, args.case, args.model, args.prompt)
@@ -167,7 +170,7 @@ def main():
 
         # Save the evaluation results to the JSON file
         evaluation_output_file = os.path.join("closed_model_output", args.model, args.prompt,
-                                              f"evaluation{cot_few_shot_suffix}.json")
+                                              f"evaluation{cot_few_shot_suffix}{summary_suffix}.json")
         os.makedirs(os.path.dirname(evaluation_output_file), exist_ok=True)
         save_evaluation_results(evaluation_output_file, evaluation_results)
     else:

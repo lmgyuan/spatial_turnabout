@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import logging
 from typing import List, Dict, Any
+import openai
 
 # Import the run_model function from run_llm_model.py
 from run_llm_model import run_model
@@ -114,12 +115,77 @@ def load_cot_prompt(prompt_name="1-1-1_cot_prompt"):
     logging.info(f"CoT prompt loaded successfully. Length: {len(prompt)} characters")
     return prompt
 
+async def summarize_context(turn_data: Dict[str, Any], model) -> str:
+    """Summarize the context using the run_model function."""
+    logging.info("Requesting context summary from LLM")
+
+    # Prepare the message content
+    evidence_summaries = "\n".join([f"evidence {i}: {evidence}" for i, evidence in enumerate(turn_data["court_record"]["evidence_objects"])])
+    testimony_summaries = "\n".join([f"testimony {i}: {testimony['testimony']}" for i, testimony in enumerate(turn_data["testimonies"])])
+    full_context = turn_data["context"]
+
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant that summarizes text while preserving key details."},
+        {"role": "user", "content": (
+            f"Please summarize the following context concisely while preserving the key information:\n"
+            f"{evidence_summaries}\n"
+            f"{testimony_summaries}\n"
+            f"Full context: {full_context}\n"
+            "Your response should be in the format:\n"
+            "\"evidence 1: summary\"\n"
+            "\"evidence 2: summary\"\n"
+            "\"testimony 1: summary\"\n"
+            "\"testimony 2: summary\"\n"
+            "\"summary of full context\""
+        )}
+    ]
+    logging.info(f"Messages to be summarized: {messages}")
+
+    try:
+        # Use the run_model function to get the summary
+        response = await run_model(model, messages)
+        summary = response['choices'][0]['message']['content'].strip()
+        logging.info(f"Context successfully summarized: {summary}")
+    except Exception as e:
+        logging.error(f"Error summarizing context: {e}")
+        summary = full_context  # Fall back to original context if summarization fails
+
+    return summary
+
+async def verify_reasoning(model: str, model_reasoning: str, model_output: str) -> bool:
+    """Verify if the model's reasoning is correct even if the output is wrong."""
+    logging.info("Verifying model's reasoning with LLM")
+
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant that evaluates reasoning correctness."},
+        {"role": "user", "content": (
+            f"Given the following context:\n{model_reasoning}\n"
+            f"And the model's output:\n{model_output}\n"
+            "Please determine if the reasoning leading to the output is correct, even if the final answer is wrong. "
+            "Respond with 'True' if the reasoning is correct, otherwise 'False'."
+        )}
+    ]
+
+    try:
+        response = await run_model(model, messages)
+        reasoning_correct = response['choices'][0]['message']['content'].strip().lower() == 'true'
+        logging.info(f"Reasoning verification result: {reasoning_correct}")
+        return reasoning_correct
+    except Exception as e:
+        logging.error(f"Error verifying reasoning: {e}")
+        return False
 
 async def get_model_action(model: str, prompt: str, turn_data: Dict[str, Any],
-                           court_record: Dict[str, List[Dict[str, str]]], cot: bool) -> str:
+                           court_record: Dict[str, List[Dict[str, str]]], 
+                           cot: bool, should_summarize: bool) -> Dict[str, Any]:
     """Generate the model's action based on the current turn data and court record."""
     logging.info(f"Generating model action for turn: {turn_data.get('turn_number', 'Unknown')}")
-    context = turn_data["context"] + "\n"
+    
+    # Use summarized context if summarization is enabled
+    if should_summarize:
+        context = await summarize_context(turn_data, model) + "\n"
+    else:
+        context = turn_data["context"] + "\n"
 
     # Adding cross-examination data to the prompt
     if turn_data["category"] == "cross_examination":
@@ -191,6 +257,16 @@ async def get_model_action(model: str, prompt: str, turn_data: Dict[str, Any],
                         action = json.loads(json_str)
                         if action.get("action") == "present" and "testimony" in action and "evidence" in action:
                             logging.info(f"Valid action received: {action}")
+                            # Check if the action is correct
+                            is_correct = verify_reasoning(model, response['choices'][0]['message']['content'].strip(), action)
+                            if not is_correct:
+                                messages.append({"role": "assistant", "content": response})
+                                messages.append({
+                                    "role": "user", 
+                                    "content": "Your previous response was incorrect. Please provide a valid JSON object with 'action', 'testimony', and 'evidence' fields. " +
+                                    "The 'action' must be 'present'. Make sure that the testimony and evidence you pick match your reasoning."
+                                })
+                                continue
                             return {
                                 "action": f"present@{action['evidence']}@{action['testimony']}",
                                 "response": response
@@ -235,6 +311,17 @@ async def get_model_action(model: str, prompt: str, turn_data: Dict[str, Any],
                     action = json.loads(json_str)
                     if action.get("action") == "present" and "testimony" in action and "evidence" in action:
                         logging.info(f"Valid action received: {action}")
+                        # Check if the action is correct
+                        is_correct = verify_reasoning(model, response['choices'][0]['message']['content'].strip(), action)
+                        if not is_correct:
+                            # Verify reasoning if the action is incorrect
+                            messages.append({"role": "assistant", "content": response})
+                            messages.append({
+                                "role": "user", 
+                                "content": "Your previous response was incorrect. Please provide a valid JSON object with 'action', 'testimony', and 'evidence' fields. " +
+                                "The 'action' must be 'present'. Make sure that the testimony and evidence you pick match your reasoning."
+                            })
+                            continue
                         return {
                                 "action": f"present@{action['evidence']}@{action['testimony']}",
                                 "response": response
@@ -257,7 +344,7 @@ async def get_model_action(model: str, prompt: str, turn_data: Dict[str, Any],
         raise ValueError("No action generated for this turn which is not cross-examination")
 
 
-async def simulate(model: str, prompt: str, case_data: List[Dict[str, Any]], cot: bool) -> List[Dict[str, Any]]:
+async def simulate(model: str, prompt: str, case_data: List[Dict[str, Any]], cot: bool, should_summarize: bool) -> List[Dict[str, Any]]:
     """Simulate the case and return the model's outputs."""
     outputs = []
     logging.info(f"Starting simulation for model: {model}")
@@ -272,7 +359,7 @@ async def simulate(model: str, prompt: str, case_data: List[Dict[str, Any]], cot
                         "characters": turn_data["characters"]}
 
         if turn_data["category"] == "cross_examination":
-            results = await get_model_action(model, prompt, turn_data, court_record, cot)
+            results = await get_model_action(model, prompt, turn_data, court_record, cot, should_summarize)
             action = results["action"]
             response = results["response"]
             outputs.append({
@@ -290,13 +377,12 @@ async def main():
     args = parser.parse_args()
     # Setup logging with optional log file
     cot_few_shot_suffix = "_cot_few_shot" if args.cot_few_shot else ""
-    # Get current date and time in the desired format (e.g., YYYYMMDD_HHMMSS)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    summary_suffix = "_context_summary" if args.summary else ""
     # Setup logging with log file
     if args.log_file:
-        log_file = os.getcwd() + f"/logs/close_llm/job_{args.model}_{args.prompt}{cot_few_shot_suffix}_{args.log_file}.log"
+        log_file = os.getcwd() + f"/logs/close_llm/job_{args.model}_{args.prompt}{cot_few_shot_suffix}{summary_suffix}_{args.log_file}.log"
     else:
-        log_file = os.getcwd() + f"/logs/close_llm/job_{args.model}_{args.prompt}{cot_few_shot_suffix}_default_log_{timestamp}.log"
+        log_file = os.getcwd() + f"/logs/close_llm/job_{args.model}_{args.prompt}{cot_few_shot_suffix}{summary_suffix}.log"
 
     setup_logging(args.log_level, log_file)
     logging.info(f"Starting script with arguments: model={args.model}, prompt={args.prompt}, case={args.case}, cot={args.cot_few_shot}")
@@ -312,14 +398,15 @@ async def main():
     prompt = load_prompt(args.prompt)
 
     # Run the simulation
-    outputs = await simulate(args.model, prompt, case_data, args.cot_few_shot)
+    outputs = await simulate(args.model, prompt, case_data, args.cot_few_shot, args.summary)
 
     # Save the outputs
     output_dir = os.path.join("closed_model_output", args.model, args.prompt)
     os.makedirs(output_dir, exist_ok=True)
     # Include 'cot' in the output filename if enabled
     cot_few_shot_suffix = "_cot_few_shot" if args.cot_few_shot else ""
-    output_file = os.path.join(output_dir, f"{args.case}_output{cot_few_shot_suffix}.json")
+    summary_suffix = "_context_summary" if args.summary else ""
+    output_file = os.path.join(output_dir, f"{args.case}_output{cot_few_shot_suffix}{summary_suffix}.json")
     logging.info(f"Saving output to: {output_file}")
     with open(output_file, 'w') as file:
         json.dump(outputs, file, indent=2)
