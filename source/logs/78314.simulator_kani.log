@@ -1,0 +1,37 @@
+cpu-bind=MASK - nlpgpu04, task  0  0 [37627]: mask 0x3f0300003f03 set
+cpu-bind=MASK - nlpgpu04, task  0  0 [37646]: mask 0x3f0300003f03 set
+cpu-bind=MASK - nlpgpu08, task  1  0 [35195]: mask 0xff000000ff set
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 2/8 [00:00<00:00, 11.45it/s]Loading checkpoint shards:  50%|█████     | 4/8 [00:00<00:00, 11.62it/s]Loading checkpoint shards:  75%|███████▌  | 6/8 [00:00<00:00, 11.70it/s]Loading checkpoint shards: 100%|██████████| 8/8 [00:00<00:00, 11.80it/s]Loading checkpoint shards: 100%|██████████| 8/8 [00:00<00:00, 11.73it/s]
+The 'max_batch_size' argument of HybridCache is deprecated and will be removed in v4.46. Use the more precisely named 'batch_size' argument instead.
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:00<00:01,  4.70it/s]Loading checkpoint shards:  25%|██▌       | 2/8 [00:00<00:02,  2.71it/s]Loading checkpoint shards:  38%|███▊      | 3/8 [00:01<00:02,  2.36it/s]Loading checkpoint shards:  50%|█████     | 4/8 [00:01<00:01,  2.16it/s]Loading checkpoint shards:  62%|██████▎   | 5/8 [00:02<00:01,  2.14it/s]Loading checkpoint shards:  75%|███████▌  | 6/8 [00:02<00:00,  2.13it/s]Loading checkpoint shards:  88%|████████▊ | 7/8 [00:03<00:00,  2.13it/s]Loading checkpoint shards: 100%|██████████| 8/8 [00:03<00:00,  2.45it/s]Loading checkpoint shards: 100%|██████████| 8/8 [00:03<00:00,  2.35it/s]
+Starting from v4.46, the `logits` model output will have the same type as the model (except at train time, where it will always be FP32)
+----------------------- 
+
+----------------------- 
+
+---------------------------------------
+Traceback (most recent call last):
+  File "/mnt/nlpgridio3/data/aceAttorney/source/llama_simulator_closedLLM.py", line 173, in <module>
+    asyncio.run(main())
+  File "/home1/a/adilsha/miniconda3/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/home1/a/adilsha/miniconda3/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home1/a/adilsha/miniconda3/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/mnt/nlpgridio3/data/aceAttorney/source/llama_simulator_closedLLM.py", line 158, in main
+    outputs = await simulate(args.model, prompt, case_data)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/nlpgridio3/data/aceAttorney/source/llama_simulator_closedLLM.py", line 132, in simulate
+    action = await get_model_action(model, prompt, turn_data, court_record)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/nlpgridio3/data/aceAttorney/source/llama_simulator_closedLLM.py", line 65, in get_model_action
+    print(reponse)
+          ^^^^^^^
+NameError: name 'reponse' is not defined. Did you mean: 'response'?
+srun: error: nlpgpu04: task 0: Exited with exit code 1
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** JOB 78314 ON nlpgpu04 CANCELLED AT 2024-10-05T03:19:57 ***
