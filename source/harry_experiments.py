@@ -2,8 +2,6 @@ import json
 import os
 from kani import Kani
 from kani.engines.huggingface import HuggingEngine
-from kani.prompts.impl import LLAMA3_PIPELINE
-from kani.prompts.impl import GEMMA_PIPELINE
 import asyncio
 
 def parse_json(file_path):
