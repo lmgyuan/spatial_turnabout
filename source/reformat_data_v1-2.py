@@ -15,6 +15,7 @@ for fname in fnames:
     characters = data[0]["characters"]
     evidences = data[0]["court_record"]["evidence_objects"]
     new_data = {
+        "previousContext": "",
         "characters": characters,
         "evidences": evidences,
         "turns": []
@@ -22,9 +23,9 @@ for fname in fnames:
     for turn_id, turn in enumerate(data):
         new_data["turns"].append({
             "category": turn["category"],
-            "new_context": turn["newContext"],
+            "newContext": turn["newContext"],
             "testimonies": turn["testimonies"],
-            "no_present": turn["no_present"]
+            "noPresent": turn["no_present"]
         })
     with open(os.path.join(target_dir, fname), 'w') as f:
         json.dump(new_data, f, indent=2)
