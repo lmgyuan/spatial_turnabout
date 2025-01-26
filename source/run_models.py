@@ -3,35 +3,40 @@ import os
 from kani import Kani
 from kani.engines.huggingface import HuggingEngine
 import asyncio
+import argparse
+
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('--model', type=str, help='model name')
+parser.add_argument('--prompt', type=str)
+parser.add_argument('--case', type=str)
+
+args = parser.parse_args()
+MODEL = args.model
+PROMPT_FILE = args.prompt + ".json"
+CASE = args.case if args.case else "ALL"
+
+with open("prompts/" + PROMPT_FILE, 'r') as file:
+    # parse json
+    data = json.load(file)
+    prompt_prefix = data['prefix']
+    prompt_suffix = data['suffix']
 
 def parse_json(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
+        characters = []
+        evidences = []
+        for character in data.get('characters', {}):
+            characters.append(character)
+        for evidence in data.get('evidences', {}):
+            evidences.append(evidence)
         turns = []
-        for turn in data:
-            #print("Evidence Objects:")
-            evidences = []
-            for evidence in turn.get('court_record', {}).get('evidence_objects', []):
-                # print(f"  - Name: {evidence['name']}")
-                # print(f"    Type: {evidence['type']}")
-                # print(f"    Obtained: {evidence['obtained']}")
-                # print(f"    Description: {evidence['description1']}")
-                # print(f"    Current Chapter: {evidence['currentChapter']}")
-                # print()
-                evidences.append(evidence)
-            
-            #print("Testimonies:")
+        for turn in data["turns"]:
             testimonies = []
             for testimony in turn.get('testimonies', []):
-                # print(f"  - Testimony: {testimony['testimony']}")
-                # print(f"    Person: {testimony['person']}")
-                # if 'present' in testimony:
-                #     print(f"    Present: {', '.join(testimony['present'])}")
-                # if 'source' in testimony:
-                #     print(f"    Source: {testimony['source']}")
-                # print()
                 testimonies.append(testimony)
             turns.append({
+                'characters': characters,
                 'evidences': evidences,
                 'testimonies': testimonies
             })
@@ -39,8 +44,6 @@ def parse_json(file_path):
         return turns
 
 def build_prompt(turns):
-    prompt_prefix = "You are provided with a list of evidences and testimonies.\n"
-    prompt_suffix = """Which evidence and testimony contradict each other? You must only answer one pair. Your answer must end with a JSON format like so: {"evidence": 2, "testimony": 3}"""
     prompts = []
     for turn in turns:
         prompt = ""
@@ -59,19 +62,17 @@ def build_prompt(turns):
         prompts.append(prompt_prefix + prompt + prompt_suffix)
 
     return prompts
-    
-MODEL = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"
 
 def run_model(model, prompts):
     answer_jsons = []
     for prompt in prompts:
-        print(prompt)
+        #print(prompt)
         engine = HuggingEngine(model_id = model, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
         ai = Kani(engine, system_prompt="")
 
         async def run_model():
-            response = await ai.chat_round_str(prompt)
-            print(response)
+            response = await ai.chat_round_str(prompt, temperature=0.6)
+            #print(response)
             return response
 
         response = asyncio.run(run_model())
@@ -84,9 +85,25 @@ def run_model(model, prompts):
 
 
 if __name__ == "__main__":
-    turns = parse_json('../case_data/final/3-1-1_Turnabout_Memories.json')
-    prompts = build_prompt(turns)
-    #print(prompts)
-    answer_jsons = run_model(MODEL, prompts)
-    for answer_json in answer_jsons:
-        print(answer_json)
+    data_dir = '../data/aceattorney_data/final'
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT_FILE}'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    all_fnames = sorted(os.listdir(data_dir))
+    if CASE == "ALL":
+        fnames = sorted(os.listdir(data_dir))
+    else:
+        for fname in all_fnames:
+            if fname.startswith(CASE):
+                fnames = [fname]
+    for fname in fnames:
+        print(fname)
+        turns = parse_json(os.path.join(data_dir, fname))
+        prompts = build_prompt(turns)
+        #print(prompts)
+        answer_jsons = run_model(MODEL, prompts)
+        for answer_json in answer_jsons:
+            print(answer_json)
+        with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
+            for answer_json in answer_jsons:
+                file.write(answer_json + "\n")
