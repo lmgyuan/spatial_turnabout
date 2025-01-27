@@ -38,7 +38,6 @@ if __name__ == "__main__":
             for turn in data['turns']:
                 correct_pairs = []
                 if turn["noPresent"]:
-                    gold.append({"evidence": -1, "testimony": -1})
                     continue
                 for i, testimony in enumerate(turn['testimonies']):
                     if testimony["present"]:
@@ -58,9 +57,13 @@ if __name__ == "__main__":
         total = 0
         print(pred)
         print(gold)
-        for i in range(len(pred)):
-            for pair in pred[i]:
-                if pair in gold[i]:
-                    correct += 1
-                total += 1
+        for i, pair in enumerate(pred):
+            print(f"i {i}")
+            print(f"Pred: {pair}")
+            if pair in gold[i]:
+                correct += 1
+                print("Correct")
+            else:
+                print("Incorrect")
+            total += 1
         print(f"Accuracy: {correct / total}")

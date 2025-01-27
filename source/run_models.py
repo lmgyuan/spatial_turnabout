@@ -4,6 +4,7 @@ from kani import Kani
 from kani.engines.huggingface import HuggingEngine
 import asyncio
 import argparse
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
@@ -32,6 +33,8 @@ def parse_json(file_path):
             evidences.append(evidence)
         turns = []
         for turn in data["turns"]:
+            if turn["noPresent"]:
+                continue
             testimonies = []
             for testimony in turn.get('testimonies', []):
                 testimonies.append(testimony)
@@ -64,12 +67,11 @@ def build_prompt(turns):
     return prompts
 
 def run_model(model, prompts):
+    engine = HuggingEngine(model_id = model, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
+    ai = Kani(engine, system_prompt="")
     answer_jsons = []
     for prompt in prompts:
         #print(prompt)
-        engine = HuggingEngine(model_id = model, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
-        ai = Kani(engine, system_prompt="")
-
         async def run_model():
             response = await ai.chat_round_str(prompt, temperature=0.6)
             #print(response)
@@ -86,7 +88,8 @@ def run_model(model, prompts):
 
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT_FILE}'
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT_FILE}_{timestamp}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     all_fnames = sorted(os.listdir(data_dir))
