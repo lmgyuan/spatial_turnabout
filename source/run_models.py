@@ -13,10 +13,10 @@ parser.add_argument('--case', type=str)
 
 args = parser.parse_args()
 MODEL = args.model
-PROMPT_FILE = args.prompt + ".json"
+PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
 
-with open("prompts/" + PROMPT_FILE, 'r') as file:
+with open("prompts/" + PROMPT + ".json", 'r') as file:
     # parse json
     data = json.load(file)
     prompt_prefix = data['prefix']
@@ -70,6 +70,7 @@ def run_model(model, prompts):
     engine = HuggingEngine(model_id = model, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
     answer_jsons = []
+    full_responses = []
     for prompt in prompts:
         #print(prompt)
         async def run_model():
@@ -83,13 +84,14 @@ def run_model(model, prompts):
             return lines[-1] if lines else ""
         answer_json = get_last_line(response)
         answer_jsons.append(answer_json)
-    return answer_jsons
+        full_responses.append(response)
+    return answer_jsons, full_responses
 
 
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT_FILE}_{timestamp}'
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{timestamp}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     all_fnames = sorted(os.listdir(data_dir))
@@ -104,9 +106,12 @@ if __name__ == "__main__":
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
         #print(prompts)
-        answer_jsons = run_model(MODEL, prompts)
+        answer_jsons, full_responses = run_model(MODEL, prompts)
         for answer_json in answer_jsons:
             print(answer_json)
         with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
             for answer_json in answer_jsons:
                 file.write(answer_json + "\n")
+        with open(os.path.join(output_dir, fname.split('.')[0] + '_full_responses.txt'), 'w') as file:
+            for response in full_responses:
+                file.write(response + "\n")
