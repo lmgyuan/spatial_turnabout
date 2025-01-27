@@ -67,8 +67,6 @@ def build_prompt(turns):
     return prompts
 
 def run_model(model, prompts):
-    engine = HuggingEngine(model_id = model, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
-    ai = Kani(engine, system_prompt="")
     answer_jsons = []
     full_responses = []
     for prompt in prompts:
@@ -94,6 +92,8 @@ if __name__ == "__main__":
     output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{timestamp}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    engine = HuggingEngine(model_id = model, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
+    ai = Kani(engine, system_prompt="")
     all_fnames = sorted(os.listdir(data_dir))
     if CASE == "ALL":
         fnames = sorted(os.listdir(data_dir))
