@@ -66,7 +66,7 @@ def build_prompt(turns):
 
     return prompts
 
-def run_model(model, prompts):
+def run_model(prompts):
     answer_jsons = []
     full_responses = []
     for prompt in prompts:
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{timestamp}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    engine = HuggingEngine(model_id = model, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
+    engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
     all_fnames = sorted(os.listdir(data_dir))
     if CASE == "ALL":
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
         #print(prompts)
-        answer_jsons, full_responses = run_model(MODEL, prompts)
+        answer_jsons, full_responses = run_model(prompts)
         for answer_json in answer_jsons:
             print(answer_json)
         with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
