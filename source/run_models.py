@@ -9,7 +9,7 @@ from datetime import datetime
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
-parser.add_argument('--case', type=str)
+parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
 
 args = parser.parse_args()
 MODEL = args.model
@@ -96,11 +96,15 @@ if __name__ == "__main__":
     ai = Kani(engine, system_prompt="")
     all_fnames = sorted(os.listdir(data_dir))
     if CASE == "ALL":
-        fnames = sorted(os.listdir(data_dir))
+        fnames = all_fnames
     else:
-        for fname in all_fnames:
-            if fname.startswith(CASE):
-                fnames = [fname]
+        for i, fname in enumerate(all_fnames):
+            if fname.startswith(CASE.strip('+')):
+                if CASE.endswith('+'):
+                    fnames = all_fnames[i:]
+                else:
+                    fnames = [fname]
+                break
     for fname in fnames:
         print(fname)
         turns = parse_json(os.path.join(data_dir, fname))
