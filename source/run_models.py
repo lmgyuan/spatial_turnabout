@@ -89,9 +89,16 @@ def run_model(prompts):
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{timestamp}'
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    with open(os.path.join(output_dir, 'metada.json'), 'w') as file:
+        json.dump({
+            'model': MODEL,
+            'prompt': PROMPT,
+            'case': CASE,
+            'timestamp': timestamp
+        }, file, indent=2)
     engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
     all_fnames = sorted(os.listdir(data_dir))
