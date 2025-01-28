@@ -113,11 +113,18 @@ def run_model(prompts):
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{timestamp}'
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
-    ai = Kani(engine, system_prompt="")
+    # output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir)
+    # with open(os.path.join(output_dir, 'metada.json'), 'w') as file:
+    #     json.dump({
+    #         'model': MODEL,
+    #         'prompt': PROMPT,
+    #         'case': CASE,
+    #         'timestamp': timestamp
+    #     }, file, indent=2)
+    # engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
+    # ai = Kani(engine, system_prompt="")
     all_fnames = sorted(os.listdir(data_dir))
     if CASE == "ALL":
         fnames = all_fnames
@@ -133,25 +140,13 @@ if __name__ == "__main__":
         print(fname)
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
-        #print(prompts)
-        if USE_TOT:
-            answer_jsons = []
-            full_responses = []
-            for idx, prompt in enumerate(prompts):
-                print(f"turn {idx + 1} / {len(prompts)}")
-                best_response, _ = asyncio.run(tot(prompt, ai))  # tot accepts a single prompt
-                answer_json = get_last_line(best_response) 
-                answer_jsons.append(answer_json)
-                full_responses.append(best_response)
-        else:
-            # Run the base run_model
-            answer_jsons, full_responses = run_model(prompts)
-
-        for answer_json in answer_jsons:
-            print(answer_json)
-        with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
-            for answer_json in answer_jsons:
-                file.write(answer_json + "\n")
-        with open(os.path.join(output_dir, fname.split('.')[0] + '_full_responses.txt'), 'w') as file:
-            for response in full_responses:
-                file.write(response + "\n")
+        print(prompts[0])
+        # answer_jsons, full_responses = run_model(prompts)
+        # for answer_json in answer_jsons:
+        #     print(answer_json)
+        # with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
+        #     for answer_json in answer_jsons:
+        #         file.write(answer_json + "\n")
+        # with open(os.path.join(output_dir, fname.split('.')[0] + '_full_responses.txt'), 'w') as file:
+        #     for response in full_responses:
+        #         file.write(response + "\n")
