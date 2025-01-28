@@ -6,6 +6,8 @@ import asyncio
 import argparse
 from datetime import datetime
 
+from tot import *
+
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
@@ -16,6 +18,7 @@ args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
+USE_TOT = True 
 
 with open("prompts/" + PROMPT + ".json", 'r') as file:
     # parse json
@@ -86,6 +89,10 @@ def build_prompt(turns):
         prompts.append(prompt_prefix + prompt + prompt_suffix)
     return prompts
 
+def get_last_line(multiline_string):
+    lines = multiline_string.splitlines()
+    return lines[-1] if lines else ""
+
 def run_model(prompts):
     answer_jsons = []
     full_responses = []
@@ -97,9 +104,6 @@ def run_model(prompts):
             return response
 
         response = asyncio.run(run_model())
-        def get_last_line(multiline_string):
-            lines = multiline_string.splitlines()
-            return lines[-1] if lines else ""
         answer_json = get_last_line(response)
         answer_jsons.append(answer_json)
         full_responses.append(response)
@@ -109,16 +113,9 @@ def run_model(prompts):
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{timestamp}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    with open(os.path.join(output_dir, 'metada.json'), 'w') as file:
-        json.dump({
-            'model': MODEL,
-            'prompt': PROMPT,
-            'case': CASE,
-            'timestamp': timestamp
-        }, file, indent=2)
     engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
     all_fnames = sorted(os.listdir(data_dir))
@@ -137,7 +134,19 @@ if __name__ == "__main__":
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
         #print(prompts)
-        answer_jsons, full_responses = run_model(prompts)
+        if USE_TOT:
+            answer_jsons = []
+            full_responses = []
+            for idx, prompt in enumerate(prompts):
+                print(f"turn {idx + 1} / {len(prompts)}")
+                best_response, _ = asyncio.run(tot(prompt, ai))  # tot accepts a single prompt
+                answer_json = get_last_line(best_response) 
+                answer_jsons.append(answer_json)
+                full_responses.append(best_response)
+        else:
+            # Run the base run_model
+            answer_jsons, full_responses = run_model(prompts)
+
         for answer_json in answer_jsons:
             print(answer_json)
         with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
