@@ -9,6 +9,7 @@ from datetime import datetime
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
+parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
 
 args = parser.parse_args()
@@ -36,34 +37,53 @@ def parse_json(file_path):
             if turn["noPresent"]:
                 continue
             testimonies = []
-            for testimony in turn.get('testimonies', []):
+            for testimony in turn['testimonies']:
                 testimonies.append(testimony)
             turns.append({
                 'characters': characters,
                 'evidences': evidences,
-                'testimonies': testimonies
+                'testimonies': testimonies,
+                'new_context': turn['newContext']
             })
             #break
         return turns
 
 def build_prompt(turns):
     prompts = []
+    context_sofar = ""
     for turn in turns:
-        prompt = ""
+        new_context = turn['new_context']
+        context_sofar += new_context
+        if args.context == "none":
+            prompt = ""
+        else:
+            prompt = "Story:\n"
+            if args.context == "new":
+                prompt += new_context + "\n"
+            elif args.context == "day":
+                prompt += context_sofar + "\n"
+        character_counter = 0
+        prompt = "Characters:\n"
+        for character in turn['characters']:
+            prompt += f"Character {character_counter}\n"
+            prompt += f"Name: {character['name']}\n"
+            prompt += f"Description: {character['description']}\n"
+            character_counter += 1
         evidence_counter = 0
+        prompt = "Evidences:\n"
         for evidence in turn['evidences']:
             prompt += f"Evidence {evidence_counter}\n"
             prompt += f"Name: {evidence['name']}\n"
             prompt += f"Description: {evidence['description1']}\n"
             evidence_counter += 1
         testimony_counter = 0
+        prompt = "Testimonies:\n"
         for testimony in turn['testimonies']:
             prompt += f"Testimony {testimony_counter}\n"
             prompt += f"Testimony: {testimony['testimony']}\n"
             prompt += f"Person: {testimony['person']}\n"
             testimony_counter += 1
         prompts.append(prompt_prefix + prompt + prompt_suffix)
-
     return prompts
 
 def run_model(prompts):
