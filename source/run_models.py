@@ -5,6 +5,9 @@ from kani.engines.huggingface import HuggingEngine
 import asyncio
 import argparse
 from datetime import datetime
+from sentence_transformers import CrossEncoder
+import torch
+import math
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
@@ -16,6 +19,8 @@ args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
+
+reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
 
 with open("prompts/" + PROMPT + ".json", 'r') as file:
     # parse json
@@ -47,6 +52,16 @@ def parse_json(file_path):
             })
             #break
         return turns
+
+def prompt_extract(context, query, keep_ratio=0.5):
+    sentences = context.split('\n')
+    total_sentences = len(sentences)
+    top_k = max(1, math.ceil(keep_ratio * total_sentences)) 
+    scores = reranker.predict([(s, query) for s in sentences])
+    top_indices = torch.argsort(torch.tensor(scores), descending=True)[:top_k]
+    top_indices_sorted = sorted(top_indices.tolist())
+    selected_sentences = [sentences[i] for i in top_indices_sorted]
+    return ' '.join(selected_sentences) 
 
 def build_prompt(turns):
     prompts = []
@@ -84,7 +99,7 @@ def build_prompt(turns):
             prompt += f"Person: {testimony['person']}\n"
             testimony_counter += 1
         prompts.append(prompt_prefix + prompt + prompt_suffix)
-    return prompts
+    return prompts 
 
 def run_model(prompts):
     answer_jsons = []
