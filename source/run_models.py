@@ -67,7 +67,7 @@ def build_prompt(turns):
         for character in turn['characters']:
             prompt += f"Character {character_counter}\n"
             prompt += f"Name: {character['name']}\n"
-            prompt += f"Description: {character['description']}\n"
+            prompt += f"Description: {character['description1']}\n"
             character_counter += 1
         evidence_counter = 0
         prompt = "Evidences:\n"
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         print(fname)
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
-        #print(prompts)
+        # print(prompts)
         answer_jsons, full_responses = run_model(prompts)
         for answer_json in answer_jsons:
             print(answer_json)

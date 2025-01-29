@@ -163,7 +163,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
 
     if CASE != "ALL":
         return
-    with open(os.path.join(output_dir, f"report.json"), 'w') as f:
+    with open(os.path.join(output_dir, f"report_v2.json"), 'w') as f:
         json.dump(report_json, f, indent=2)
 
 if __name__ == "__main__":
