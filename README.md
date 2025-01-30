@@ -2,7 +2,7 @@
 
 This project benchmarks LLMs' deductive reasoning ability using interactive detective novel games such as [Ace Attorney](https://en.wikipedia.org/wiki/Ace_Attorney) and [Danganronpa](https://en.wikipedia.org/wiki/Danganronpa). This repo includes our datasets, scripts, and analyses.
 
-![Objection!](images/Objection.webp)
+![Objection!](images/objection.jpg)
 
 ## Why interactive detective novels?
 
