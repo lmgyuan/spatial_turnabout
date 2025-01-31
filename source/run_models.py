@@ -67,37 +67,47 @@ def build_prompt(turns):
     prompts = []
     context_sofar = ""
     for turn in turns:
+
         new_context = turn['new_context']
         context_sofar += new_context
+        overall_context = ""
         if args.context == "none":
-            prompt = ""
+            overall_context = ""
         else:
-            prompt = "Story:\n"
+            overall_context = "Story:\n"
             if args.context == "new":
-                prompt += new_context + "\n"
+                overall_context += new_context + "\n"
             elif args.context == "day":
-                prompt += context_sofar + "\n"
+                overall_context += context_sofar + "\n"
+
         character_counter = 0
-        prompt = "Characters:\n"
+        characters = "Characters:\n"
         for character in turn['characters']:
-            prompt += f"Character {character_counter}\n"
-            prompt += f"Name: {character['name']}\n"
-            prompt += f"Description: {character['description']}\n"
+            characters += f"Character {character_counter}\n"
+            characters += f"Name: {character['name']}\n"
+            characters += f"Description: {character['description']}\n"
             character_counter += 1
+
         evidence_counter = 0
-        prompt = "Evidences:\n"
+        evidences = "Evidences:\n"
         for evidence in turn['evidences']:
-            prompt += f"Evidence {evidence_counter}\n"
-            prompt += f"Name: {evidence['name']}\n"
-            prompt += f"Description: {evidence['description1']}\n"
+            evidences += f"Evidence {evidence_counter}\n"
+            evidences += f"Name: {evidence['name']}\n"
+            evidences += f"Description: {evidence['description1']}\n"
             evidence_counter += 1
+
         testimony_counter = 0
-        prompt = "Testimonies:\n"
+        testimonies = "Testimonies:\n"
         for testimony in turn['testimonies']:
-            prompt += f"Testimony {testimony_counter}\n"
-            prompt += f"Testimony: {testimony['testimony']}\n"
-            prompt += f"Person: {testimony['person']}\n"
+            testimonies += f"Testimony {testimony_counter}\n"
+            testimonies += f"Testimony: {testimony['testimony']}\n"
+            testimonies += f"Person: {testimony['person']}\n"
             testimony_counter += 1
+
+        query = prompt_prefix + characters + evidences + testimonies + prompt_suffix
+        extracted_context = prompt_extract(overall_context, query)
+        prompt = extracted_context + "\n" + characters + evidences + testimonies
+
         prompts.append(prompt_prefix + prompt + prompt_suffix)
     return prompts 
 
