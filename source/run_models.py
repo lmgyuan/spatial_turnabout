@@ -106,9 +106,12 @@ def build_prompt(turns):
             testimonies += f"Person: {testimony['person']}\n"
             testimony_counter += 1
 
-        query = prompt_prefix + characters + evidences + testimonies + prompt_suffix
-        extracted_context = prompt_extract(overall_context, query)
-        prompt = extracted_context + "\n" + characters + evidences + testimonies
+        if EXTRACTION:
+            query = prompt_prefix + characters + evidences + testimonies + prompt_suffix
+            extracted_context = prompt_extract(overall_context, query)
+            prompt = extracted_context + "\n" + characters + evidences + testimonies
+        else:
+            prompt = overall_context + "\n" + characters + evidences + testimonies
 
         prompts.append(prompt_prefix + prompt + prompt_suffix)
     return prompts 
