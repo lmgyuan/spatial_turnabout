@@ -87,7 +87,9 @@ def build_prompt(turns):
         for character in turn['characters']:
             characters += f"Character {character_counter}\n"
             characters += f"Name: {character['name']}\n"
-            characters += f"Description: {character['description']}\n"
+            desc_keys = [key for key in character.keys() if key.startswith("description")]
+            latest_desc_key = max(desc_keys, key=lambda k: int(k.replace("description", "") or 0))
+            characters += f"Description: {character[latest_desc_key]}\n"
             character_counter += 1
 
         evidence_counter = 0
@@ -95,7 +97,9 @@ def build_prompt(turns):
         for evidence in turn['evidences']:
             evidences += f"Evidence {evidence_counter}\n"
             evidences += f"Name: {evidence['name']}\n"
-            evidences += f"Description: {evidence['description1']}\n"
+            desc_keys = [key for key in evidence.keys() if key.startswith("description")]
+            latest_desc_key = max(desc_keys, key=lambda k: int(k.replace("description", "") or 0))
+            characters += f"Description: {evidence[latest_desc_key]}\n"
             evidence_counter += 1
 
         testimony_counter = 0
