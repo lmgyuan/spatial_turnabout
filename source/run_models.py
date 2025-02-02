@@ -14,11 +14,13 @@ parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
 parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+parser.add_argument('--extraction', action='store_true', help='Enable extraction mode')
 
 args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
+EXTRACTION = args.extraction
 
 reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
 
@@ -134,7 +136,10 @@ def run_model(prompts):
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+    extract = ""
+    if EXTRACTION:
+        extract = "extracted"
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{extract}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(os.path.join(output_dir, 'metada.json'), 'w') as file:
