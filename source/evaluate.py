@@ -6,14 +6,19 @@ parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
 parser.add_argument('--case', type=str)
+parser.add_argument('--extraction', action='store_true', help='Enable extraction mode')
 
 args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
+EXTRACTION = args.extraction
+extract = ""
+if EXTRACTION:
+    extract = "extracted"
 
 data_dir = '../data/aceattorney_data/final'
-output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{extract}'
 
 def parse_pred(caseid):
     pred = []
