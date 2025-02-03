@@ -129,6 +129,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                         "testimony": testimonies_by_case[caseid][i][pred[i]["testimony"]] if pred[i]["testimony"] < len(testimonies_by_case[caseid][i]) else "N/A"
                     }
                 elif "character" in pred[i]:
+                    print(caseid + "\n")
                     print("prediction \n")
                     print(pred[i])
                     print("\n" + "\n")
