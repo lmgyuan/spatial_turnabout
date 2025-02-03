@@ -56,7 +56,7 @@ def parse_json(file_path):
         return turns
 
 def prompt_extract(context, query, keep_ratio=0.5):
-    sentences = context.split('\n')
+    sentences = context.split('.')
     total_sentences = len(sentences)
     top_k = max(1, math.ceil(keep_ratio * total_sentences)) 
     scores = reranker.predict([(s, query) for s in sentences])
