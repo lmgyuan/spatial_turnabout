@@ -107,11 +107,11 @@ def build_prompt(turns):
             testimony_counter += 1
 
         if EXTRACTION:
-            query = prompt_prefix + characters + evidences + testimonies + prompt_suffix
+            query = prompt_prefix + "\n" + characters + "\n" + evidences + "\n" + testimonies + "\n" + prompt_suffix
             extracted_context = prompt_extract(overall_context, query)
-            prompt = extracted_context + "\n" + characters + evidences + testimonies
+            prompt = "Story:\n" + extracted_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
         else:
-            prompt = overall_context + "\n" + characters + evidences + testimonies
+            prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
 
         print("query: \n")
         print(query + "\n" + "\n")
@@ -120,7 +120,7 @@ def build_prompt(turns):
         print("extracted: \n")
         print(extracted_context + "\n" + "\n")
 
-        prompts.append(prompt_prefix + prompt + prompt_suffix)
+        prompts.append(prompt_prefix + "\n" + prompt + "\n" + prompt_suffix)
     return prompts 
 
 def run_model(prompts):
