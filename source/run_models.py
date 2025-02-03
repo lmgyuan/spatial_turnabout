@@ -58,7 +58,8 @@ def parse_json(file_path):
 def prompt_extract(context, query, keep_ratio=0.5):
     sentences = context.split('.')
     total_sentences = len(sentences)
-    top_k = max(1, math.ceil(keep_ratio * total_sentences)) 
+    # top_k = max(1, math.ceil(keep_ratio * total_sentences)) 
+    top_k = 20
     scores = reranker.predict([(s, query) for s in sentences])
     top_indices = torch.argsort(torch.tensor(scores), descending=True)[:top_k]
     top_indices_sorted = sorted(top_indices.tolist())
