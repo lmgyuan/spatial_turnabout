@@ -85,17 +85,17 @@ def build_prompt(turns):
         character_counter = 0
         characters = "Characters:\n"
         for character in turn['characters']:
-            prompt += f"Character {character_counter}\n"
-            prompt += f"Name: {character['name']}\n"
-            prompt += f"Description: {character['description1']}\n"
+            characters += f"Character {character_counter}\n"
+            characters += f"Name: {character['name']}\n"
+            characters += f"Description: {character['description1']}\n"
             character_counter += 1
 
         evidence_counter = 0
         evidences = "Evidences:\n"
         for evidence in turn['evidences']:
-            prompt += f"Evidence {evidence_counter}\n"
-            prompt += f"Name: {evidence['name']}\n"
-            prompt += f"Description: {evidence['description1']}\n"
+            evidences += f"Evidence {evidence_counter}\n"
+            evidences += f"Name: {evidence['name']}\n"
+            evidences += f"Description: {evidence['description1']}\n"
             evidence_counter += 1
 
         testimony_counter = 0
