@@ -13,12 +13,11 @@ MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
 EXTRACTION = args.extraction
-extract = ""
-if EXTRACTION:
-    extract = "extracted"
 
 data_dir = '../data/aceattorney_data/final'
-output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{extract}'
+output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+if EXTRACTION:
+    output_dir += '_extracted'
 
 def parse_pred(caseid):
     pred = []
