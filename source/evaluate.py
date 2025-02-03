@@ -135,6 +135,10 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                     print("\n" + "\n")
                     print("testimony \n")
                     print(testimonies_by_case[caseid])
+                    print("testimony \n")
+                    print(len(testimonies_by_case[caseid]))
+                    print("\n")
+                    print(pred[i]["testimony"])
                     out_pred = {
                         "character_id": pred[i]["character"],
                         "character": evidences_by_case[caseid]["characters"][pred[i]["character"]],
