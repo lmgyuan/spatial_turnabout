@@ -130,6 +130,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                     }
                 elif "character" in pred[i]:
                     print(pred[i])
+                    print("\n" + "\n")
                     print(testimonies_by_case[caseid])
                     out_pred = {
                         "character_id": pred[i]["character"],
