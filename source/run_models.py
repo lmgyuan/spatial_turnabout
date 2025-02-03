@@ -62,7 +62,8 @@ def prompt_extract(context, query, keep_ratio=0.5):
     print("\n" + "\n")
     top_k = max(1, math.ceil(keep_ratio * total_sentences)) 
     top_k = 100
-    print(total_sentences + "\n" + "\n")
+    print(total_sentences)
+    print("\n" + "\n")
     scores = reranker.predict([(s, query) for s in sentences])
     top_indices = torch.argsort(torch.tensor(scores), descending=True)[:top_k]
     top_indices_sorted = sorted(top_indices.tolist())
