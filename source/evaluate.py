@@ -142,7 +142,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                         "character_id": pred[i]["character"],
                         "character": evidences_by_case[caseid]["characters"][pred[i]["character"]],
                         "testimony_id": pred[i]["testimony"],
-                        "testimony": testimonies_by_case[caseid][pred[i]["testimony"]] if pred[i]["testimony"] < len(testimonies_by_case[caseid][i]) else "N/A"
+                        "testimony": testimonies_by_case[caseid][i][pred[i]["testimony"]] if pred[i]["testimony"] < len(testimonies_by_case[caseid][i]) else "N/A"
                     }
             except TypeError:
                 out_pred = {
