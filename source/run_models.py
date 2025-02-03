@@ -58,7 +58,8 @@ def parse_json(file_path):
 def prompt_extract(context, query, keep_ratio=0.5):
     sentences = context.split('.')
     total_sentences = len(sentences)
-    print(total_sentences + "\n" + "\n")
+    print(total_sentences)
+    print("\n" + "\n")
     top_k = max(1, math.ceil(keep_ratio * total_sentences)) 
     top_k = 100
     print(total_sentences + "\n" + "\n")
