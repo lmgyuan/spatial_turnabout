@@ -117,10 +117,12 @@ def build_prompt(turns):
         else:
             prompt = overall_context + "\n" + characters + evidences + testimonies
 
-        print("query: \n")
-        print(query + "\n" + "\n")
-        print("extracted_context: \n")
-        print(extracted_context + "\n" + "\n")
+        print("characters: \n")
+        print(characters + "\n" + "\n")
+        print("evidences: \n")
+        print(evidences + "\n" + "\n")
+        print("testimonies: \n")
+        print(testimonies + "\n" + "\n")
 
         prompts.append(prompt_prefix + prompt + prompt_suffix)
     return prompts 
