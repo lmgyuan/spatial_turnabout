@@ -11,7 +11,7 @@ On the present-level, the following information is annotated:
 - `difficulty`: one of the following:
     - Easy: the contradiction is explicitly local. E.g., testimony "I saw Yuan come into the office at 3AM" evidence: "Yuan is with Adil in a bar at 3AM"
     - Medium: the contradiction is implicitly local. E.g., testimony "I saw Yuan come into the office at 3AM" evidence: "Yuan is abroad with Adil for the whole month" -> the implied logical link is that "If someone travels abroad for a month, they cannot be in the office at any time within"
-    - Hard: the contradiction requires external context. E.g., testimony "I saw Yuan come into the office at 3AM" evidence: "Yuan is seen at the bar at 2:30AM" && previous context "It takes one hour to go from the bar to the office"
+    - Difficult: the contradiction requires external context. E.g., testimony "I saw Yuan come into the office at 3AM" evidence: "Yuan is seen at the bar at 2:30AM" && previous context "It takes one hour to go from the bar to the office"
     - Common sense: the contradiction requires non-trivial common sense
 
 On the turn-level, the following information is annotated:
