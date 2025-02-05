@@ -118,7 +118,7 @@ async function main() {
             previousContext: accumulatedPreviousContext,
             characters: CURR_CHAPTER_CHARACTERS,
             evidences: initialEvidences,
-            crossExaminations
+            turns: crossExaminations
         };
 
         accumulatedPreviousContext += parseContent(contentWrapper);
@@ -129,7 +129,7 @@ async function main() {
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `4-1-${i+1}_Turnabout_Trump_Parsed.json`),
+            path.join(OUTPUT_DIRECTORY, `4-1-${i+1}_Turnabout_Trump.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }

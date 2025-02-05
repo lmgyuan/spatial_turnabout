@@ -120,7 +120,7 @@ async function main() {
             previousContext: accumulatedPreviousContext,
             characters: CURR_CHAPTER_CHARACTERS,
             evidences: initialEvidences,
-            crossExaminations
+            turns: crossExaminations
         };
 
         accumulatedPreviousContext += parseContent(contentWrapper);
@@ -131,7 +131,7 @@ async function main() {
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `4-3-${i+1}_Turnabout_Succession_Parsed.json`),
+            path.join(OUTPUT_DIRECTORY, `4-3-${i+1}_Turnabout_Succession.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }
