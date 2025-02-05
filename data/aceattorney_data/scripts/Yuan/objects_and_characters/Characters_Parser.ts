@@ -3,9 +3,10 @@ import consola from "consola";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
 import fs from "fs";
+import { CASE_DATA_ROOT_DIRECTORY } from "../../legacy/utils.ts";
 
-const OUTPUT_DIRECTORY = "./case_data/generated/characters_parsed/";
-const CHARACTERS_HTML_FILE_DIRECTORY = "./case_data/generated/raw/";
+const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "characters_parsed");
+const CHARACTERS_HTML_FILE_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "raw");
 const CHARACTERS_HTML_FILE_NAMES = fs.readdirSync(CHARACTERS_HTML_FILE_DIRECTORY).filter((fileName) => fileName.startsWith("List_of_Profiles_in"));
 const CHARACTERS_HTML_FILE_PATHS = CHARACTERS_HTML_FILE_NAMES.map((fileName) => path.join(CHARACTERS_HTML_FILE_DIRECTORY, fileName));
 
