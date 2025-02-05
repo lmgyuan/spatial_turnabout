@@ -7,7 +7,7 @@ On the present-level, the following information is annotated:
 - `testimony_span`: the substring span in the testimony text that directly causes the contradiction
 - `explanation`: a short explanation of the contradiction
 - `is_self_contained`: whether finding the contradiction requires additional context beyond the current testimony and evidence
-- `context_span`: the substring span in above context, if any
+- `context_span`: the substring span in above context, or in an evidence or testimony other than the correct one to present, if any
 - `difficulty`: one of the following:
     - Easy: the contradiction is explicitly local. E.g., testimony "I saw Yuan come into the office at 3AM" evidence: "Yuan is with Adil in a bar at 3AM"
     - Medium: the contradiction is implicitly local. E.g., testimony "I saw Yuan come into the office at 3AM" evidence: "Yuan is abroad with Adil for the whole month" -> the implied logical link is that "If someone travels abroad for a month, they cannot be in the office at any time within"
