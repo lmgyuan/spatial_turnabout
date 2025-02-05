@@ -24,3 +24,9 @@ On the turn-level, the following information is annotated:
     - object property: e.g., "death by blunt object" vs. "weapon was a gun"
     - behavior: e.g., "hates music" vs. "listen to music every day"
     - spelling: e.g., "Harry" vs. "Henry"
+- `reasoning`: a list of *facts* to arrive at the contradiction. Considerations:
+    - A fact can either be an *assertion*, something being true, or a *conditional*, some general rule of implication.
+    - The first two facts are always assertions. The first fact is what the witness claims (e.g., "witness claims he saw victim being shot to death"), the second fact is what the evidence suggests (e.g., "the victim died by blunt force"). 
+    - The rest, if any, is either assertions from testimonies, evidences, or contexts, or conditionals from common sense or contexts (e.g., "If someone died by blunt force, they did not die by a gunshot.")
+    - Modus ponens (assertion P + conditional if P then Q → assertion Q) is the only rule needed to combine a pair of facts.
+    - Each fact should be an atomic unit, though subjectivity is inevitable
