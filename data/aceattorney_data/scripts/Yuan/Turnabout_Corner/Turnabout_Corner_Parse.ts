@@ -9,7 +9,7 @@ import { CASE_DATA_ROOT_DIRECTORY } from "../../legacy/utils.ts";
 let FULL_EVIDENCES = JSON.parse(await readFile(path.join(CASE_DATA_ROOT_DIRECTORY, "objects_parsed", "List_of_Evidence_in_Apollo_Justice_Ace_Attorney.json"), "utf-8"));
 let CURR_CHAPTER_EVIDENCES;
 FULL_EVIDENCES.forEach((e, index) => {
-    if (e.chapter == "Turnabout Trump") {
+    if (e.chapter == "Turnabout Corner") {
         CURR_CHAPTER_EVIDENCES = e.evidences;
     }
 })
@@ -19,26 +19,28 @@ let HTML_FILE_PATHS = [];
 let FULL_CHARACTERS = JSON.parse(await readFile(path.join(CASE_DATA_ROOT_DIRECTORY, "characters_parsed", "List_of_Profiles_in_Apollo_Justice_Ace_Attorney.json"), "utf-8"));
 let CURR_CHAPTER_CHARACTERS;
 FULL_CHARACTERS.forEach((e, index) => {
-    if (e.chapter == "Turnabout Trump") {
+    if (e.chapter == "Turnabout Corner") {
         CURR_CHAPTER_CHARACTERS = e.characters;
     }
 })
 
-// Get the Turnabout Trump HTML file
+// Get the HTML files
 try {
     const files = await readdir(path.join(CASE_DATA_ROOT_DIRECTORY, "raw"));
     HTML_FILE_PATHS = files
-        .filter(file => file.startsWith("Turnabout_Trump") && file.endsWith(".html"))
+        .filter(file => file.startsWith("Turnabout_Corner") && file.endsWith(".html"))
         .map(file => path.join(CASE_DATA_ROOT_DIRECTORY, "raw", file));
 } catch (e) {
     consola.fatal("Could not read the directory or filter HTML files.");
     consola.log(e);
 }
 
+// Rest of the code is identical to Turnabout_Trump_Parse.ts except for the output filename 
+
 const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "parsed_full_context");
 
 async function main() {
-    consola.start("Parsing Turnabout Trump HTML file");
+    consola.start("Parsing Turnabout Corner HTML file");
     
     let accumulatedPreviousContext = "";
 
@@ -129,7 +131,7 @@ async function main() {
         }
 
         await writeFile(
-            path.join(OUTPUT_DIRECTORY, `4-1-${i+1}_Turnabout_Trump_Parsed.json`),
+            path.join(OUTPUT_DIRECTORY, `4-2-${i+1}_Turnabout_Corner_Parsed.json`),
             JSON.stringify(parsedData, null, 2)
         );
     }
