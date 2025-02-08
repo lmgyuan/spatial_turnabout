@@ -1,6 +1,7 @@
 import json
 import os
 import argparse
+import copy
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
@@ -102,7 +103,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     def vprint(*args, **kwargs):
         if verbose:
             print(*args, **kwargs)
-    evidences_by_case = get_evidences_by_case(caseids)  # key: caseid, value: {'evidences': , 'characters': }
+    evidences_by_case = get_evidences_by_case(caseids)  # key: caseid, value: {'evidences': [], 'characters': []}
     testimonies_by_case = get_testimonies_by_case(caseids)  # key: caseid, value: [["test1, test2"], ["test1"], ["test1"]]
     labels_by_case = get_labels_by_case(caseids) # key: caseid, value: [{"labels": [], "reasoning": []}, {"labels": [], "reasoning": []}..]
 
@@ -123,7 +124,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                 for turn_category in turn_label["labels"]]))
 
     categories_correct = {label: {"correct": 0, "total": 0, "accuracy": 0, "bad_cases": []} for label in categories}
-    reasoning_correct = {idx: {"correct": 0, "total": 0, "accuracy": 0, "bad_cases": []} for idx in range(1, 7)}
+    reasoning_correct = {idx: {"correct": 0, "total": 0, "accuracy": 0, "bad_cases": []} for idx in range(1, 10)}
 
     for caseid, pred, gold_indices, gold_names \
         in zip(caseids, preds, golds_indices, golds_names):  # num of cases
@@ -174,14 +175,14 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                 elif "evidence" in pred[i]:
                     out_pred = {
                         "evidence_id": pred[i]["evidence"],
-                        "evidence": evidences_by_case[caseid]["evidences"][pred[i]["evidence"]],
+                        "evidence": evidences_by_case[caseid]["evidences"][pred[i]["evidence"]] if [pred[i]["evidence"]] < len(evidences_by_case[caseid]["evidences"]) else "N/A",
                         "testimony_id": pred[i]["testimony"],
                         "testimony": testimonies_by_case[caseid][i][pred[i]["testimony"]] if pred[i]["testimony"] < len(testimonies_by_case[caseid][i]) else "N/A"
                     }
                 elif "character" in pred[i]:
                     out_pred = {
                         "character_id": pred[i]["character"],
-                        "character": evidences_by_case[caseid]["characters"][pred[i]["character"]],
+                        "character": evidences_by_case[caseid]["characters"][pred[i]["character"]] if [pred[i]["character"]] < len(evidences_by_case[caseid]["characters"]) else "N/A",
                         "testimony_id": pred[i]["testimony"],
                         "testimony": testimonies_by_case[caseid][pred[i]["testimony"]]
                     }
@@ -217,14 +218,18 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     report_json["overall_accuracy"] = round(overall_correct / overall_total, 4)
     vprint(f"Overall accuracy: {overall_correct / overall_total}")
 
+    # Log category accuracy
     for label in categories:
         accuracy = categories_correct[label]["correct"] / categories_correct[label]["total"]
         categories_correct[label]["accuracy"] = round(accuracy, 4)
     report_json["categories_accuracy"] = categories_correct
 
-    for idx in reasoning_correct.keys():
+    # Log reasoning step accuracy
+    keys = copy.copy(list(reasoning_correct.keys()))
+    for idx in keys:
         if reasoning_correct[idx]["total"] == 0:
-            continue
+            del reasoning_correct[idx]
+            continue 
         accuracy = reasoning_correct[idx]["correct"] / reasoning_correct[idx]["total"]
         reasoning_correct[idx]["accuracy"] = round(accuracy, 4)
     report_json["reasoning_steps_accuracy"] = reasoning_correct
@@ -245,12 +250,24 @@ if __name__ == "__main__":
     preds = []
     golds_indices = []
     golds_names = []
-    for caseid in caseids:
+    caseids_final = []
+    for i, caseid in enumerate(caseids):
+        pred_path = os.path.join(output_dir, caseid + ".jsonl")
+        if not os.path.exists(pred_path):
+            print(f"{pred_path} does not exist. Skipping...")
+            continue
+
         pred = parse_pred(caseid)
         gold_indices, gold_names = parse_gold(caseid)
+        if len(pred) != len(gold_indices):
+            print(f"Case {caseid}, num of pred: {len(pred)} is not equal to num of turn: {len(gold_indices)}. Skipping...\n")
+            continue
+
+        caseids_final.append(caseid)
         preds.append(pred)  # List of dicts
         golds_indices.append(gold_indices)  # List of list of dicts
         golds_names.append(gold_names)
-        if len(pred) != len(gold_indices):
-            print(f"Case {caseid}, num of pred: {len(pred)} is not equal to num of turn: {len(gold_indices)}. Skipping...\n")
+    
+    print(f"Evaluating {len(caseids)} cases...")
+    caseids = caseids_final
     evaluate(caseids, preds, golds_indices, golds_names)
