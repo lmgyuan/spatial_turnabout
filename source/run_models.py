@@ -134,6 +134,8 @@ if __name__ == "__main__":
                 break
     for fname in fnames:
         print(fname)
+        if fname.startswith('4-'):  # Skip validation set
+            continue
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
         # print(prompts)
