@@ -1,17 +1,19 @@
 import json
 import os
-import asyncio
 import argparse
 from datetime import datetime
+import time
 
 from openai import OpenAI
 client = OpenAI()
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--model', type=str, help='model name')
+parser.add_argument('--model', type=str, default='o3-mini', help='model name')
 parser.add_argument('--prompt', type=str)
 parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+
+# python run_openai_models.py --model o3-mini --prompt harry_v1.2
 
 args = parser.parse_args()
 MODEL = args.model
@@ -116,7 +118,30 @@ def create_batch(fnames):
                 }
             }
             batch.append(request)
+    
+    assert len(batch) > 0, "Must have at least 1 batch item"
     return batch
+
+def submit_batch_job(jsonl_path):
+    batch_input_file = client.files.create(
+        file=open(jsonl_path, "rb"),
+        purpose="batch"
+    )
+    batch_input_file_id = batch_input_file.id
+
+    batch_job = client.batches.create(
+        input_file_id=batch_input_file_id,
+        endpoint="/v1/chat/completions",
+        completion_window="24h",
+        metadata={
+            "description": "turnabout llm"
+        }
+    )
+    batch_job_id = batch_job.id
+    with open(os.path.join(output_dir, "batch_api_metadata.json"), "w") as f:
+        f.write(json.dumps({"batch_job_id": batch_job_id}, indent=4))
+
+    return batch_job_id
 
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
@@ -132,6 +157,7 @@ if __name__ == "__main__":
             'timestamp': timestamp
         }, file, indent=2)
     all_fnames = sorted(os.listdir(data_dir))
+    fnames = []
     if CASE == "ALL":
         fnames = all_fnames
     else:
@@ -156,30 +182,31 @@ if __name__ == "__main__":
         for request in batch:
             f.write(json.dumps(request, ensure_ascii=False) + "\n")
     
-    batch_input_file = client.files.create(
-        file=open(jsonl_path, "rb"),
-        purpose="batch"
-    )
-    batch_input_file_id = batch_input_file.id
+    batch_job_id = submit_batch_job(jsonl_path)
 
-    batch_job = client.batches.create(
-        input_file_id=batch_input_file_id,
-        endpoint="/v1/chat/completions",
-        completion_window="24h",
-        metadata={
-            "description": "turnabout llm"
-        }
-    )
-    batch_job_id = batch_job.id
-    with open(os.path.join(output_dir, "batch_api_metadata.json"), "w") as f:
-        f.write(json.dumps({"batch_job_id": batch_job_id}, indent=4))
+    max_tries = 24
+    cur = 0
+    success = False
+    while cur < max_tries:
+        cur += 1
+        time.sleep(3600)
+        print(f"Attempting tries: {cur+1}")
+        batch_job = client.batches.retrieve(batch_job_id)
+        status = batch_job["status"]
+        if status == "completed":
+            success = True
+            break
+        elif status in ["failed", "expired", "cancelling", "cancelled"]:
+            break
+    if success:
+        print(f"Batch job {status}. Writing ...")
+        result_file_id = batch_job.output_file_id
+        result = client.files.content(result_file_id).content
 
-    answer_jsons, full_responses = run_model(prompts)
-    for answer_json in answer_jsons:
-        print(answer_json)
-    with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
-        for answer_json in answer_jsons:
-            file.write(answer_json + "\n")
-    with open(os.path.join(output_dir, fname.split('.')[0] + '_full_responses.txt'), 'w') as file:
-        for response in full_responses:
-            file.write(response + "\n")
+        result_file_name = os.path.join(output_dir, "batchoutput.jsonl")
+
+        with open(result_file_name, 'wb') as file:
+            file.write(result)
+
+    else:
+        print(f"Batch job {status}. Terminating...")

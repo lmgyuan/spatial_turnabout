@@ -122,6 +122,7 @@ if __name__ == "__main__":
     engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
     all_fnames = sorted(os.listdir(data_dir))
+    fnames = []
     if CASE == "ALL":
         fnames = all_fnames
     else:
