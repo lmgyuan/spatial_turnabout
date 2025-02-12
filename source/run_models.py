@@ -153,10 +153,9 @@ def run_model(prompts):
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    extract = ""
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
     if EXTRACTION:
-        extract = "extracted"
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{extract}'
+        output_dir += '_extracted'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(os.path.join(output_dir, 'metada.json'), 'w') as file:
