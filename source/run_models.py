@@ -50,7 +50,8 @@ def parse_json(file_path):
                 'characters': characters,
                 'evidences': evidences,
                 'testimonies': testimonies,
-                'new_context': turn['newContext']
+                'new_context': turn['newContext'],
+                'is_self_contained' : turn['is_self_contained']
             })
             #break
         return turns
