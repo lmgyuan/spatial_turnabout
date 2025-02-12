@@ -72,6 +72,7 @@ def build_prompt(turns):
     for turn in turns:
 
         new_context = turn['new_context']
+        is_self_contained = turn['is_self_contained']
         context_sofar += new_context
         overall_context = ""
         if args.context == "none":
@@ -107,10 +108,15 @@ def build_prompt(turns):
             testimonies += f"Person: {testimony['person']}\n"
             testimony_counter += 1
 
-        if EXTRACTION:
-            query = prompt_prefix + "\n" + characters + "\n" + evidences + "\n" + testimonies + "\n" + prompt_suffix
-            extracted_context = prompt_extract(overall_context, query)
-            prompt = "Story:\n" + extracted_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
+        # if EXTRACTION:
+        #     query = prompt_prefix + "\n" + characters + "\n" + evidences + "\n" + testimonies + "\n" + prompt_suffix
+        #     extracted_context = prompt_extract(overall_context, query)
+        #     prompt = "Story:\n" + extracted_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
+        # else:
+        #     prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
+
+        if is_self_contained:
+            prompt = characters + "\n" + evidences + "\n" + testimonies
         else:
             prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
 
