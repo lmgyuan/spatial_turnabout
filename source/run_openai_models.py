@@ -3,9 +3,15 @@ import os
 import argparse
 from datetime import datetime
 import time
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv("../.env")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 from openai import OpenAI
-client = OpenAI()
+client = OpenAI(
+    api_key=OPENAI_API_KEY
+)
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, default='o3-mini', help='model name')
@@ -13,7 +19,7 @@ parser.add_argument('--prompt', type=str)
 parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
 
-# python run_openai_models.py --model o3-mini --prompt harry_v1.2
+# python run_openai_models.py --model gpt-4o-mini --prompt harry_v1.2
 
 args = parser.parse_args()
 MODEL = args.model
@@ -97,7 +103,7 @@ def build_prompt(turns):
 def create_batch(fnames):
     batch = []
     for fname in fnames:
-        print(fname)
+        # print(fname)
         if fname.startswith('4-'):  # Skip validation set
             continue
         turns = parse_json(os.path.join(data_dir, fname))
@@ -105,7 +111,7 @@ def create_batch(fnames):
         # print(prompts)
         for i, prompt in enumerate(prompts):
             request = {
-                "custom_id": f"{fname.split(".")[0]}_{i}",
+                "custom_id": f"{fname.split('.')[0]}_{i}",
                 "method": "POST",
                 "url": "/v1/chat/completions",
                 "body": {
@@ -184,9 +190,17 @@ if __name__ == "__main__":
     
     batch_job_id = submit_batch_job(jsonl_path)
 
+    # Initial check
+    batch_job = client.batches.retrieve(batch_job_id)
+    status = batch_job["status"]
+    if status in ["failed", "expired", "cancelling", "cancelled"]:
+        print(f"Batch job {status}. Terminating...")
+        import sys; sys.exit(0)
+
     max_tries = 24
     cur = 0
     success = False
+
     while cur < max_tries:
         cur += 1
         time.sleep(3600)
