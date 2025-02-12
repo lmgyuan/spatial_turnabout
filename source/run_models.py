@@ -115,10 +115,10 @@ def build_prompt(turns):
         # else:
         #     prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
 
-        if is_self_contained:
-            prompt = characters + "\n" + evidences + "\n" + testimonies
-        else:
-            prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
+        # if is_self_contained:
+        #     prompt = characters + "\n" + evidences + "\n" + testimonies
+        # else:
+        #     prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
 
         # print("query: \n")
         # print(query + "\n" + "\n")
@@ -126,27 +126,65 @@ def build_prompt(turns):
         # print(overall_context + "\n" + "\n")
         # print("extracted: \n")
         # print(extracted_context + "\n" + "\n")
+        prompt = characters + "\n" + evidences + "\n" + testimonies
 
-        prompts.append(prompt_prefix + "\n" + prompt + "\n" + prompt_suffix)
+        # prompts.append({'prompt': prompt_prefix + "\n" + prompt + "\n" + prompt_suffix, 'story': overall_context})
+        prompts.append({'prompt': prompt, 'story': overall_context})
+
     return prompts 
 
-def run_model(prompts):
+# def run_model(prompts):
+#     answer_jsons = []
+#     full_responses = []
+#     for prompt in prompts:
+
+#         #print(prompt)
+#         async def run_model():
+#             response = await ai.chat_round_str(prompt, temperature=0.6)
+#             #print(response)
+#             return response
+
+#         response = asyncio.run(run_model())
+#         def get_last_line(multiline_string):
+#             lines = multiline_string.splitlines()
+#             return lines[-1] if lines else ""
+#         answer_json = get_last_line(response)
+#         answer_jsons.append(answer_json)
+#         full_responses.append(response)
+#     return answer_jsons, full_responses
+
+async def call_model(prompt):
+    response = await ai.chat_round_str(prompt, temperature=0.6)
+    return response
+
+def get_last_line(multiline_string):
+    lines = multiline_string.splitlines()
+    return lines[-1] if lines else ""
+
+def run_model(prompt_pairs):
     answer_jsons = []
     full_responses = []
-    for prompt in prompts:
-        #print(prompt)
-        async def run_model():
-            response = await ai.chat_round_str(prompt, temperature=0.6)
-            #print(response)
-            return response
+    
+    for prompt_pair in prompt_pairs:
+        prompt, story = prompt_pair  # Unpacking the two-variable object
+        
+        # First model call
+        include_story = asyncio.run(call_model(prompt_prefix + "\n" + prompt + "\n" + prompt_suffix + "\n\n" + "do you believe you have sufficient information to answer the above question or do you need the story that gives additional context on the sequence of events being discussed in the testimony. Respond only with a yes or no"))
+        print(include_story)
+        
+        # Second model call using output from the first call
+        if include_story == "yes":
+            prompt = prompt_prefix + story + "\n" + prompt + "\n" + prompt_suffix
+        else:
+            prompt = prompt_prefix + "\n" + prompt + "\n" + prompt_suffix
 
-        response = asyncio.run(run_model())
-        def get_last_line(multiline_string):
-            lines = multiline_string.splitlines()
-            return lines[-1] if lines else ""
+        response = asyncio.run(call_model(prompt))
         answer_json = get_last_line(response)
+        
+        # Collecting results
         answer_jsons.append(answer_json)
         full_responses.append(response)
+    
     return answer_jsons, full_responses
 
 
