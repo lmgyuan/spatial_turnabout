@@ -3,9 +3,12 @@ import consola from "consola";
 import { mkdir, readdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
 import { existsSync } from "fs";
+import { parseContent } from "../utils/index.ts";
 
 // @ts-ignore
-let FULL_EVIDENCES = JSON.parse(await readFile("./case_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Trials_and_Tribulations.json", "utf-8"));
+let FULL_EVIDENCES = JSON.parse(await readFile(
+	"./data/aceattorney_data/generated/objects_parsed/"+
+	"List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Trials_and_Tribulations.json", "utf-8"));
 let CURR_CHAPTER_EVIDENCES;
 FULL_EVIDENCES.forEach((e, index) => {
 	if (e.chapter == "The Stolen Turnabout") {
@@ -13,7 +16,9 @@ FULL_EVIDENCES.forEach((e, index) => {
 	}
 })
 // @ts-ignore
-let FULL_CHARACTERS = JSON.parse(await readFile("./case_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Trials_and_Tribulations.json", "utf-8"));
+let FULL_CHARACTERS = JSON.parse(await readFile(
+	"./data/aceattorney_data/generated/characters_parsed/"+
+	"List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Trials_and_Tribulations.json", "utf-8"));
 let CURR_CHAPTER_CHARACTERS;
 FULL_CHARACTERS.forEach((e, index) => {
 	if (e.chapter == "The Stolen Turnabout") {
@@ -21,7 +26,7 @@ FULL_CHARACTERS.forEach((e, index) => {
 	}
 })
 
-const CASE_DATA_ROOT_DIRECTORY = "./case_data/generated";  // Define your root directory
+const CASE_DATA_ROOT_DIRECTORY = "./data/aceattorney_data/generated";  // Define your root directory
 
 // dynamically include all the Turnabout Samurai html files in the raw directory
 let HTML_FILE_PATHS = [];
@@ -41,9 +46,8 @@ const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "parsed_full_contex
 
 async function main() {
 	consola.start("Parsing HTML file");
-
-	// Use contextObj to manage context and newContext together
-	let contextObj = { context: "", newContext: "" };
+	
+	let accumulatedPreviousContext = "";
 
 	for (let i = 0; i < HTML_FILE_PATHS.length; i++) {
 		let rawHtml: string;
@@ -76,11 +80,30 @@ async function main() {
 			return;
 		}
 
-		const initialEvidences = findInitialListOfEvidence(contentWrapper, CURR_CHAPTER_EVIDENCES);
+		const crossExaminations = parseHtmlContent(contentWrapper, document, CURR_CHAPTER_EVIDENCES);
 
-		// Pass contextObj instead of separate context and newContext
-		let parsedData = parseHtmlContent(contentWrapper, document, contextObj, initialEvidences);
-		parsedData = parsedDataHandling(parsedData);
+		// Process the context before adding to parsedData
+		const processedContext = accumulatedPreviousContext
+			.split('\n')
+			.map(line => line.trim())
+			.filter(line => line.length > 0)  // Remove empty lines
+			.join('\n');
+
+		const parsedData = {
+			previousContext: processedContext,
+			characters: CURR_CHAPTER_CHARACTERS,
+			evidences: CURR_CHAPTER_EVIDENCES,
+			turns: crossExaminations
+		};
+
+		// Add current file's content to accumulated context
+		const newContent = parseContent(contentWrapper)
+			.split('\n')
+			.map(line => line.trim())
+			.filter(line => line.length > 0)
+			.join('\n');
+		
+		accumulatedPreviousContext += newContent + '\n';
 
 		consola.log("Writing parsed data to JSON file");
 		if (!existsSync(OUTPUT_DIRECTORY)) {
@@ -88,58 +111,42 @@ async function main() {
 		}
 
 		await writeFile(
-				path.join(OUTPUT_DIRECTORY, `3-2-${i+1}_The_Stolen_Turnabout_Parsed.json`),
+				path.join(OUTPUT_DIRECTORY, `3-2-${i+1}_The_Stolen_Turnabout.json`),
 				JSON.stringify(parsedData, null, 2)
 		);
 	}
 }
 
-function parsedDataHandling(parsedData: any) {
-	// flag cross examinations that do not require players to present anything
-	if (!parsedData) {
-		return parsedData;
-	}
-
-	// check if the cross examination has any present evidence
-	// if it does, set the no_present flag to false
-	// otherwise, set it to true
-	parsedData.forEach((data, index) => {
-		data['no_present'] = true;
-
-		for (let i = 0; i < data.testimonies.length; i++) {
-			if (data.testimonies[i].present.length > 0) {
-				data['no_present'] = false;
-				break;
-			}
-		}
-	})
-
-	return parsedData;
-}
-
-function parseHtmlContent(contentWrapper: Element, document: Document, contextObj, evidence_objects) {
+function parseHtmlContent(contentWrapper: Element, document: Document, evidence_objects) {
 	const data = [];
 	let childIndex = 0;
+	let newContext = "";  // Track new context locally instead of in contextObj
 
 	while (childIndex < contentWrapper.children.length) {
 		const child = contentWrapper.children[childIndex];
 
-		// Update both context and newContext within contextObj
-		contextObj.context += child.textContent.trim();
-		contextObj.newContext += child.textContent.trim();
+		// Add all text content with newlines for readability
+		newContext += parseContent(child);
 
-		if (child.tagName === "CENTER" && child.querySelector("span[style*='color:red']") && child.textContent.trim() === "Cross Examination") {
-			const crossExamination = parseCrossExamination(contentWrapper, childIndex, document, contextObj, evidence_objects);
+		if (child.tagName === "CENTER" && 
+			child.querySelector("span[style*='color:red']") && 
+			child.textContent?.trim() === "Cross Examination") {
+			const crossExamination = parseCrossExamination(
+				contentWrapper, 
+				childIndex, 
+				document, 
+				newContext,  // Pass newContext directly
+				evidence_objects
+			);
 			data.push(crossExamination);
-			// Reset newContext after parsing a cross-examination
-			contextObj.newContext = "";
+			newContext = "";  // Reset newContext after cross examination
 		}
 
-		if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
-			if (child.textContent.toLowerCase().includes(" added to the court record")) {
-				addEvidenceToCourtRecord(child.textContent.toLowerCase(), evidence_objects);
-			}
-		}
+		// if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
+		// 	if (child.textContent?.toLowerCase().includes(" added to the court record")) {
+		// 		addEvidenceToCourtRecord(child.textContent.toLowerCase(), evidence_objects);
+		// 	}
+		// }
 
 		++childIndex;
 	}
@@ -147,40 +154,14 @@ function parseHtmlContent(contentWrapper: Element, document: Document, contextOb
 	return data;
 }
 
-function findInitialListOfEvidence(contentWrapper: Element, initialEvidences: any[]) {
-	let childIndex = 0;
-	let evidences = [...initialEvidences];
 
-	while (childIndex < contentWrapper.children.length) {
-		const child = contentWrapper.children[childIndex];
-		if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
-			if (child.textContent.toLowerCase().includes("added to the court record")) {
-				const objectName = child.textContent.split("added to the court record")[0].trim();
-				evidences.forEach((e, index) => {
-					if (e.name.trim().toLowerCase() === objectName.toLowerCase()) {
-						evidences.splice(index, 1); // Delete the item from the array
-					}
-				});
-			}
-		}
-		++childIndex;
-	}
-
-	return evidences;
-}
-
-function addEvidenceToCourtRecord(childTextContent: string, evidence_objects: any[]) {
-	if (childTextContent.toLowerCase().includes("added to the court record")) {
-		const objectName = childTextContent.split("added to the Court Record")[0].trim();
-		CURR_CHAPTER_EVIDENCES.forEach((e, index) => {
-			if (e.name.trim().toLowerCase() === objectName.toLowerCase()) {
-				evidence_objects.push(e);
-			}
-		});
-	}
-}
-
-function parseCrossExamination(contentWrapper: Element, startIndex: number, document: Document, contextObj, evidence_objects: any[]) {
+function parseCrossExamination(
+	contentWrapper: Element, 
+	startIndex: number, 
+	document: Document, 
+	newContext: string, 
+	evidence_objects: any[]
+) {
 	const testimonies = [];
 	let childIndex = startIndex;
 	let secondBarIndex = startIndex;
@@ -193,11 +174,7 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
 			break;
 		}
 
-		if (child.tagName === "P" && child.querySelector("span[style*='color:#0070C0']")) {
-			if (child.textContent.toLowerCase().includes(" added to the court record")) {
-				addEvidenceToCourtRecord(child.textContent.toLowerCase(), evidence_objects);
-			}
-		}
+		newContext += parseContent(child);
 
 		++secondBarIndex;
 	}
@@ -214,13 +191,13 @@ function parseCrossExamination(contentWrapper: Element, startIndex: number, docu
 		}
 	}
 
+    const hasPresent = testimonies.some(t => t.present && t.present.length > 0);
+
 	return {
 		category: "cross_examination",
-		context: contextObj.context,
-		new_context: contextObj.newContext,
-		characters: CURR_CHAPTER_CHARACTERS,
-		court_record: { evidence_objects },
+		new_context: newContext,
 		testimonies,
+		noPresent: !hasPresent
 	};
 }
 
@@ -250,5 +227,6 @@ function getPresentEvidence(contentWrapper: Element, index: number, document: Do
 	}
 	return evidence;
 }
+
 
 main();

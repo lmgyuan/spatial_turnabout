@@ -70,6 +70,7 @@ async function main() {
             path.join(OUTPUT_DIRECTORY, `${OBJECT_FILES_NAMES[i].split(".html")[0]}.json`),
             JSON.stringify(parsedData, null, 2)
         );
+        consola.log(`Finished parsing ${OBJECT_FILES_NAMES[i]}`);
     }
 }
 
