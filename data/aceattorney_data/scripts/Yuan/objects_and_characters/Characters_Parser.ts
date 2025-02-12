@@ -33,10 +33,10 @@ async function main() {
     for (let i = 0; i < CHARACTERS_HTML_FILE_PATHS.length; i++) {
         let rawHtml: string;
         const HTML_FILE_PATH = CHARACTERS_HTML_FILE_PATHS[i];
-        if (path.join(CHARACTERS_HTML_FILE_DIRECTORY, "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html") === HTML_FILE_PATH) {
-            console.log("Skipping List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html");
-            continue;
-        }
+        // if (path.join(CHARACTERS_HTML_FILE_DIRECTORY, "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html") === HTML_FILE_PATH) {
+        //     console.log("Skipping List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.html");
+        //     continue;
+        // }
 
         try {
             rawHtml = await readFile(HTML_FILE_PATH, "utf-8");
