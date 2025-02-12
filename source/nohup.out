@@ -1,0 +1,28 @@
+Loading checkpoint shards:   0%|          | 0/30 [00:00<?, ?it/s]Loading checkpoint shards:   3%|▎         | 1/30 [00:00<00:17,  1.70it/s]Loading checkpoint shards:   7%|▋         | 2/30 [00:01<00:18,  1.53it/s]Loading checkpoint shards:  10%|█         | 3/30 [00:02<00:18,  1.44it/s]Loading checkpoint shards:  13%|█▎        | 4/30 [00:02<00:18,  1.38it/s]Loading checkpoint shards:  17%|█▋        | 5/30 [00:03<00:17,  1.40it/s]Loading checkpoint shards:  20%|██        | 6/30 [00:04<00:16,  1.42it/s]Loading checkpoint shards:  23%|██▎       | 7/30 [00:04<00:15,  1.44it/s]Loading checkpoint shards:  27%|██▋       | 8/30 [00:05<00:15,  1.43it/s]Loading checkpoint shards:  30%|███       | 9/30 [00:06<00:14,  1.42it/s]Loading checkpoint shards:  33%|███▎      | 10/30 [00:06<00:14,  1.42it/s]Loading checkpoint shards:  37%|███▋      | 11/30 [00:07<00:13,  1.42it/s]Loading checkpoint shards:  40%|████      | 12/30 [00:08<00:12,  1.44it/s]Loading checkpoint shards:  43%|████▎     | 13/30 [00:09<00:11,  1.44it/s]Loading checkpoint shards:  47%|████▋     | 14/30 [00:09<00:11,  1.44it/s]Loading checkpoint shards:  50%|█████     | 15/30 [00:10<00:10,  1.45it/s]Loading checkpoint shards:  53%|█████▎    | 16/30 [00:11<00:09,  1.44it/s]Loading checkpoint shards:  57%|█████▋    | 17/30 [00:11<00:09,  1.41it/s]/home/ms5833/venv/lib/python3.12/site-packages/torch/cuda/__init__.py:129: UserWarning: CUDA initialization: CUDA driver initialization failed, you might not have a CUDA gpu. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+  return torch._C._cuda_getDeviceCount() > 0
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:00,  7.02it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:00<00:00,  9.54it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:00<00:00,  9.69it/s]
+Traceback (most recent call last):
+  File "/home/ms5833/turnabout_llm/source/run_models.py", line 162, in <module>
+    engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ms5833/venv/lib/python3.12/site-packages/kani/engines/huggingface/base.py", line 111, in __init__
+    self.model.to(device)
+  File "/home/ms5833/venv/lib/python3.12/site-packages/transformers/modeling_utils.py", line 3110, in to
+    return super().to(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ms5833/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1340, in to
+    return self._apply(convert)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ms5833/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 900, in _apply
+    module._apply(fn)
+  File "/home/ms5833/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 900, in _apply
+    module._apply(fn)
+  File "/home/ms5833/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 927, in _apply
+    param_applied = fn(param)
+                    ^^^^^^^^^
+  File "/home/ms5833/venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1326, in convert
+    return t.to(
+           ^^^^^
+  File "/home/ms5833/venv/lib/python3.12/site-packages/torch/cuda/__init__.py", line 319, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: CUDA driver initialization failed, you might not have a CUDA gpu.
