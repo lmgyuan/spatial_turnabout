@@ -330,7 +330,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     plot_reasoning_accuracies(reasoning_correct)
 
 if __name__ == "__main__":
-    all_caseids = [n.split('.')[0] for n in sorted(os.listdir(data_dir))]
+    all_caseids = [n.split('.')[0] for n in sorted(os.listdir(data_dir)) if not n.startswith('4-')]
     if CASE == "ALL":
         caseids = all_caseids
     else:

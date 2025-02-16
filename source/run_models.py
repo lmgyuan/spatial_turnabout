@@ -12,7 +12,7 @@ parser.add_argument('--prompt', type=str)
 parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
 
-# 
+# python run_models.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --prompt harry_v1.2
 
 args = parser.parse_args()
 MODEL = args.model

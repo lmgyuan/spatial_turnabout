@@ -3,7 +3,7 @@ import os
 import argparse
 from datetime import datetime
 import time
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 
 load_dotenv("../.env")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -206,7 +206,7 @@ if __name__ == "__main__":
         time.sleep(3600)
         print(f"Attempting tries: {cur+1}")
         batch_job = client.batches.retrieve(batch_job_id)
-        status = batch_job["status"]
+        status = batch_job.status
         if status == "completed":
             success = True
             break
