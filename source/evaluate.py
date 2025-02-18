@@ -22,7 +22,7 @@ CASE = args.case if args.case else "ALL"
 data_dir = '../data/aceattorney_data/final'
 output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
 
-BLACK_LIST = ('1-3-2', '1-3-4', '1-3-6', '1-4-2', '1-4-4')
+BLACK_LIST = ('1-3-2', '1-3-4', '1-3-6', '1-4-2', '1-4-4', '1-4-6')
 
 def parse_pred(caseid):
     pred = []
@@ -351,17 +351,17 @@ if __name__ == "__main__":
     for i, caseid in enumerate(caseids):
         pred_path = os.path.join(output_dir, caseid + ".jsonl")
         if not os.path.exists(pred_path):
-            print(f"{pred_path} does not exist. Skipping...")
+            # print(f"{caseid.split('_')[0]} does not exist. Skipping...")
             continue
 
         if caseid.startswith(BLACK_LIST):
-            print(f"{caseid} is problematic, skipping...")
+            print(f"{caseid.split('_')[0]} is problematic, skipping...")
             continue
 
         pred = parse_pred(caseid)
         gold_indices, gold_names = parse_gold(caseid)
         if len(pred) != len(gold_indices):
-            print(f"Case {caseid}, num of pred: {len(pred)} is not equal to num of turn: {len(gold_indices)}. Skipping...\n")
+            print(f"Case {caseid.split('_')[0]}, num of pred: {len(pred)} is not equal to num of turn: {len(gold_indices)}. Skipping...\n")
             continue
 
         caseids_final.append(caseid)
