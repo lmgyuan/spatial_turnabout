@@ -34,6 +34,9 @@ async function main() {
         //     console.log("Skipping List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.html");
         //     continue;
         // }
+        if (HTML_FILE_PATH.split("/").pop() == "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.html") {
+            console.log("Found List of Evidence in Phoenix Wright Ace Attorney - Dual Destinies.html");
+        }
         try {
             rawHtml = await readFile(HTML_FILE_PATH, "utf-8");
             console.log("Raw HTML content read successfully.");
