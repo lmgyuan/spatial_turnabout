@@ -33,11 +33,14 @@ async function main() {
         const HTML_FILE_PATH = CHARACTERS_HTML_FILE_PATHS[i];
         
         if (HTML_FILE_PATH.split("/").pop() !== 
-        "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.html") {
+        "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.html" &&
+        HTML_FILE_PATH.split("/").pop() !== 
+        "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.html"
+        ) {
             continue;
         }
 
-        console.log("Parsing Dual Destinies List of Profiles");
+        console.log("Parsing List of Profiles for Dual Destinies or Spirit of Justice");
 
         try {
             rawHtml = await readFile(HTML_FILE_PATH, "utf-8");

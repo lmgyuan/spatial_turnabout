@@ -129,49 +129,90 @@ const CASES = [
     //     evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Apollo_Justice_Ace_Attorney.json",
     //     charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Apollo_Justice_Ace_Attorney.json"
     // }
+    // {
+    //     name: "Turnabout_Countdown",
+    //     chapterName: "Turnabout Countdown",
+    //     casePrefix: "5-1",
+    //     evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
+    //     charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+    // },
+    // {
+    //     name: "The_Monstrous_Turnabout",
+    //     chapterName: "The Monstrous Turnabout",
+    //     casePrefix: "5-2",
+    //     evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
+    //     charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+    // },
+    // {
+    //     name: "Turnabout_Academy",
+    //     chapterName: "Turnabout Academy",
+    //     casePrefix: "5-3",
+    //     evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
+    //     charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+    // },
+    // {
+    //     name: "The_Cosmic_Turnabout",
+    //     chapterName: "The Cosmic Turnabout",
+    //     casePrefix: "5-4",
+    //     evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
+    //     charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+    // },
+    // {
+    //     name: "Turnabout_for_Tomorrow",
+    //     chapterName: "Turnabout for Tomorrow",
+    //     casePrefix: "5-5",
+    //     evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
+    //     charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+    // },
+    // {
+    //     name: "Turnabout_Reclaimed",
+    //     chapterName: "Turnabout Reclaimed",
+    //     casePrefix: "5-6",
+    //     evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
+    //     charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+    // },
     {
-        name: "Turnabout_Countdown",
-        chapterName: "Turnabout Countdown",
-        casePrefix: "5-1",
-        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
-        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+        name: "The_Foreign_Turnabout",
+        chapterName: "The Foreign Turnabout",
+        casePrefix: "6-1",
+        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json",
+        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json"
     },
     {
-        name: "The_Monstrous_Turnabout",
-        chapterName: "The Monstrous Turnabout",
-        casePrefix: "5-2",
-        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
-        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+        name: "The_Magical_Turnabout",
+        chapterName: "The Magical Turnabout",
+        casePrefix: "6-2",
+        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json",
+        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json"
     },
     {
-        name: "Turnabout_Academy",
-        chapterName: "Turnabout Academy",
-        casePrefix: "5-3",
-        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
-        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+        name: "The_Rite_of_Turnabout",
+        chapterName: "The Rite of Turnabout",
+        casePrefix: "6-3",
+        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json",
+        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json"
     },
     {
-        name: "The_Cosmic_Turnabout",
-        chapterName: "The Cosmic Turnabout",
-        casePrefix: "5-4",
-        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
-        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+        name: "Turnabout_Storyteller",
+        chapterName: "Turnabout Storyteller",
+        casePrefix: "6-4",
+        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json",
+        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json"
     },
     {
-        name: "Turnabout_for_Tomorrow",
-        chapterName: "Turnabout for Tomorrow",
-        casePrefix: "5-5",
-        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
-        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
+        name: "Turnabout_Revolution",
+        chapterName: "Turnabout Revolution",
+        casePrefix: "6-5",
+        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json",
+        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json"
     },
     {
-        name: "Turnabout_Reclaimed",
-        chapterName: "Turnabout Reclaimed",
-        casePrefix: "5-6",
-        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json",
-        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.json"
-    },
-    
+        name: "Turnabout_Time_Traveler",
+        chapterName: "Turnabout Time Traveler",
+        casePrefix: "6-6",
+        evidencesPath: "./data/aceattorney_data/generated/objects_parsed/List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json",
+        charactersPath: "./data/aceattorney_data/generated/characters_parsed/List_of_Profiles_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.json"
+    }
 ];
 
 async function parse(caseName: string, evidencesPath: string, charactersPath: string, chapterName: string, casePrefix: string) {

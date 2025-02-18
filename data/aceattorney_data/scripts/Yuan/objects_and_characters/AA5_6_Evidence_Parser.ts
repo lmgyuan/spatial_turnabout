@@ -35,11 +35,14 @@ async function main() {
         //     continue;
         // }
         if (HTML_FILE_PATH.split("/").pop() != 
-        "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.html") {
+        "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Spirit_of_Justice.html" &&
+        HTML_FILE_PATH.split("/").pop() != 
+        "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Dual_Destinies.html"
+        ) {
             continue;
         }
 
-        console.log("Parsing Dual Destinies List of Evidence");
+        console.log("Parsing List of Evidence for AA5&6");
         
         try {
             rawHtml = await readFile(HTML_FILE_PATH, "utf-8");
