@@ -5,6 +5,7 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import traceback
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
@@ -21,6 +22,8 @@ CASE = args.case if args.case else "ALL"
 data_dir = '../data/aceattorney_data/final'
 output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
 
+BLACK_LIST = ('1-3-2', '1-3-4', '1-3-6', '1-4-2', '1-4-4')
+
 def parse_pred(caseid):
     pred = []
     with open(os.path.join(output_dir, caseid + ".jsonl"), 'r') as f:
@@ -32,32 +35,36 @@ def parse_pred(caseid):
     return pred
 
 def parse_gold(caseid):
+    """
+    gold_indices = [[{"evidence": 2, "testimony": 3}, {"evidence":4, "testimony": 3}], [{...}]]
+    """
     gold_indices = []
     gold_names = []
     with open(os.path.join(data_dir, caseid + ".json"), 'r') as f:
-        data = json.load(f)
-        evidences = [evidence['name'] for evidence in data['evidences']]
-        characters = [character['name'] for character in data['characters']]
-        for turn in data['turns']:
-            correct_pairs_indices = []
-            correct_pairs_names = []
-            if turn["noPresent"]:
-                continue
-            for i, testimony in enumerate(turn['testimonies']):
-                if testimony["present"]:
-                    correct_evidence_names = testimony["present"]
-                    for correct_evidence_name in correct_evidence_names:
-                        try:
+        try:
+            data = json.load(f)
+            evidences = [evidence['name'] for evidence in data['evidences']]
+            characters = [character['name'] for character in data['characters']]
+            for turn in data['turns']:
+                correct_pairs_indices = []
+                correct_pairs_names = []
+                if turn["noPresent"]:
+                    continue
+                for i, testimony in enumerate(turn['testimonies']):
+                    if testimony["present"]:
+                        correct_evidence_names = testimony["present"]
+                        for correct_evidence_name in correct_evidence_names:
                             correct_evidence_index = evidences.index(correct_evidence_name)
                             evidence_type = "evidence"
-                        except ValueError:
-                            correct_evidence_index = characters.index(correct_evidence_name)
-                            evidence_type = "character"
-                        correct_testimony_index = i
-                        correct_pairs_indices.append({evidence_type: correct_evidence_index, "testimony": correct_testimony_index})
-                        correct_pairs_names.append({evidence_type: correct_evidence_name, "testimony": testimony["testimony"]})
-            gold_indices.append(correct_pairs_indices)
-            gold_names.append(correct_pairs_names)
+                            correct_testimony_index = i
+                            correct_pairs_indices.append({evidence_type: correct_evidence_index, "testimony": correct_testimony_index})
+                            correct_pairs_names.append({evidence_type: correct_evidence_name, "testimony": testimony["testimony"]})
+                gold_indices.append(correct_pairs_indices)
+                gold_names.append(correct_pairs_names)
+        except Exception:
+            print(f"\n\n{caseid} error:\n\n")
+            traceback.print_exc()
+            return [], []
     return gold_indices, gold_names
 
 def get_evidences_by_case(caseids):
@@ -330,7 +337,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     plot_reasoning_accuracies(reasoning_correct)
 
 if __name__ == "__main__":
-    all_caseids = [n.split('.')[0] for n in sorted(os.listdir(data_dir)) if not n.startswith('4-')]
+    all_caseids = [n.split('.')[0] for n in sorted(os.listdir(data_dir)) if not n.startswith(('4-', '5-', '6-'))]
     if CASE == "ALL":
         caseids = all_caseids
     else:
@@ -345,6 +352,10 @@ if __name__ == "__main__":
         pred_path = os.path.join(output_dir, caseid + ".jsonl")
         if not os.path.exists(pred_path):
             print(f"{pred_path} does not exist. Skipping...")
+            continue
+
+        if caseid.startswith(BLACK_LIST):
+            print(f"{caseid} is problematic, skipping...")
             continue
 
         pred = parse_pred(caseid)
