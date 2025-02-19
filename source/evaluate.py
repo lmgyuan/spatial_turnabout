@@ -22,7 +22,7 @@ CASE = args.case if args.case else "ALL"
 CONTEXT = args.context
 
 data_dir = '../data/aceattorney_data/final'
-output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{CONTEXT}'
+output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{CONTEXT}_self_contained'
 
 def parse_pred(caseid):
     pred = []
