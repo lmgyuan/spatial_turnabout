@@ -115,11 +115,11 @@ def build_prompt(turns):
         # else:
         #     prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
 
-        prompt = ""
-        if is_self_contained:
-            prompt = characters + "\n" + evidences + "\n" + testimonies
-        else:
-            prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
+        # prompt = ""
+        # if is_self_contained:
+        #     prompt = characters + "\n" + evidences + "\n" + testimonies
+        # else:
+        #     prompt = overall_context + "\n" + characters + "\n" + evidences + "\n" + testimonies
 
         # print("query: \n")
         # print(query + "\n" + "\n")
@@ -127,7 +127,7 @@ def build_prompt(turns):
         # print(overall_context + "\n" + "\n")
         # print("extracted: \n")
         # print(extracted_context + "\n" + "\n")
-        # prompt = overall_context + "\n" +characters + "\n" + evidences + "\n" + testimonies
+        prompt = overall_context + "\n" +characters + "\n" + evidences + "\n" + testimonies
         prompts.append(prompt_prefix + prompt + prompt_suffix)
 
         # prompts.append({'prompt': prompt_prefix + "\n" + prompt + "\n" + prompt_suffix, 'story': overall_context})
@@ -197,7 +197,7 @@ def run_model(prompts):
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{args.context}_self_contained'
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{args.context}'
     if EXTRACTION:
         output_dir += '_extracted'
     if not os.path.exists(output_dir):
