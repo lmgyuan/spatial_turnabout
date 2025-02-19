@@ -174,7 +174,7 @@ def run_model(prompt_pairs):
             print(include_story)
             
             # Logging the result
-            log_file.write("Include Story: {include_story}\n\n")
+            log_file.write(f"Include Story: {include_story}\n\n")
         
             # Second model call using output from the first call
             if include_story == "yes":
