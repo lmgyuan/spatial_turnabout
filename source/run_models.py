@@ -136,9 +136,14 @@ if __name__ == "__main__":
                     fnames = [fname]
                 break
     for fname in fnames:
-        print(fname)
-        if fname.startswith('4-'):  # Skip validation set
+        if fname.startswith(('4-', '5-', '6-')):  # Skip validation set
             continue
+        if int((fname.split("_")[0]).split("-")[-1]) % 2 == 1:  # Skip odd cases
+            continue
+        if os.path.exists(os.path.join(output_dir, fname.split('.')[0] + '.jsonl')):
+            print(f"Skipping existing outputs {fname.split('.')[0] + '.jsonl'}")
+            continue
+        print(fname)
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
         # print(prompts)
