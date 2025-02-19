@@ -170,7 +170,7 @@ def run_model(prompt_pairs):
             prompt, story = prompt_pair  # Unpacking the two-variable object
             
             # First model call
-            include_story = asyncio.run(call_model(prompt_prefix + "\n" + prompt + "\n" + prompt_suffix + "\n\n" + "do you believe you have sufficient information to answer the above question or do you need the story that gives additional context on the sequence of events being discussed in the testimony. Respond only with a yes or no"))
+            include_story = asyncio.run(call_model(prompt_prefix + "\n" + prompt + "\n" + prompt_suffix + "\n\n" + "do you believe you have sufficient information to answer the above question or do you need the story that gives additional context on the sequence of events being discussed in the testimony. Respond only with a yes or no. Yes if you need additional context and no if you do not."))
             print(include_story)
             
             # Logging the result
