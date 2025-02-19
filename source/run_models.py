@@ -126,7 +126,7 @@ def build_prompt(turns):
         # print(overall_context + "\n" + "\n")
         # print("extracted: \n")
         # print(extracted_context + "\n" + "\n")
-        prompt = characters + "\n" + evidences + "\n" + testimonies
+        prompt = overall_context + "\n" +characters + "\n" + evidences + "\n" + testimonies
         prompts.append(prompt_prefix + prompt + prompt_suffix)
 
         # prompts.append({'prompt': prompt_prefix + "\n" + prompt + "\n" + prompt_suffix, 'story': overall_context})
