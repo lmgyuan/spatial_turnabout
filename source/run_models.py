@@ -195,7 +195,7 @@ def run_model(prompt_pairs):
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{args.context}'
     if EXTRACTION:
         output_dir += '_extracted'
     if not os.path.exists(output_dir):

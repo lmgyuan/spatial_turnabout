@@ -10,6 +10,8 @@ parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
 parser.add_argument('--case', type=str)
+parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
+
 
 # python evaluate.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B --prompt harry_v1
 
@@ -17,9 +19,10 @@ args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
+CONTEXT = args.context
 
 data_dir = '../data/aceattorney_data/final'
-output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}_{CONTEXT}'
 
 def parse_pred(caseid):
     pred = []
