@@ -164,26 +164,30 @@ def get_last_line(multiline_string):
 def run_model(prompt_pairs):
     answer_jsons = []
     full_responses = []
-    
-    for prompt_pair in prompt_pairs:
-        prompt, story = prompt_pair  # Unpacking the two-variable object
-        
-        # First model call
-        include_story = asyncio.run(call_model(prompt_prefix + "\n" + prompt + "\n" + prompt_suffix + "\n\n" + "do you believe you have sufficient information to answer the above question or do you need the story that gives additional context on the sequence of events being discussed in the testimony. Respond only with a yes or no"))
-        print(include_story)
-        
-        # Second model call using output from the first call
-        if include_story == "yes":
-            prompt = prompt_prefix + story + "\n" + prompt + "\n" + prompt_suffix
-        else:
-            prompt = prompt_prefix + "\n" + prompt + "\n" + prompt_suffix
 
-        response = asyncio.run(call_model(prompt))
-        answer_json = get_last_line(response)
-        
-        # Collecting results
-        answer_jsons.append(answer_json)
-        full_responses.append(response)
+    with open("include_story_log.txt", "a") as log_file:
+        for prompt_pair in prompt_pairs:
+            prompt, story = prompt_pair  # Unpacking the two-variable object
+            
+            # First model call
+            include_story = asyncio.run(call_model(prompt_prefix + "\n" + prompt + "\n" + prompt_suffix + "\n\n" + "do you believe you have sufficient information to answer the above question or do you need the story that gives additional context on the sequence of events being discussed in the testimony. Respond only with a yes or no"))
+            print(include_story)
+            
+            # Logging the result
+            log_file.write("Include Story: {include_story}\n\n")
+            
+            # Second model call using output from the first call
+            if include_story == "yes":
+                prompt = prompt_prefix + story + "\n" + prompt + "\n" + prompt_suffix
+            else:
+                prompt = prompt_prefix + "\n" + prompt + "\n" + prompt_suffix
+
+            response = asyncio.run(call_model(prompt))
+            answer_json = get_last_line(response)
+            
+            # Collecting results
+            answer_jsons.append(answer_json)
+            full_responses.append(response)
     
     return answer_jsons, full_responses
 
