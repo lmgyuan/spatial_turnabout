@@ -6,6 +6,8 @@ import asyncio
 import argparse
 from datetime import datetime
 
+import torch
+
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
@@ -109,6 +111,7 @@ def run_model(prompts):
 
 
 if __name__ == "__main__":
+    # Find cases
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
@@ -121,8 +124,13 @@ if __name__ == "__main__":
             'case': CASE,
             'timestamp': timestamp
         }, file, indent=2)
+
+    # Load model
+    torch.cuda.empty_cache()
     engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
+
+    # Run cases
     all_fnames = sorted(os.listdir(data_dir))
     fnames = []
     if CASE == "ALL":

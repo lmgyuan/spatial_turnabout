@@ -261,6 +261,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
         for i in range(len(gold_indices)):  # num of turns for each case
             # Compute standard accuracy
             is_correct = False
+            # print(f"{caseid} - {i} - {pred[i]}")
             if pred[i] in gold_indices[i]:  
                 is_correct = True
                 case_correct += 1
@@ -309,18 +310,20 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                 elif "evidence" in pred[i]:
                     out_pred = {
                         "evidence_id": pred[i]["evidence"],
-                        "evidence": evidences_by_case[caseid]["evidences"][pred[i]["evidence"]] if [pred[i]["evidence"]] < len(evidences_by_case[caseid]["evidences"]) else "N/A",
+                        "evidence": evidences_by_case[caseid]["evidences"][pred[i]["evidence"]] if pred[i]["evidence"] < len(evidences_by_case[caseid]["evidences"]) else "N/A",
                         "testimony_id": pred[i]["testimony"],
                         "testimony": testimonies_by_case[caseid][i][pred[i]["testimony"]] if pred[i]["testimony"] < len(testimonies_by_case[caseid][i]) else "N/A"
                     }
                 elif "character" in pred[i]:
                     out_pred = {
                         "character_id": pred[i]["character"],
-                        "character": evidences_by_case[caseid]["characters"][pred[i]["character"]] if [pred[i]["character"]] < len(evidences_by_case[caseid]["characters"]) else "N/A",
+                        "character": evidences_by_case[caseid]["characters"][pred[i]["character"]] if pred[i]["character"] < len(evidences_by_case[caseid]["characters"]) else "N/A",
                         "testimony_id": pred[i]["testimony"],
-                        "testimony": testimonies_by_case[caseid][pred[i]["testimony"]]
+                        "testimony": testimonies_by_case[caseid][i][pred[i]["testimony"]] if pred[i]["testimony"] < len(testimonies_by_case[caseid][i]) else "N/A"
                     }
-            except TypeError:
+            except Exception:
+                print(f"{caseid} - {i} - {pred[i]}")
+                traceback.print_exc()
                 out_pred = {
                     "evidence_id": -1,
                     "evidence": "N/A",
@@ -367,7 +370,8 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
         label: {**stats, "accuracy": round(stats["correct"] / stats["total"], 4)}
         for label, stats in categories_correct.items()
     }
-    report_json["categories_accuracy"] = dict(sorted(categories_correct.items()))
+    categories_correct = dict(sorted(categories_correct.items()))  # First sort for visualization
+    report_json["categories_accuracy"] = categories_correct
 
     # Log reasoning step accuracy
     reasoning_correct = {
@@ -375,7 +379,8 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
         for label, stats in reasoning_correct.items()
         if stats["total"] > 0
     }
-    report_json["reasoning_steps_accuracy"] = dict(sorted(reasoning_correct.items()))
+    reasoning_correct = dict(sorted(reasoning_correct.items()))
+    report_json["reasoning_steps_accuracy"] = reasoning_correct
 
     # Log difficulty accuracy
     difficulty_correct = {
@@ -383,7 +388,8 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
         for difficulty, stats in difficulty_correct.items()
         if stats["total"] > 0
     }
-    report_json["action_space_accuracy"] = dict(sorted(difficulty_correct.items()))
+    difficulty_correct = dict(sorted(difficulty_correct.items()))
+    report_json["action_space_accuracy"] = difficulty_correct
 
     # Log json
     if CASE != "ALL":
@@ -429,6 +435,6 @@ if __name__ == "__main__":
         golds_indices.append(gold_indices)  # List of list of dicts
         golds_names.append(gold_names)
     
-    print(f"Evaluating {len(caseids)} cases...")
     caseids = caseids_final
+    print(f"Evaluating {len(caseids)} court days...")
     evaluate(caseids, preds, golds_indices, golds_names)

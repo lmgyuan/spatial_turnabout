@@ -162,7 +162,13 @@ if __name__ == "__main__":
             'case': CASE,
             'timestamp': timestamp
         }, file, indent=2)
-    all_fnames = sorted(os.listdir(data_dir))
+    all_fnames = sorted([
+        fname for fname 
+        in os.listdir(data_dir) 
+        if not fname.startswith(('4-', '5-', '6-')) and not int((fname.split("_")[0]).split("-")[-1]) % 2 == 1
+    ])
+    print(all_fnames)
+    import sys; sys.exit(0)
     fnames = []
     if CASE == "ALL":
         fnames = all_fnames
