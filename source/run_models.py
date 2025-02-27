@@ -6,11 +6,15 @@ import asyncio
 import argparse
 from datetime import datetime
 
+import torch
+
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
 parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+
+# python run_models.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --prompt harry_v1.2
 
 args = parser.parse_args()
 MODEL = args.model
@@ -107,6 +111,7 @@ def run_model(prompts):
 
 
 if __name__ == "__main__":
+    # Find cases
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
@@ -119,8 +124,13 @@ if __name__ == "__main__":
             'case': CASE,
             'timestamp': timestamp
         }, file, indent=2)
+
+    # Load model
+    torch.cuda.empty_cache()
     engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
+
+    # Run cases
     all_fnames = sorted(os.listdir(data_dir))
     fnames = []
     if CASE == "ALL":
@@ -134,9 +144,14 @@ if __name__ == "__main__":
                     fnames = [fname]
                 break
     for fname in fnames:
-        print(fname)
-        if fname.startswith('4-'):  # Skip validation set
+        if fname.startswith(('4-', '5-', '6-')):  # Skip validation set
             continue
+        if int((fname.split("_")[0]).split("-")[-1]) % 2 == 1:  # Skip odd cases
+            continue
+        if os.path.exists(os.path.join(output_dir, fname.split('.')[0] + '.jsonl')):
+            print(f"Skipping existing outputs {fname.split('.')[0] + '.jsonl'}")
+            continue
+        print(fname)
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
         # print(prompts)
