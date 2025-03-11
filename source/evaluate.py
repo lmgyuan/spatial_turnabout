@@ -30,7 +30,8 @@ def parse_pred(caseid):
         for line in f:
             try:
                 pred.append(json.loads(line))
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
+                print(f"{caseid}: {e}")
                 pred.append({})
     return pred
 
@@ -112,34 +113,40 @@ def get_labels_by_case(caseids):
 def plot_category_accuracies(categories_correct):
     categories = list(categories_correct.keys())
     totals = [data['total'] for data in categories_correct.values()]
-    corrects = [data['correct'] for data in categories_correct.values()]
-    incorrects = [t - c for t, c in zip(totals, corrects)]
+    
+    # Get all three accuracy metrics
     accuracies = [data['accuracy'] for data in categories_correct.values()]
+    evidence_accuracies = [data['evidence_accuracy'] for data in categories_correct.values()]
+    testimony_accuracies = [data['testimony_accuracy'] for data in categories_correct.values()]
     
     plt.figure(figsize=(14, 7))
     
-    bar_width = 0.8
-    bars1 = plt.bar(categories, corrects, bar_width, 
-                    label='Correct', color='forestgreen')
-    bars2 = plt.bar(categories, incorrects, bar_width,
-                    bottom=corrects, label='Incorrect', color='lightcoral')
+    # Set width and positions
+    bar_width = 0.25
+    r1 = np.arange(len(categories))
+    r2 = [x + bar_width for x in r1]
+    r3 = [x + bar_width for x in r2]
     
-    plt.title(f'{MODEL.split("/")[-1]}: Accuracy by Category (with Total Counts)', pad=20)
+    # Create the three bar types
+    plt.bar(r1, accuracies, width=bar_width, label='Overall Accuracy', color='forestgreen')
+    plt.bar(r2, evidence_accuracies, width=bar_width, label='Evidence Accuracy', color='royalblue')
+    plt.bar(r3, testimony_accuracies, width=bar_width, label='Testimony Accuracy', color='darkorange')
+    
+    plt.title(f'{MODEL.split("/")[-1]}: Accuracy by Category', pad=20)
     plt.xlabel('Category')
-    plt.ylabel('Number of Cases')
+    plt.ylabel('Accuracy')
+    plt.ylim(0, 1.1)  # Set y-axis from 0 to 1.1 to accommodate labels
     
-    plt.xticks(rotation=45, ha='right')
+    # Add category labels at appropriate positions
+    plt.xticks([r + bar_width for r in range(len(categories))], categories, rotation=45, ha='right')
     
+    # Add accuracy values above bars
     for i in range(len(categories)):
-        total = totals[i]
-        correct = corrects[i]
-        
-        plt.text(i, total + 0.5, f'{accuracies[i]:.1%}',
-                ha='center', va='bottom')
+        plt.text(r1[i], accuracies[i] + 0.02, f'{accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
+        plt.text(r2[i], evidence_accuracies[i] + 0.02, f'{evidence_accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
+        plt.text(r3[i], testimony_accuracies[i] + 0.02, f'{testimony_accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
     
     plt.legend()
-    
-    plt.margins(y=0.2)
     plt.tight_layout()
     
     plt.savefig(os.path.join(output_dir, 'report_category_accuracies.png'))
@@ -148,30 +155,41 @@ def plot_category_accuracies(categories_correct):
 def plot_reasoning_accuracies(reasoning_correct):
     steps = list(reasoning_correct.keys())
     totals = [data['total'] for data in reasoning_correct.values()]
-    corrects = [data['correct'] for data in reasoning_correct.values()]
-    incorrects = [t - c for t, c in zip(totals, corrects)]
+    
+    # Get all three accuracy metrics
     accuracies = [data['accuracy'] for data in reasoning_correct.values()]
+    evidence_accuracies = [data['evidence_accuracy'] for data in reasoning_correct.values()]
+    testimony_accuracies = [data['testimony_accuracy'] for data in reasoning_correct.values()]
     
     plt.figure(figsize=(14, 7))
     
-    bar_width = 0.8
-    bars1 = plt.bar(steps, corrects, bar_width,
-                    label='Correct', color='forestgreen')
-    bars2 = plt.bar(steps, incorrects, bar_width,
-                    bottom=corrects, label='Incorrect', color='lightcoral')
+    # Convert steps to strings to prevent numerical interpolation on x-axis
+    step_labels = [str(step) for step in steps]
+    
+    # Set width and positions
+    bar_width = 0.25
+    r1 = np.arange(len(steps)) - bar_width
+    r2 = np.arange(len(steps))
+    r3 = np.arange(len(steps)) + bar_width
+    
+    # Create three bar types
+    plt.bar(r1, accuracies, width=bar_width, label='Overall Accuracy', color='forestgreen')
+    plt.bar(r2, evidence_accuracies, width=bar_width, label='Evidence Accuracy', color='royalblue')
+    plt.bar(r3, testimony_accuracies, width=bar_width, label='Testimony Accuracy', color='darkorange')
 
     plt.title(f'{MODEL.split("/")[-1]}: Accuracy by Number of Reasoning Steps')
     plt.xlabel('Number of Reasoning Steps')
     plt.ylabel('Accuracy')
-        
-    for step, acc in zip(steps, accuracies):  # Use actual step numbers instead of index
-        total = totals[steps.index(step)]
-        plt.text(step, total + 0.5, f'{acc:.1%}',
-                ha='center', va='bottom')
+    plt.ylim(0, 1.1)
+    
+    # Add accuracy values above bars
+    for i in range(len(steps)):
+        plt.text(r1[i], accuracies[i] + 0.02, f'{accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
+        plt.text(r2[i], evidence_accuracies[i] + 0.02, f'{evidence_accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
+        plt.text(r3[i], testimony_accuracies[i] + 0.02, f'{testimony_accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
     
     plt.legend()
-    
-    plt.margins(y=0.2)
+    plt.xticks(r2, step_labels)  # Use string labels at positions r2 (middle bars)
     plt.tight_layout()
     
     # Save the plot
@@ -182,34 +200,42 @@ def plot_difficulty_accuracies(difficulty_correct):
     difficulty_correct = {str(k): v for k, v in difficulty_correct.items()}
     difficulties = list(difficulty_correct.keys())
     totals = [data['total'] for data in difficulty_correct.values()]
-    corrects = [data['correct'] for data in difficulty_correct.values()]
-    incorrects = [t - c for t, c in zip(totals, corrects)]
+    
+    # Get all three accuracy metrics
     accuracies = [data['accuracy'] for data in difficulty_correct.values()]
+    evidence_accuracies = [data['evidence_accuracy'] for data in difficulty_correct.values()]
+    testimony_accuracies = [data['testimony_accuracy'] for data in difficulty_correct.values()]
     
     # Dynamic figsize based on number of difficulties
     num_difficulties = len(difficulties)
-    width = max(8, num_difficulties * 2)
+    width = max(8, num_difficulties * 2.5)  # Increased width to accommodate 3 bars per category
     plt.figure(figsize=(width, 7))
     
-    bar_width = 0.8
-    # Use difficulties instead of steps
-    bars1 = plt.bar(difficulties, corrects, bar_width,
-                    label='Correct', color='forestgreen')
-    bars2 = plt.bar(difficulties, incorrects, bar_width,
-                    bottom=corrects, label='Incorrect', color='lightcoral')
+    # Set width and positions
+    bar_width = 0.25
+    x = np.arange(len(difficulties))
+    r1 = x - bar_width
+    r2 = x
+    r3 = x + bar_width
+    
+    # Create three bar types
+    plt.bar(r1, accuracies, width=bar_width, label='Overall Accuracy', color='forestgreen')
+    plt.bar(r2, evidence_accuracies, width=bar_width, label='Evidence Accuracy', color='royalblue')
+    plt.bar(r3, testimony_accuracies, width=bar_width, label='Testimony Accuracy', color='darkorange')
 
     plt.title('Accuracy by Sizes of Action Space')
     plt.xlabel('Sizes of Action Space')
-    plt.ylabel('Number of Cases')
+    plt.ylabel('Accuracy')
+    plt.ylim(0, 1.1)  # Set y-axis from 0 to 1.1 to accommodate labels
     
-    # Use difficulties instead of steps
-    for diff, acc, total in zip(difficulties, accuracies, totals):
-        plt.text(diff, total + 0.5, f'{acc:.1%}',
-                ha='center', va='bottom')
+    # Add accuracy values above bars
+    for i in range(len(difficulties)):
+        plt.text(r1[i], accuracies[i] + 0.02, f'{accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
+        plt.text(r2[i], evidence_accuracies[i] + 0.02, f'{evidence_accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
+        plt.text(r3[i], testimony_accuracies[i] + 0.02, f'{testimony_accuracies[i]:.1%}', ha='center', va='bottom', fontsize=8)
     
     plt.legend()
-    
-    plt.margins(y=0.2)
+    plt.xticks(x, difficulties)  # Set x-ticks at the correct positions with difficulty labels
     plt.tight_layout()
     
     # Save the plot
@@ -229,8 +255,12 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
             'prompt': PROMPT,
             'case': CASE,
             'overall_correct': -1,
+            'overall_correct_evidence': -1,
+            'overall_correct_testimony': -1,
             'overall_total': -1,
             'overall_accuracy': -1,
+            'overall_evidence_accuracy': -1,
+            'overall_testimony_accuracy': -1,
             'categories_accuracy': {},
             'reasoning_steps_accuracy': {},
             'action_space_accuracy': {},
@@ -238,13 +268,39 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     }
     overall_correct = 0
     overall_total = 0
+    overall_correct_evidence = 0
+    overall_correct_testimony = 0
     categories = list(set([turn_category 
                 for turns_label in labels_by_case.values() 
                 for turn_label in turns_label
                 for turn_category in turn_label["labels"]]))
 
-    categories_correct = {label: {"correct": 0, "total": 0, "accuracy": 0, "bad_cases": []} for label in categories}
-    reasoning_correct = {idx: {"correct": 0, "total": 0, "accuracy": 0, "bad_cases": []} for idx in range(1, 10)}
+    categories_correct = {
+        label: {
+            "correct": 0, 
+            'evidence_correct': 0,
+            'testimony_correct': 0,
+            "total": 0, 
+            "accuracy": 0, 
+            'evidence_accuracy': 0,
+            'testimony_accuracy': 0,
+            "bad_cases": []
+        } 
+        for label in categories
+    }
+    reasoning_correct = {
+        idx: {
+            "correct": 0, 
+            'evidence_correct': 0,
+            'testimony_correct': 0,
+            "total": 0, 
+            "accuracy": 0, 
+            'evidence_accuracy': 0,
+            'testimony_accuracy': 0,
+            "bad_cases": []
+        } 
+        for idx in range(1, 10)
+    }
     difficulty_correct = {}
 
     for caseid, pred, gold_indices, gold_names \
@@ -257,14 +313,30 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
             "turns": []
         }
         case_correct = 0
+        case_evidence_correct = 0
+        case_testimony_correct = 0
         case_total = 0
         for i in range(len(gold_indices)):  # num of turns for each case
             # Compute standard accuracy
             is_correct = False
+            is_evidence_correct = False
+            is_testimony_correct = False
             # print(f"{caseid} - {i} - {pred[i]}")
             if pred[i] in gold_indices[i]:  
                 is_correct = True
                 case_correct += 1
+            if "evidence" in pred[i] and any(pred[i]["evidence"] == gold_indices[i][j]["evidence"] for j in range(len(gold_indices[i]))):
+                is_evidence_correct = True
+                case_evidence_correct += 1
+            elif 'character' in pred[i] or 'evidence' not in pred[i]:
+                print(f"{caseid} pred[{i}] missing evidence: {pred[i]}")
+
+            if "testimony" in pred[i] and any(pred[i]["testimony"] == gold_indices[i][j]["testimony"] for j in range(len(gold_indices[i]))):
+                is_testimony_correct = True
+                case_testimony_correct += 1
+            elif "testimony" not in pred[i]:
+                print(f"{caseid} pred[{i}] missing testimony: {pred[i]}")
+
             case_total += 1
 
             # Compute category accuracy
@@ -276,6 +348,11 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                 else:
                     categories_correct[label]["bad_cases"].append(f"{caseid}_{i}")
 
+                if is_evidence_correct:
+                    categories_correct[label]['evidence_correct'] += 1
+                if is_testimony_correct:
+                    categories_correct[label]['testimony_correct'] += 1
+
             # Compute reasoning accuracy
             turn_reasoning = labels_by_case[caseid][i]["reasoning"]  # Return empty list if none
             turn_n_reasoning = len(turn_reasoning)
@@ -286,18 +363,37 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                 else:
                     reasoning_correct[turn_n_reasoning]["bad_cases"].append(f"{caseid}_{i}")
 
+                if is_evidence_correct:
+                    reasoning_correct[turn_n_reasoning]['evidence_correct'] += 1
+                if is_testimony_correct:
+                    reasoning_correct[turn_n_reasoning]['testimony_correct'] += 1
+
             # Compute difficulty accuracy
             n_evidences = len(evidences_by_case[caseid]["evidences"])
             n_testimonies = len(testimonies_by_case[caseid][i])
             difficulty = max(math.ceil((n_evidences * n_testimonies) / 20), 5)
 
             if difficulty not in difficulty_correct.keys():
-                difficulty_correct[difficulty] = {"correct": 0, "total": 0, "accuracy": 0, "bad_cases": []}
+                difficulty_correct[difficulty] = {
+                    "correct": 0, 
+                    'evidence_correct': 0,
+                    'testimony_correct': 0,
+                    "total": 0, 
+                    "accuracy": 0, 
+                    'evidence_accuracy': 0,
+                    'testimony_accuracy': 0,
+                    "bad_cases": []
+                }
             difficulty_correct[difficulty]["total"] += 1
             if is_correct:
                 difficulty_correct[difficulty]["correct"] += 1
             else:
                 difficulty_correct[difficulty]["bad_cases"].append(f"{caseid}_{i}")
+
+            if is_evidence_correct:
+                difficulty_correct[difficulty]["evidence_correct"] += 1
+            if is_testimony_correct:
+                difficulty_correct[difficulty]["testimony_correct"] += 1
 
             try:
                 if not pred[i]:
@@ -315,6 +411,7 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
                         "testimony": testimonies_by_case[caseid][i][pred[i]["testimony"]] if pred[i]["testimony"] < len(testimonies_by_case[caseid][i]) else "N/A"
                     }
                 elif "character" in pred[i]:
+                    print(f"caseid {caseid} {i} has character in pred")
                     out_pred = {
                         "character_id": pred[i]["character"],
                         "character": evidences_by_case[caseid]["characters"][pred[i]["character"]] if pred[i]["character"] < len(evidences_by_case[caseid]["characters"]) else "N/A",
@@ -351,23 +448,37 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
         report_json["case_details"][caseid]["case_accuracy"] = round(case_correct / case_total, 4)
         overall_correct += case_correct
         overall_total += case_total
+        overall_correct_evidence += case_evidence_correct
+        overall_correct_testimony += case_testimony_correct
 
     report_json['overall_correct'] = overall_correct
     report_json['overall_total'] = overall_total
     report_json["overall_accuracy"] = round(overall_correct / overall_total, 4)
     vprint(f"Overall accuracy: {overall_correct / overall_total}")
 
+    report_json['overall_correct_evidence'] = overall_correct_evidence
+    report_json['overall_correct_testimony'] = overall_correct_testimony
+    report_json['overall_evidence_accuracy'] = round(overall_correct_evidence / overall_total, 4)
+    report_json['overall_testimony_accuracy'] = round(overall_correct_testimony / overall_total, 4)
+
     # Log category accuracy
     if "spacial" in categories_correct.keys():
+        print(f"Found typo: spacial")
         categories_correct["spatial"]["total"] += categories_correct["spacial"]["total"]  # Handle typos
         categories_correct["spatial"]["correct"] += categories_correct["spacial"]["correct"] 
         del categories_correct["spacial"]
     if "object propoerty" in categories_correct.keys():
+        print(f"Found typo: object propoerty")
         categories_correct["object property"]["total"] += categories_correct["object propoerty"]["total"]  # Handle typos
         categories_correct["object property"]["correct"] += categories_correct["object propoerty"]["correct"] 
         del categories_correct["object propoerty"]
     categories_correct = {
-        label: {**stats, "accuracy": round(stats["correct"] / stats["total"], 4)}
+        label: {
+            **stats, 
+            "accuracy": round(stats["correct"] / stats["total"], 4),
+            "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
+            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4)
+        }
         for label, stats in categories_correct.items()
     }
     categories_correct = dict(sorted(categories_correct.items()))  # First sort for visualization
@@ -375,7 +486,12 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
 
     # Log reasoning step accuracy
     reasoning_correct = {
-        label: {**stats, "accuracy": round(stats["correct"] / stats["total"], 4)}
+        label: {
+            **stats, 
+            "accuracy": round(stats["correct"] / stats["total"], 4),
+            "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
+            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4)
+        }
         for label, stats in reasoning_correct.items()
         if stats["total"] > 0
     }
@@ -384,7 +500,12 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
 
     # Log difficulty accuracy
     difficulty_correct = {
-        (difficulty * 20): {**stats, "accuracy": round(stats["correct"] / stats["total"], 4)}
+        (difficulty * 20): {
+            **stats, 
+            "accuracy": round(stats["correct"] / stats["total"], 4),
+            "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
+            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4)
+        }
         for difficulty, stats in difficulty_correct.items()
         if stats["total"] > 0
     }
@@ -401,7 +522,6 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     plot_category_accuracies(categories_correct)
     plot_reasoning_accuracies(reasoning_correct)
     plot_difficulty_accuracies(difficulty_correct)
-
 
 if __name__ == "__main__":
     all_caseids = [n.split('.')[0] for n in sorted(os.listdir(data_dir)) if not n.startswith(('4-', '5-', '6-'))]
