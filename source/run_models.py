@@ -6,11 +6,15 @@ import asyncio
 import argparse
 from datetime import datetime
 
+import torch
+
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
 parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+
+# python run_models.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --prompt harry_v1.2
 
 args = parser.parse_args()
 MODEL = args.model
@@ -63,21 +67,21 @@ def build_prompt(turns):
             elif args.context == "day":
                 prompt += context_sofar + "\n"
         character_counter = 0
-        prompt = "Characters:\n"
+        prompt += "Characters:\n"
         for character in turn['characters']:
             prompt += f"Character {character_counter}\n"
             prompt += f"Name: {character['name']}\n"
             prompt += f"Description: {character['description1']}\n"
             character_counter += 1
         evidence_counter = 0
-        prompt = "Evidences:\n"
+        prompt += "Evidences:\n"
         for evidence in turn['evidences']:
             prompt += f"Evidence {evidence_counter}\n"
             prompt += f"Name: {evidence['name']}\n"
             prompt += f"Description: {evidence['description1']}\n"
             evidence_counter += 1
         testimony_counter = 0
-        prompt = "Testimonies:\n"
+        prompt += "Testimonies:\n"
         for testimony in turn['testimonies']:
             prompt += f"Testimony {testimony_counter}\n"
             prompt += f"Testimony: {testimony['testimony']}\n"
@@ -107,21 +111,28 @@ def run_model(prompts):
 
 
 if __name__ == "__main__":
+    # Find cases
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    with open(os.path.join(output_dir, 'metada.json'), 'w') as file:
+    with open(os.path.join(output_dir, 'metadata.json'), 'w') as file:
         json.dump({
             'model': MODEL,
             'prompt': PROMPT,
             'case': CASE,
             'timestamp': timestamp
         }, file, indent=2)
+
+    # Load model
+    torch.cuda.empty_cache()
     engine = HuggingEngine(model_id = MODEL, use_auth_token=True, model_load_kwargs={"device_map": "auto"})
     ai = Kani(engine, system_prompt="")
+
+    # Run cases
     all_fnames = sorted(os.listdir(data_dir))
+    fnames = []
     if CASE == "ALL":
         fnames = all_fnames
     else:
@@ -133,6 +144,13 @@ if __name__ == "__main__":
                     fnames = [fname]
                 break
     for fname in fnames:
+        if fname.startswith(('4-', '5-', '6-')):  # Skip validation set
+            continue
+        if int((fname.split("_")[0]).split("-")[-1]) % 2 == 1:  # Skip odd cases
+            continue
+        if os.path.exists(os.path.join(output_dir, fname.split('.')[0] + '.jsonl')):
+            print(f"Skipping existing outputs {fname.split('.')[0] + '.jsonl'}")
+            continue
         print(fname)
         turns = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns)
