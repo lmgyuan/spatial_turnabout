@@ -462,16 +462,11 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     report_json['overall_testimony_accuracy'] = round(overall_correct_testimony / overall_total, 4)
 
     # Log category accuracy
-    if "spacial" in categories_correct.keys():
-        print(f"Found typo: spacial")
-        categories_correct["spatial"]["total"] += categories_correct["spacial"]["total"]  # Handle typos
-        categories_correct["spatial"]["correct"] += categories_correct["spacial"]["correct"] 
-        del categories_correct["spacial"]
-    if "object propoerty" in categories_correct.keys():
-        print(f"Found typo: object propoerty")
-        categories_correct["object property"]["total"] += categories_correct["object propoerty"]["total"]  # Handle typos
-        categories_correct["object property"]["correct"] += categories_correct["object propoerty"]["correct"] 
-        del categories_correct["object propoerty"]
+    # if "" in categories_correct.keys():
+    #     print(f"Found typo: ")
+    #     categories_correct[" "]["total"] += categories_correct[" "]["total"]  # Handle typos
+    #     categories_correct[" "]["correct"] += categories_correct[" "]["correct"] 
+    #     del categories_correct[" "]
     categories_correct = {
         label: {
             **stats, 
