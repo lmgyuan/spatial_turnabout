@@ -26,6 +26,15 @@ with open("prompts/" + PROMPT + ".json", 'r') as file:
     data = json.load(file)
     prompt_prefix = data['prefix']
     prompt_suffix = data['suffix']
+# Load cot examples
+if "one_shot" in PROMPT:
+    with open("prompts/example_one_shot.txt", "r") as file:
+        example_one_shot = file.read()
+    prompt_prefix = prompt_prefix.format(example_one_shot=example_one_shot)
+elif "few_shot" in PROMPT:
+    with open("prompts/example_few_shot.txt", "r") as file:
+        example_few_shot = file.read()
+    prompt_prefix = prompt_prefix.format(example_few_shot=example_few_shot)
 
 def parse_json(file_path):
     with open(file_path, 'r') as file:
@@ -58,7 +67,7 @@ def build_prompt(turns):
     for turn in turns:
         new_context = turn['new_context']
         context_sofar += new_context
-        if args.context == "none":
+        if args.context is None:
             prompt = ""
         else:
             prompt = "Story:\n"
@@ -111,7 +120,7 @@ def run_model(prompts):
 
 
 if __name__ == "__main__":
-    # Find cases
+    # # Find cases
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
