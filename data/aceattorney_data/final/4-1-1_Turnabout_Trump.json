@@ -59,14 +59,14 @@
       "name": "Crime Photo 1",
       "type": "Photographs",
       "obtained": "Received during the preliminary hearing.",
-      "description1": "The sub-basement at the Borscht Bowl Club. Click here for details."
+      "description1": "The sub-basement at the Borscht Bowl Club. [caption] A man is found dead, slumped in a chair and leaning back. He is wearing a hat which covers his eyes and forehead. The table is set for a game of poker. Cards and chipped scartter around the table. There are some cards lying on the floor too. A bottle of grape juice is on the table. The room is dimly lit, with light coming in from a small window. The walls are partially peeled."
     },
     {
       "currentChapter": "Turnabout Trump",
       "name": "Deadly Bottle",
       "type": "Weapons",
       "obtained": "Submitted as evidence by Prosecutor Payne.",
-      "description1": "Grape juice bottle used as the murder weapon. Bears the defendant Mr. Wright's prints.",
+      "description1": "Grape juice bottle used as the murder weapon. Bears the defendant Mr. Wright's prints. [caption] The bottle is empty.",
       "description2": "Grape juice bottle used as the murder weapon. Mr. Wright's prints on it are upside-down."
     },
     {
@@ -88,7 +88,7 @@
       "name": "Chip Photo",
       "type": "Photographs",
       "obtained": "Submitted as evidence by Prosecutor Payne.",
-      "description1": "Defendant & victim's chips when crime took place. Click here for details."
+      "description1": "Defendant & victim's chips when crime took place. [caption] On the near side, there are 4 red, small chips and 1 gray, big chip. On the far side, there are 2 red, small chips and 9 gray, big chips. On the near side, the cards are 7 heart, 7 diamond, 7 club, Ace spade, and Ace diamond. On the far side, the cards are King heart, King diamond, King spade, Ace club, and Ace heart."
     },
     {
       "currentChapter": "Turnabout Trump",
@@ -154,10 +154,27 @@
           "person": "Phoenix",
           "present": [
             "Deadly Bottle"
-          ]
+          ],
+          "source": {
+            "evidence_span": "Grape juice bottle used as the murder weapon. Bears the defendant Mr. Wright's prints.",
+            "testimony_span": "I never touched the murder weapon.",
+            "explanation": "The witness' fingerprints on the bottle which is the murder weapon suggests that the witness had touched it.",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "labels": [
+        "object property"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims he never touched the murder weapon.",
+        "Fact 2: The evidence suggests the grape juice bottle was the murder weapon.",
+        "Fact 3: The evidence also suggests there are witness' fingerprints on the bottle.",
+        "Prop 1: If someone's fingerprints are left on an object, they must have touched that object.",
+        "Prop 2: If a person touched object A, and if object A is in fact object B, then they touched object B."
+      ]
     },
     {
       "category": "cross_examination",
@@ -190,7 +207,14 @@
           "person": "Olga",
           "present": [
             "Smith's Autopsy Report"
-          ]
+          ],
+          "source": {
+            "evidence_span": "Death caused by a single blow to the forehead.",
+            "testimony_span": "is strangling him to death",
+            "explanation": "If a person is strangled to death, they wouldn't have a single blow to the forehead.",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "After defendant tried to strangle victim, he hit him with bottle.",
@@ -198,7 +222,15 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "labels": [
+        "behavior"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims the witness was strangled to death.",
+        "Fact 2: The evidence suggests the witness was killed by a single blow to the forehead.",
+        "Prop 1: If a person is strangled to death, they wouldn't have been killed by a single blow to the forehead."
+      ]
     },
     {
       "category": "cross_examination",
@@ -208,8 +240,15 @@
           "testimony": "The game began with 3,500 point in chips for each man.",
           "person": "Olga",
           "present": [
-            "Chip Photo (after changing second statement)"
-          ]
+            "Chip Photo"
+          ],
+          "source": {
+            "evidence_span": "On the near side, there are 4 red, small chips and 1 gray, big chip. On the far side, there are 2 red, small chips and 9 gray, big chips.",
+            "testimony_span": "The game began with 3,500 point in chips for each man.",
+            "explanation": "There are 6 red chips and 10 gray chips in total. If the red chip is worth 100 points and the gray chip is worth 1,000 points, then the total points would be 6 * 100 + 10 * 1,000 = 10,600 points, which is not equal to 7,000 points in total. So, the red chip is worth 1,000 points and the gray chip is worth 100 points. The total points would be 6 * 1000 + 10 * 100 = 7,000 points, which is equal to 7,000 points in total. Therefore, the defendant's or the near side has 4 * 1,000 + 1 * 100 = 4,100 points and the victim's or the far side has 2 * 1,000 + 9 * 100 = 2,900 points. So, the defendant is actually winning.",
+            "is_self_contained": "no",
+            "context_span": "The hand and chips on this side belong to the defendant, Mr. Wright. Those on the far side belonged to the victim, Mr. Smith."
+          }
         },
         {
           "testimony": "House chips come in two size: small and large.",
@@ -221,14 +260,28 @@
           "person": "Olga",
           "present": [
             "Chip Photo"
-          ]
+          ],
+          "source": {
+            "evidence_span": "On the near side, there are 4 red, small chips and 1 gray, big chip. On the far side, there are 2 red, small chips and 9 gray, big chips.",
+            "testimony_span": "One kind of chip is worth 100 points, other kind is worth 1,000. Two kinds in all.",
+            "explanation": "There are 6 red chips and 10 gray chips in total. If the red chip is worth 100 points and the gray chip is worth 1,000 points, then the total points would be 6 * 100 + 10 * 1,000 = 10,600 points, which is not equal to 7,000 points in total. So, the red chip is worth 1,000 points and the gray chip is worth 100 points. The total points would be 6 * 1000 + 10 * 100 = 7,000 points, which is equal to 7,000 points in total. Therefore, the defendant's or the near side has 4 * 1,000 + 1 * 100 = 4,100 points and the victim's or the far side has 2 * 1,000 + 9 * 100 = 2,900 points. So, the defendant is actually winning.",
+            "is_self_contained": "no",
+            "context_span": "The hand and chips on this side belong to the defendant, Mr. Wright. Those on the far side belonged to the victim, Mr. Smith."
+          }
         },
         {
           "testimony": "The one who was winning... dah, it was victim!",
           "person": "Olga",
           "present": [
-            "Chip Photo (after changing second statement)"
-          ]
+            "Chip Photo"
+          ],
+          "source": {
+            "evidence_span": "On the near side, there are 4 red, small chips and 1 gray, big chip. On the far side, there are 2 red, small chips and 9 gray, big chips.",
+            "testimony_span": "The one who was winning... dah, it was victim!",
+            "explanation": "There are 6 red chips and 10 gray chips in total. If the red chip is worth 100 points and the gray chip is worth 1,000 points, then the total points would be 6 * 100 + 10 * 1,000 = 10,600 points, which is not equal to 7,000 points in total. So, the red chip is worth 1,000 points and the gray chip is worth 100 points. The total points would be 6 * 1000 + 10 * 100 = 7,000 points, which is equal to 7,000 points in total. Therefore, the defendant's or the near side has 4 * 1,000 + 1 * 100 = 4,100 points and the victim's or the far side has 2 * 1,000 + 9 * 100 = 2,900 points. So, the defendant is actually winning.",
+            "is_self_contained": "no",
+            "context_span": "The hand and chips on this side belong to the defendant, Mr. Wright. Those on the far side belonged to the victim, Mr. Smith."
+          }
         },
         {
           "testimony": "For last hand, defendant play with all chips on table and lose.",
@@ -241,7 +294,23 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "labels": [
+        "numerical",
+        "spatial"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims there are only two types of chips: 100 points and 1,000 points.",
+        "Fact 2: The evidence suggests that on the near side, there are 4 red, small chips and 1 gray, big chip.",
+        "Fact 3: The evidence also suggests that on the far side, there are 2 red, small chips and 9 gray, big chips.",
+        "Fact 4: The context suggests that the defendant is on the near side and the victim is on the far side.",
+        "Prop 1: If one side has 4 red, small chips and 1 gray, big chip, and the other side has 2 red, small chips and 9 gray, big chips, there are 6 red chips and 10 gray chips in total.",
+        "Prop 2: If the red chip is worth 100 points and the gray chip is worth 1,000 points, then the total points would be 6 * 100 + 10 * 1,000 = 10,600 points, which is not equal to 7,000 points in total.",
+        "Prop 3: If it is not the case that the red chip is worth 100 points and the gray chip is worth 1,000 points, then the red chip must be worth 1,000 points and the gray chip must be worth 100 points.",
+        "Prop 4: If the red chip is worth 1,000 points and the gray chip is worth 100 points, then the near side has 4 * 1,000 + 1 * 100 = 4,100 points which is more than the far side that has 2 * 1,000 + 9 * 100 = 2,900 points.",
+        "Prop 5: If one side has more points than the other, then that side is winning.",
+        "Prop 6: If the defendant is on the near side and the near side is winning, then the defendant is winning."
+      ]
     },
     {
       "category": "cross_examination",
@@ -267,7 +336,14 @@
           "person": "Olga",
           "present": [
             "Chip Photo"
-          ]
+          ],
+          "source": {
+            "evidence_span": "On the near side, the cards are 7 heart, 7 diamond, 7 club, Ace spade, and Ace diamond. On the far side, the cards are King heart, King diamond, King spade, Ace club, and Ace heart.",
+            "testimony_span": "Mr. Smith's hand has three aces",
+            "explanation": "The defendant's hand has two aces, not three, according to the photo.",
+            "is_self_contained": "no",
+            "context_span": "The hand and chips on this side belong to the defendant, Mr. Wright. Those on the far side belonged to the victim, Mr. Smith."
+          }
         },
         {
           "testimony": "The next moment, game becomes argument, dah! The defendant's trick was exposed!",
@@ -280,7 +356,17 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "labels": [
+        "numerical",
+        "spatial"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims Mr. Smith's hand had three aces.",
+        "Fact 2: The evidence suggests on the far side there were two aces.",
+        "Fact 3: The context suggests Mr. Smith was on the far side.",
+        "Prop 1: If a person is sitting on a side where there are two aces, that person does not have three aces."
+      ]
     },
     {
       "category": "cross_examination",
@@ -316,10 +402,27 @@
           "person": "Olga",
           "present": [
             "Wright's Cell Phone"
-          ]
+          ],
+          "source": {
+            "evidence_span": "Used by the defendant to notify the police from the restaurant's first floor.",
+            "testimony_span": "I didn't let him out of my sight until the cops got there!",
+            "explanation": "Since the defendant left the basement to call the police, the witness who claimed to have witness the muder in the basement must have left the defendant out of her sight.",
+            "is_self_contained": "no",
+            "context_span": "The victim was murdered in a small room in a basement two floors down from ground level. Of course, cell phones can't get reception so far down. The defendant used the stairs in this hallway to go above ground... The call came from the first floor of the restaurant."
+          }
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "labels": [
+        "spatial"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims she didn't let the defendant out of her sight since the murder.",
+        "Fact 2: The evidence suggests the defendant went to the first floor to make the call.",
+        "Fact 3: the context suggests the murder happened in the basement.",
+        "Prop 1: If a person goes to the first floor, they must not be in the basement.",
+        "Prop 2: If a person is not in the location of the murder, another person who witnessed the murder must have let them out of their sight."
+      ]
     },
     {
       "category": "cross_examination",
@@ -344,9 +447,15 @@
           "testimony": "I discovered the \"trap\" during the game, and disposed of the card in the bottle.",
           "person": "Phoenix",
           "present": [
-            "Deadly Bottle (after examining bottom of bottle; before correctly presenting Crime Photo 1)",
-            "Deadly Bottle (after examining bottom of bottle; after correctly presenting Crime Photo 1)"
-          ]
+            "Deadly Bottle"
+          ],
+          "source": {
+            "evidence_span": "The bottle is empty.",
+            "testimony_span": "disposed of the card in the bottle",
+            "explanation": "If the witness did dispose the card in the bottle, it would be inside the bottle. However, the bottle is empty.",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "The girl was knocked out cold, and Smith was uncontrollable. I left to call the police.",
@@ -357,9 +466,15 @@
           "testimony": "When I returned, he was dead, blood streaming from a cut on his forehead.",
           "person": "Phoenix",
           "present": [
-            "Crime Photo 1 (before correctly presenting Deadly Bottle)",
-            "Crime Photo 1 (after correctly presenting Deadly Bottle)"
-          ]
+            "Crime Photo 1"
+          ],
+          "source": {
+            "evidence_span": "He is wearing a hat which covers his eyes and forehead.",
+            "testimony_span": "blood streaming from a cut on his forehead",
+            "explanation": "Since the hat covers the victim's forehead, it is impossible to see if there is a cut on his forehead.",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "That's when I made another phone call... To Defense Attorney Gavin.",
@@ -367,7 +482,15 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "labels": [
+        ""
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims he saw a cut on the victim's forehead.",
+        "Fact 2: The evidence suggests the victim's forehead is covered by his hat.",
+        "Prop 1: If a body part is covered by an object, it is impossible to see any injuries on that body part."
+      ]
     },
     {
       "category": "cross_examination",
