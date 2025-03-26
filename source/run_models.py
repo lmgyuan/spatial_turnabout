@@ -154,8 +154,7 @@ def run_model(prompts):
             response = asyncio.run(run_single_model())
             last_line = response.strip().splitlines()[-1]
             try:
-                parsed = json.loads(last_line)
-                answer_jsons.append(json.dumps(parsed))
+                answer_jsons.append(last_line)
                 full_responses.append(response)
             except json.JSONDecodeError:
                 print("Fallback model response also invalid. Skipping prompt.")
