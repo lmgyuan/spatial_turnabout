@@ -1,3 +1,33 @@
+# The Turnabout LLM Dataset
+
+## Coverage
+
+The **Turnabout LLM** dataset contains 9 installations of classic detective visual novels:
+- (AA1) Phoenix Wright: Ace Attorney 
+- (AA2) Phoenix Wright: Ace Attorney – Justice for All 
+- (AA3) Phoenix Wright: Ace Attorney – Trials and Tribulations
+- (AA4) Apollo Justice: Ace Attorney
+- (AA5) Phoenix Wright: Ace Attorney – Dual Destinies
+- (AA6) Phoenix Wright: Ace Attorney – Spirit of Justice
+- (GAA1) The Great Ace Attorney: Adventures
+- (GAA2) The Great Ace Attorney 2: Resolve
+- (DGRP1) Danganronpa: Trigger Happy Havoc
+> Note: Danganronpa 2: Goodbye Despair and Danganronpa V3: Killing Harmony were not included due to the lack of a well-structured transcript. Let us know if you know those that exist!
+
+The dataset comes in a collection of JSON files. The ready-to-use datasets are found at [[Ace Attorney dataset]](aceattorney_data/final/) and [[Danganronpa dataset]](danganronpa_data/final/).
+
+## Organization
+
+An episode (e.g., 1-2: Turnabout Sisters in AA1) is typically split into multiple chapters (e.g., 1-2-2: the second day, or the court day, of 1-2). Each chapter is represented with a JSON file (e.g., [1-2-2.json](aceattorney_data/final/1-2-2_Turnabout_Sisters.json)). Each chapter JSON file has the following schema:
+- `previousContext`: The story that has happened until the start of this chapter. The story is expressed as a long string containing all transcripts, flattened.
+- `characters`: Information about all involved characters in the episode
+    - `currentChapter`, `name`, `age`, `gender`
+    - `description1`, `description2`, ...: episode-specific descriptions extracted from the wiki source. Multiple descriptions happen when the character description is updated through the progression of the game. For simplicity, we concatenate all descriptions in an episode and use that throughout the evaluation.
+- `evidences`: Information about all involved evidences in the episode
+    - `currentChapter`, `name`, `type`, `obtained`
+    - `description1`, `description2`, ...: same as above; episode-specific descriptions extracted from the wiki source. Multiple descriptions happen when the evidence description is updated through the progression of the game. For simplicity, we concatenate all descriptions in an episode and use that throughout the evaluation.
+- `turns`: The cross-examination (AA) and class trial (DGRP) portions of the games.
+
 ## Annotations
 
 In each episode (e.g., 2-1-1), a "turn" is a turn of cross-examination which a series of testimonies. A "present" event happens in a testimony, where one or more evidence can be presented. 
