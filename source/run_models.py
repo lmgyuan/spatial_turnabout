@@ -130,7 +130,8 @@ def run_model(prompts):
         all_responses = []
 
         async def run_single_model():
-            return await ai.chat_round_str(prompt, temperature=0.6)
+            return await ai.chat_round_str(prompt, temperature=0.6, generation_kwargs={"pad_token_id": 128001, "max_new_tokens": 256, "do_sample": True})
+            torch.cuda.empty_cache()
         
         dafualt_answer=""
 
