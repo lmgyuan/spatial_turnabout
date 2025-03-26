@@ -13,6 +13,7 @@ parser.add_argument('--model', type=str, help='model name')
 parser.add_argument('--prompt', type=str)
 parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
 parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+parser.add_argument('--num_votes', type=int, default=3, help='Number of generations to use for majority voting')
 
 # python run_models.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --prompt harry_v1.2
 
@@ -99,25 +100,94 @@ def build_prompt(turns):
         prompts.append(prompt_prefix + prompt + prompt_suffix)
     return prompts
 
+# def run_model(prompts):
+#     answer_jsons = []
+#     full_responses = []
+#     for prompt in prompts:
+#         #print(prompt)
+#         async def run_model():
+#             response = await ai.chat_round_str(prompt, temperature=0.6)
+#             #print(response)
+#             return response
+
+#         response = asyncio.run(run_model())
+#         def get_last_line(multiline_string):
+#             lines = multiline_string.splitlines()
+#             return lines[-1] if lines else ""
+#         answer_json = get_last_line(response)
+#         answer_jsons.append(answer_json)
+#         full_responses.append(response)
+#     return answer_jsons, full_responses
+
+from collections import Counter
+import json
+
 def run_model(prompts):
     answer_jsons = []
     full_responses = []
     for prompt in prompts:
-        #print(prompt)
-        async def run_model():
-            response = await ai.chat_round_str(prompt, temperature=0.6)
-            #print(response)
-            return response
+        all_answers = []
+        all_responses = []
 
-        response = asyncio.run(run_model())
-        def get_last_line(multiline_string):
-            lines = multiline_string.splitlines()
-            return lines[-1] if lines else ""
-        answer_json = get_last_line(response)
-        answer_jsons.append(answer_json)
-        full_responses.append(response)
+        async def run_single_model():
+            return await ai.chat_round_str(prompt, temperature=0.6)
+
+        # Generate N outputs per prompt
+        for _ in range(args.num_votes):
+            response = asyncio.run(run_single_model())
+            last_line = response.strip().splitlines()[-1]
+            try:
+                parsed = json.loads(last_line)
+                all_answers.append(parsed)
+                all_responses.append((parsed, response))
+            except json.JSONDecodeError:
+                print("Skipping malformed JSON:", last_line)
+                continue
+
+        # Separate valid evidence and testimony for majority voting
+        evidence_list = [ans["evidence"] for ans in all_answers if "evidence" in ans]
+        testimony_list = [ans["testimony"] for ans in all_answers if "testimony" in ans]
+
+        # Only proceed if we have at least one of each
+        if not evidence_list or not testimony_list:
+            print("Skipping due to insufficient valid answers.")
+            continue
+
+        evidence_votes = Counter(evidence_list)
+        testimony_votes = Counter(testimony_list)
+
+        most_common_evidence = evidence_votes.most_common(1)[0][0]
+        most_common_testimony = testimony_votes.most_common(1)[0][0]
+
+
+        majority_answer = {
+            "evidence": most_common_evidence,
+            "testimony": most_common_testimony
+        }
+
+        # Find full responses for majority evidence and testimony
+        evidence_response = None
+        testimony_response = None
+        for parsed, resp in all_responses:
+            if evidence_response is None and parsed["evidence"] == most_common_evidence:
+                evidence_response = resp
+            if testimony_response is None and parsed["testimony"] == most_common_testimony:
+                testimony_response = resp
+            if evidence_response and testimony_response:
+                break
+
+        # Combine the two full responses
+        joined_response = (
+            "=== Evidence Response ===\n"
+            + (evidence_response or "[None found]") + "\n\n"
+            + "=== Testimony Response ===\n"
+            + (testimony_response or "[None found]")
+        )
+
+        answer_jsons.append(json.dumps(majority_answer))
+        full_responses.append(joined_response)
+
     return answer_jsons, full_responses
-
 
 if __name__ == "__main__":
     # # Find cases
