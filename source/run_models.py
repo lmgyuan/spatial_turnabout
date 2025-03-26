@@ -135,6 +135,7 @@ def run_model(prompts):
         # Generate N outputs per prompt
         for _ in range(args.num_votes):
             response = asyncio.run(run_single_model())
+            torch.cuda.empty_cache()
             last_line = response.strip().splitlines()[-1]
             try:
                 parsed = json.loads(last_line)
