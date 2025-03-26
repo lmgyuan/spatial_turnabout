@@ -152,6 +152,7 @@ def run_model(prompts):
         if not evidence_list or not testimony_list:
             print("Insufficient valid answers, falling back to single model call.")
             response = asyncio.run(run_single_model())
+            torch.cuda.empty_cache()
             last_line = response.strip().splitlines()[-1]
             try:
                 answer_jsons.append(last_line)
