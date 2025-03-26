@@ -131,12 +131,15 @@ def run_model(prompts):
 
         async def run_single_model():
             return await ai.chat_round_str(prompt, temperature=0.6)
+        
+        dafualt_answer=""
 
         # Generate N outputs per prompt
         for _ in range(args.num_votes):
             response = asyncio.run(run_single_model())
-            torch.cuda.empty_cache()
             last_line = response.strip().splitlines()[-1]
+            default_answer = last_line
+            default_response = response
             try:
                 parsed = json.loads(last_line)
                 all_answers.append(parsed)
@@ -152,12 +155,9 @@ def run_model(prompts):
         # Only proceed if we have at least one of each
         if not evidence_list or not testimony_list:
             print("Insufficient valid answers, falling back to single model call.")
-            response = asyncio.run(run_single_model())
-            torch.cuda.empty_cache()
-            last_line = response.strip().splitlines()[-1]
             try:
-                answer_jsons.append(last_line)
-                full_responses.append(response)
+                answer_jsons.append(default_answer)
+                full_responses.append(default_response)
             except json.JSONDecodeError:
                 print("Fallback model response also invalid. Skipping prompt.")
                 continue
