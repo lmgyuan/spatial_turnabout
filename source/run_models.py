@@ -169,12 +169,13 @@ def run_model(prompts):
         evidence_response = None
         testimony_response = None
         for parsed, resp in all_responses:
-            if evidence_response is None and parsed["evidence"] == most_common_evidence:
+            if evidence_response is None and "evidence" in parsed and parsed["evidence"] == most_common_evidence:
                 evidence_response = resp
-            if testimony_response is None and parsed["testimony"] == most_common_testimony:
+            if testimony_response is None and "testimony" in parsed and parsed["testimony"] == most_common_testimony:
                 testimony_response = resp
             if evidence_response and testimony_response:
                 break
+
 
         # Combine the two full responses
         joined_response = (
