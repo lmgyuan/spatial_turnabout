@@ -12,10 +12,10 @@ Unfortunately, most detective novels like Sherlock Holmes can hardly be used for
 
 ## Dataset
 
-At [data/aceattorney_data/final](data/aceattorney_data/final) and [data/danganronpa_data/final](data/aceattorney_data/final), we provide datasets from Ace Attorney and Danganronpa that can be used to evaluate LLMs' deductive reasoning ability. The game data is crawled and parsed from [an Ace Attorney Wiki](https://aceattorney.fandom.com/wiki/Category:Transcripts) and [a Danganronpa archive](https://lparchive.org/Danganronpa-Trigger-Happy-Havoc/). Some notes:
+Detailed information about the Turnabout LLM dataset can be found at [data/](data/aceattorney_data/final). We provide datasets from Ace Attorney and Danganronpa that can be used to evaluate LLMs' deductive reasoning ability. The game data is crawled and parsed from [an Ace Attorney Wiki](https://aceattorney.fandom.com/wiki/Category:Transcripts) and [a Danganronpa archive](https://lparchive.org/Danganronpa-Trigger-Happy-Havoc/). Some notes:
 
 - We only consider the textual elements, which are core to reasoning in most cases
-    - Whenver visuals are needed for reasoning, they are captioned
+    - Whenver visuals are needed for reasoning, they are captioned, though a multimodal evaluation might come in future work
 - For Ace Attorney
   - We only consider the cross-examination gameplay during trials, neglecting other gameplay elements such as investigation, psyche-locks, etc.
   - While characters and evidences may change throughout the game, we only consider the final list of them with their final descriptions in each case
@@ -28,7 +28,7 @@ For each turn (either a cross-examination or a non-stop debate gameplay), the fo
 2. A list of evidences (Ace Attorney) or truth bullets (Danganronpa) and their descriptions
 3. A list of testimonies
 
-The task is to take the above as input and predict a contradicting pair of evidence or character (Ace Attorney only) and a testimony. One or more correct contradicting pairs are used for evaluation.
+The task is to take the above as input and predict a contradicting pair of evidence or character (Ace Attorney only) and a testimony. 
 
 ## Evaluation
 
@@ -44,3 +44,6 @@ To evaluate said output, run
 > python evaluate.py --model MODEL --prompt PROMPT --case CASE --context CONTEXT
 
 This will create a `report.json` in the same output folder. 
+
+## License
+Following the source of our data, [fandom.com](https://www.fandom.com/licensing), our resources are licensed under Creative Commons Attribution-Share Alike License 3.0 (Unported) (CC BY-SA). 
