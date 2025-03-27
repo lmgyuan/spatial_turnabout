@@ -14,6 +14,8 @@ Most detective novels like Sherlock Holmes can hardly be used for evaluation bec
 
 Despite possible subjectivity, games like Ace Attorney are critically acclaimed with a sizeable player community that generally agree upon the validity of questions and answers. While challenging even for human players, an attentive player should be able to find most contradictions. However, as of the time of writing, no LLM could achieve more than 40\% accuracy.
 
+![An example from the Turnabout LLM dataset](images/aa_example.png)
+
 ## Dataset
 
 Detailed information about the Turnabout LLM dataset can be found at [data/](data/); **see the README there for more information**. We pose this dataset to evaluate LLMs' deductive reasoning ability. The game data is crawled and parsed from [an Ace Attorney Wiki](https://aceattorney.fandom.com/wiki/Category:Transcripts) and [a Danganronpa archive](https://lparchive.org/Danganronpa-Trigger-Happy-Havoc/). We make the following design choices:
