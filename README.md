@@ -4,15 +4,17 @@ This project benchmarks LLMs' deductive reasoning ability using interactive dete
 
 ![Objection!](images/objection.jpg)
 
+> The name "Turnabout" is a naming convention from Ace Attorney as a nod to the playable character's knack for completely changing the direction of a trial, against all odds.
+
 ## Why interactive detective novels?
 
-Detective stories contain some of the most difficult reasoning problems, which are meticulously crafted to be intriguing and obscure. Moreover, solving these problems often require intuition from long passages of context. With these two reasons combined, evaluating LLMs on detective stories brings about unique challenges. 
+Detective stories contain some of the most difficult reasoning problems, which are meticulously crafted to be intriguing and obscure. Moreover, such deduction requires diverse reasoning ability and may require information retrieval from long passages of context. Therefore, evaluating LLMs on detective stories brings about unique challenges. 
 
 Unfortunately, most detective novels like Sherlock Holmes can hardly be used for evaluation because they do not contain explicit questions to pose to models. However, games like Ace Attorney surprasses this constraint, as the interactive gameplay provides a natural interface with LLMs.
 
 ## Dataset
 
-Detailed information about the Turnabout LLM dataset can be found at [data/](data/aceattorney_data/final). We provide datasets from Ace Attorney and Danganronpa that can be used to evaluate LLMs' deductive reasoning ability. The game data is crawled and parsed from [an Ace Attorney Wiki](https://aceattorney.fandom.com/wiki/Category:Transcripts) and [a Danganronpa archive](https://lparchive.org/Danganronpa-Trigger-Happy-Havoc/). Some notes:
+Detailed information about the Turnabout LLM dataset can be found at [data/](data/). We provide datasets from Ace Attorney and Danganronpa that can be used to evaluate LLMs' deductive reasoning ability. The game data is crawled and parsed from [an Ace Attorney Wiki](https://aceattorney.fandom.com/wiki/Category:Transcripts) and [a Danganronpa archive](https://lparchive.org/Danganronpa-Trigger-Happy-Havoc/). Some notes:
 
 - We only consider the textual elements, which are core to reasoning in most cases
     - Whenver visuals are needed for reasoning, they are captioned, though a multimodal evaluation might come in future work
