@@ -22,6 +22,7 @@ Detailed information about the Turnabout LLM dataset can be found at [data/](dat
 - We only consider the textual elements, which are core to reasoning in most cases. Whenver visuals are needed for reasoning, they are captioned, though a multimodal evaluation might come in future work.
 - For Ace Attorney, we only consider the cross-examination gameplay during trials, neglecting other gameplay elements such as investigation, psyche-locks, etc.
 - For Danganronpa, we only consider the non-stop debate gameplay during trials, neglecting other gameplay elements such as socializing, hangman gambit, etc.
+- While our dataset is mostly faithful to the original games, we made various edits (change to wording, removing loose contradictions, adding information for logic leaps, etc.) to improve the rigorousness of reasoning.
 
 For each turn (either a cross-examination or a non-stop debate), the input to a model is:
 
