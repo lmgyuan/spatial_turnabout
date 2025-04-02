@@ -97,20 +97,21 @@ function parseHTMLContent(contentWrapper: Element, document: Document) {
                 chapterData = { chapter: currentChapter, evidences: [] };
             } else if (
                 child.getAttribute('style') === 'color:#000;' +
-                'border:3px solid #000;' +
-                'padding:2px;background:#867545;' +
+                'border:3px solid #6b5e30;' +
+                'padding:2px;background:#dfd8bb;' +
                 'border-radius: 10px; ' +
                 '-moz-border-radius: 10px; ' +
                 '-webkit-border-radius: 10px; ' +
                 '-khtml-border-radius: 10px; ' +
                 '-icab-border-radius: 10px; ' +
-                '-o-border-radius: 10px') {
-                let tableData = parseTable(child, currentChapter);
-                if (tableData.description1.includes("↳")) {
-                    tableData = parseDescription(tableData);
+                '-o-border-radius: 10px') 
+                {
+                    let tableData = parseTable(child, currentChapter);
+                    if (tableData.description1.includes("↳")) {
+                        tableData = parseDescription(tableData);
+                    }
+                    chapterData.evidences.push(tableData);
                 }
-                chapterData.evidences.push(tableData);
-            }
             ++childIndex;
         }
         if (chapterData.chapter) {
@@ -140,10 +141,6 @@ function parseTable(table: Element, currentChapter: string) {
         const row = rows[i];
         if (i === 0) {
             object.name = row.textContent.trim();
-        } else if (i === 1) {
-            object.type = row.textContent.split(":").slice(1).join(" ").trim();
-        } else if (i === 2) {
-            object.obtained = row.textContent.split(":").slice(1).join(" ").trim();
         } else {
             object.description1 = row.textContent.trim();
         }

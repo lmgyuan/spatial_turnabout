@@ -63,23 +63,30 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     // "https://aceattorney.fandom.com/wiki/Bridge_to_the_Turnabout_-_Transcript_-_Part_3",
     // "https://aceattorney.fandom.com/wiki/Bridge_to_the_Turnabout_-_Transcript_-_Part_4",
     // "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_Phoenix_Wright:_Ace_Attorney_-_Trials_and_Tribulations"
-    "https://aceattorney.fandom.com/wiki/Turnabout_Trump_-_Transcript",
-    "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_Apollo_Justice:_Ace_Attorney",
-    "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_Apollo_Justice:_Ace_Attorney",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_1",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_2",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_3",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_4",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_1",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_2",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_3",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_4",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_1",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_2",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_3",
-    "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_4"
-    
-    
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Trump_-_Transcript",
+    // "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_Apollo_Justice:_Ace_Attorney",
+    // "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_Apollo_Justice:_Ace_Attorney",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_1",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_2",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_3",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Corner_-_Transcript_-_Part_4",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_1",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_2",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_3",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Serenade_-_Transcript_-_Part_4",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_1",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_2",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_3",
+    // "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Great_Departure_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unbreakable_Speckled_Band_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Runaway_Room_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Clouded_Kokoro_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Clouded_Kokoro_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unspeakable_Story_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unspeakable_Story_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_The_Great_Ace_Attorney:_Adventures",
+    "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_The_Great_Ace_Attorney:_Adventures"
 ];
 
 
