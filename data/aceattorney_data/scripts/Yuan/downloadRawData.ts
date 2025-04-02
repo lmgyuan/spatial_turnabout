@@ -78,15 +78,16 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     // "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_2",
     // "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_3",
     // "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_4",
-    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Great_Departure_-_Transcript",
-    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unbreakable_Speckled_Band_-_Transcript",
-    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Runaway_Room_-_Transcript",
-    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Clouded_Kokoro_-_Transcript_-_Part_1",
-    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Clouded_Kokoro_-_Transcript_-_Part_2",
-    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unspeakable_Story_-_Transcript_-_Part_1",
-    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unspeakable_Story_-_Transcript_-_Part_2",
-    "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_The_Great_Ace_Attorney:_Adventures",
-    "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_The_Great_Ace_Attorney:_Adventures"
+    // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Great_Departure_-_Transcript",
+    // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unbreakable_Speckled_Band_-_Transcript",
+    // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Runaway_Room_-_Transcript",
+    // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Clouded_Kokoro_-_Transcript_-_Part_1",
+    // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Clouded_Kokoro_-_Transcript_-_Part_2",
+    // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unspeakable_Story_-_Transcript_-_Part_1",
+    // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unspeakable_Story_-_Transcript_-_Part_2",
+    // "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_The_Great_Ace_Attorney:_Adventures",
+    // "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_The_Great_Ace_Attorney:_Adventures",
+    "https://aceattorney.huijiwiki.com/wiki/最初的逆转/抄本"
 ];
 
 
