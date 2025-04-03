@@ -9,9 +9,11 @@ import traceback
 import math
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('--model', type=str, help='model name')
-parser.add_argument('--prompt', type=str)
+parser.add_argument('-m', '--model', type=str, help='model name')
+parser.add_argument('-p', '--prompt', type=str)
 parser.add_argument('--case', type=str)
+parser.add_argument('--context', type=str, help='new, day, partial')
+parser.add_argument('-n', '--no_description', action='store_true')
 
 # python evaluate.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B --prompt harry_v1
 
@@ -19,10 +21,14 @@ args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
+CONTEXT = args.context if args.context else 'no_context'
 
 data_dir = '../data/aceattorney_data/final'
 output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
-
+if args.context is not None:
+    output_dir += f"_{CONTEXT}"
+if args.no_description:
+    output_dir += "_no_description" 
 
 def parse_pred(caseid):
     pred = []
