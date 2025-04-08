@@ -5,18 +5,27 @@ import argparse
 
 from evaluate import parse_gold, evaluate
 
-parser = argparse.ArgumentParser(description='')
-parser.add_argument('--model', type=str, help='gpt-4o-mini, o3-mini')
-parser.add_argument('--prompt', type=str)
-parser.add_argument('--context', type=str, help='If none, run with no context; if new, run with new context; if day, run...')
-parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+from dotenv import load_dotenv
+load_dotenv("../.env")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# python evaluate_openai_models.py --model o3-mini --prompt harry_v1.3
+from openai import OpenAI
+client = OpenAI(
+    api_key=OPENAI_API_KEY
+)
+
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('-m', '--model', type=str, help='model name')
+parser.add_argument('-p', '--prompt', type=str)
+parser.add_argument('--context', type=str, help='new, day')
+parser.add_argument('-c', '--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+parser.add_argument('-n', '--no_description', action='store_true')
 
 args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
+CONTEXT = args.context if args.context else None
 
 def check_status(output_dir):
     with open(os.path.join(output_dir, "batch_api_metadata.json"), "r") as file:

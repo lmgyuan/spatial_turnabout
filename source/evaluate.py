@@ -8,34 +8,35 @@ import seaborn as sns
 import traceback
 import math
 
+from run_models import get_output_dir, get_fnames
+
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('-m', '--model', type=str, help='model name')
 parser.add_argument('-p', '--prompt', type=str)
-parser.add_argument('--case', type=str)
-parser.add_argument('--context', type=str, help='new, day, partial')
+parser.add_argument('--context', type=str, help='new, day')
+parser.add_argument('-c', '--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
 parser.add_argument('-n', '--no_description', action='store_true')
-
-# python evaluate.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B --prompt harry_v1
 
 args = parser.parse_args()
 MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
-CONTEXT = args.context if args.context else 'no_context'
-
-data_dir = '../data/aceattorney_data/final'
-output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
-if args.context is not None:
-    output_dir += f"_{CONTEXT}"
-if args.no_description:
-    output_dir += "_no_description" 
+CONTEXT = args.context if args.context else None
 
 def parse_pred(caseid):
+    pred_path = os.path.join(output_dir, caseid.replace(".json", ".jsonl"))
     pred = []
-    with open(os.path.join(output_dir, caseid + ".jsonl"), 'r') as f:
+    if not os.path.exists(pred_path):
+        return pred
+    
+    with open(pred_path, 'r') as f:
         for line in f:
             try:
-                pred.append(json.loads(line))
+                turn_pred = json.loads(line)
+                assert "evidence" in turn_pred, f"{caseid}: {turn_pred} missing evidence"
+                assert "testimony" in turn_pred, f"{caseid}: {turn_pred} missing testimony"
+                pred.append(turn_pred)
+                
             except json.JSONDecodeError as e:
                 print(f"{caseid}: {e}")
                 pred.append({})
@@ -43,78 +44,37 @@ def parse_pred(caseid):
 
 def parse_gold(caseid):
     """
-    gold_indices = [[{"evidence": 2, "testimony": 3}, {"evidence":4, "testimony": 3}], [{...}]]
+    Return a list of turns, 
+    each turn is a list of correct pairs,
+    each pair is a dict with evidence and testimony.
+    gold_indices = [[
+        {"evidence": 2, "testimony": 3}, 
+        {"evidence":4, "testimony": 3}
+    ], [
+        {...}
+    ], ...]
     """
     gold_indices = []
     gold_names = []
-    with open(os.path.join(data_dir, caseid + ".json"), 'r') as f:
-        try:
-            data = json.load(f)
-            evidences = [evidence['name'] for evidence in data['evidences']]
-            characters = [character['name'] for character in data['characters']]
-            for turn in data['turns']:
-                correct_pairs_indices = []
-                correct_pairs_names = []
-                if turn["noPresent"]:
-                    continue
-                for i, testimony in enumerate(turn['testimonies']):
-                    if testimony["present"]:
-                        correct_evidence_names = testimony["present"]
-                        for correct_evidence_name in correct_evidence_names:
-                            correct_evidence_index = evidences.index(correct_evidence_name)
-                            evidence_type = "evidence"
-                            correct_testimony_index = i
-                            correct_pairs_indices.append({evidence_type: correct_evidence_index, "testimony": correct_testimony_index})
-                            correct_pairs_names.append({evidence_type: correct_evidence_name, "testimony": testimony["testimony"]})
-                gold_indices.append(correct_pairs_indices)
-                gold_names.append(correct_pairs_names)
-        except Exception:
-            print(f"\n\n{caseid} error:\n\n")
-            traceback.print_exc()
-            return [], []
+    with open(os.path.join(data_dir, caseid), 'r') as f:
+        data = json.load(f)
+        evidences = [evidence['name'] for evidence in data['evidences']]
+        characters = [character['name'] for character in data['characters']]
+        for turn in data['turns']:
+            correct_pairs_indices = []
+            correct_pairs_names = []
+            if turn["noPresent"]:
+                continue
+            for i, testimony in enumerate(turn['testimonies']):
+                if testimony["present"]:
+                    correct_evidence_names = testimony["present"]
+                    for correct_evidence_name in correct_evidence_names:
+                        correct_evidence_index = evidences.index(correct_evidence_name)
+                        correct_pairs_indices.append({"evidence": correct_evidence_index, "testimony": i})
+                        correct_pairs_names.append({"evidence": correct_evidence_name, "testimony": testimony["testimony"]})
+            gold_indices.append(correct_pairs_indices)
+            gold_names.append(correct_pairs_names)
     return gold_indices, gold_names
-
-def get_evidences_by_case(caseids):
-    evidences_by_case = {}
-    for caseid in caseids:
-        with open(os.path.join(data_dir, caseid + ".json"), 'r') as f:
-            data = json.load(f)
-            evidences = [evidence['name'] for evidence in data['evidences']]
-            characters = [character['name'] for character in data['characters']]
-            evidences_by_case[caseid] = {"evidences": evidences, "characters": characters}
-    return evidences_by_case
-    
-def get_testimonies_by_case(caseids):
-    testimonies_by_case = {}
-    for caseid in caseids:
-        testimonies_by_case[caseid] = []
-        with open(os.path.join(data_dir, caseid + ".json"), 'r') as f:
-            data = json.load(f)
-            for turn in data['turns']:
-                testimonies = []
-                if turn["noPresent"]:
-                    continue
-                for testimony in turn['testimonies']:
-                    testimonies.append(testimony["testimony"])
-                testimonies_by_case[caseid].append(testimonies)
-    return testimonies_by_case
-
-def get_labels_by_case(caseids):
-    labels_by_case = {}
-    for caseid in caseids:
-        labels_by_case[caseid] = []
-        with open(os.path.join(data_dir, caseid + ".json"), 'r') as f:
-            data = json.load(f)
-            for turn in data['turns']:
-                if turn["noPresent"]:
-                    continue
-                if "labels" in turn and "reasoning" in turn:
-                    labels_by_case[caseid].append(
-                        {"labels": turn["labels"], "reasoning": turn["reasoning"]}
-                    )
-                else:
-                    labels_by_case[caseid].append({"labels": [], "reasoning": []})
-    return labels_by_case
 
 def plot_category_accuracies(categories_correct):
     categories = list(categories_correct.keys())
@@ -248,14 +208,52 @@ def plot_difficulty_accuracies(difficulty_correct):
     plt.savefig(os.path.join(output_dir, 'report_action_space_accuracies.png'))
     plt.close()
 
-def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
-    def vprint(*args, **kwargs):
-        if verbose:
-            print(*args, **kwargs)
-    evidences_by_case = get_evidences_by_case(caseids)  # key: caseid, value: {'evidences': [], 'characters': []}
-    testimonies_by_case = get_testimonies_by_case(caseids)  # key: caseid, value: [["test1, test2"], ["test1"], ["test1"]]
-    labels_by_case = get_labels_by_case(caseids) # key: caseid, value: [{"labels": [], "reasoning": []}, {"labels": [], "reasoning": []}..]
+def init_correct(caseids):
+    categories = []
+    reasoning_steps = []
+    for caseid in caseids:
+        with open(os.path.join(data_dir, caseid), 'r') as f:
+            data = json.load(f)
+            for turn in data['turns']:
+                if "labels" in turn:
+                    for label in turn['labels']:
+                        categories.append(label)
+                if "reasoning" in turn:
+                    len_of_reasoning = len(turn['reasoning'])
+                    reasoning_steps.append(len_of_reasoning)
 
+    categories = list(set(categories))
+    reasoning_steps = list(set(reasoning_steps))
+    
+    categories_correct = {
+        label: {
+            "correct": 0, 
+            'evidence_correct': 0,
+            'testimony_correct': 0,
+            "total": 0, 
+            "accuracy": 0, 
+            'evidence_accuracy': 0,
+            'testimony_accuracy': 0,
+            "bad_cases": []
+        } 
+        for label in categories
+    }
+    reasoning_correct = {
+        step: {
+            "correct": 0, 
+            'evidence_correct': 0,
+            'testimony_correct': 0,
+            "total": 0, 
+            "accuracy": 0, 
+            'evidence_accuracy': 0,
+            'testimony_accuracy': 0,
+            "bad_cases": []
+        } 
+        for step in reasoning_steps
+    }
+    return categories_correct, reasoning_correct
+
+def evaluate(caseids, preds, golds_indices, golds_names):
     report_json = {
             'model': MODEL,
             'prompt': PROMPT,
@@ -276,44 +274,12 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     overall_total = 0
     overall_correct_evidence = 0
     overall_correct_testimony = 0
-    categories = list(set([turn_category 
-                for turns_label in labels_by_case.values() 
-                for turn_label in turns_label
-                for turn_category in turn_label["labels"]]))
 
-    categories_correct = {
-        label: {
-            "correct": 0, 
-            'evidence_correct': 0,
-            'testimony_correct': 0,
-            "total": 0, 
-            "accuracy": 0, 
-            'evidence_accuracy': 0,
-            'testimony_accuracy': 0,
-            "bad_cases": []
-        } 
-        for label in categories
-    }
-    reasoning_correct = {
-        idx: {
-            "correct": 0, 
-            'evidence_correct': 0,
-            'testimony_correct': 0,
-            "total": 0, 
-            "accuracy": 0, 
-            'evidence_accuracy': 0,
-            'testimony_accuracy': 0,
-            "bad_cases": []
-        } 
-        for idx in range(1, 10)
-    }
+    categories_correct, reasoning_correct = init_correct(caseids)
     difficulty_correct = {}
 
     for caseid, pred, gold_indices, gold_names \
         in zip(caseids, preds, golds_indices, golds_names):  # num of cases
-        vprint(caseid)
-        vprint(pred)
-        vprint(gold_indices)
         report_json["case_details"][caseid] = {
             "case_accuracy": -1,
             "turns": []
@@ -321,29 +287,34 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
         case_correct = 0
         case_evidence_correct = 0
         case_testimony_correct = 0
-        case_total = 0
+        case_total = len(gold_indices)
+
         for i in range(len(gold_indices)):  # num of turns for each case
-            # Compute standard accuracy
+            # Init correctness count
             is_correct = False
             is_evidence_correct = False
             is_testimony_correct = False
-            # print(f"{caseid} - {i} - {pred[i]}")
+            
+            # Evaluate correctness
             if pred[i] in gold_indices[i]:  
                 is_correct = True
                 case_correct += 1
-            if "evidence" in pred[i] and any(pred[i]["evidence"] == gold_indices[i][j]["evidence"] for j in range(len(gold_indices[i]))):
+
+            # Evaluate evidence correctness
+            if "evidence" in pred[i] and any(
+                pred[i]["evidence"] == gold_indices[i][j]["evidence"] 
+                for j in range(len(gold_indices[i]))
+            ):  # Need to check property because it can be {}, default to incorrect
                 is_evidence_correct = True
                 case_evidence_correct += 1
-            elif 'character' in pred[i] or 'evidence' not in pred[i]:
-                print(f"{caseid} pred[{i}] missing evidence: {pred[i]}")
 
-            if "testimony" in pred[i] and any(pred[i]["testimony"] == gold_indices[i][j]["testimony"] for j in range(len(gold_indices[i]))):
+            # Evaluate testimony correctness
+            if "testimony" in pred[i] and any(
+                pred[i]["testimony"] == gold_indices[i][j]["testimony"] 
+                for j in range(len(gold_indices[i]))
+            ):
                 is_testimony_correct = True
                 case_testimony_correct += 1
-            elif "testimony" not in pred[i]:
-                print(f"{caseid} pred[{i}] missing testimony: {pred[i]}")
-
-            case_total += 1
 
             # Compute category accuracy
             turn_labels = labels_by_case[caseid][i]["labels"]  # Return empty list if none            
@@ -525,30 +496,22 @@ def evaluate(caseids, preds, golds_indices, golds_names, verbose=False):
     plot_difficulty_accuracies(difficulty_correct)
 
 if __name__ == "__main__":
-    all_caseids = [n.split('.')[0] for n in sorted(os.listdir(data_dir)) if not n.startswith(('4-', '5-', '6-'))]
-    if CASE == "ALL":
-        caseids = all_caseids
-    else:
-        for caseid in all_caseids:
-            if caseid.startswith(CASE):
-                caseids = [caseid]
+    data_dir = '../data/aceattorney_data/final'
+    output_dir = get_output_dir()   
+    caseids = get_fnames(data_dir)
+
     preds = []
     golds_indices = []
     golds_names = []
     caseids_final = []
+
     for i, caseid in enumerate(caseids):
-        pred_path = os.path.join(output_dir, caseid + ".jsonl")
-        if not os.path.exists(pred_path):
-            # print(f"{caseid.split('_')[0]} does not exist. Skipping...")
-            continue
-
-        if int((caseid.split("_")[0]).split("-")[-1]) % 2 == 1:  # Skip odd cases
-            continue
-
         pred = parse_pred(caseid)
+        if not pred: continue
+
         gold_indices, gold_names = parse_gold(caseid)
         if len(pred) != len(gold_indices):
-            print(f"Case {caseid.split('_')[0]}, num of pred: {len(pred)} is not equal to num of turn: {len(gold_indices)}. Skipping...\n")
+            print(f"Case {caseid.split('_')[0]}, num of pred: {len(pred)} != {len(gold_indices)}. Skipping...")
             continue
 
         caseids_final.append(caseid)
@@ -556,6 +519,5 @@ if __name__ == "__main__":
         golds_indices.append(gold_indices)  # List of list of dicts
         golds_names.append(gold_names)
     
-    caseids = caseids_final
-    print(f"Evaluating {len(caseids)} court days...")
-    evaluate(caseids, preds, golds_indices, golds_names)
+    print(f"Evaluating {len(caseids_final)} court days...")
+    evaluate(caseids_final, preds, golds_indices, golds_names)

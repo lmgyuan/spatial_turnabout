@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description='')
 parser.add_argument('-m', '--model', type=str, help='model name')
 parser.add_argument('-p', '--prompt', type=str)
 parser.add_argument('--context', type=str, help='new, day')
-parser.add_argument('--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
+parser.add_argument('-c', '--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
 parser.add_argument('-n', '--no_description', action='store_true')
 
 # python run_models.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --prompt harry_v1.3
@@ -18,6 +18,48 @@ MODEL = args.model
 PROMPT = args.prompt
 CASE = args.case if args.case else "ALL"
 CONTEXT = args.context if args.context else None
+
+def get_output_dir():
+    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
+    if args.context is not None:
+        output_dir += f"_context_{CONTEXT}"
+    if args.no_description:
+        output_dir += "_no_desc"
+    if CASE != "ALL":
+        output_dir += f"_case_{args.case}"
+    return output_dir
+
+def get_fnames(data_dir, output_dir):
+    """Return list of .json files"""
+    all_fnames = sorted([
+        fname for fname 
+        in os.listdir(data_dir) 
+        if fname.endswith('.json')
+        if not int((fname.split("_")[0]).split("-")[-1]) % 2 == 1
+        if not fname.startswith(('7-'))  # skip test split
+    ])
+    fnames = []
+    if CASE == "ALL":
+        fnames = all_fnames
+    else:
+        for i, fname in enumerate(all_fnames):
+            if fname.startswith(CASE.strip('+')):
+                if CASE.endswith('+'):
+                    fnames = all_fnames[i:]
+                else:
+                    fnames = [fname]
+                break
+
+    print(f"Found {len(fnames)} cases")
+
+    fnames_to_check = fnames.copy()
+    for fname in fnames_to_check:
+        if os.path.exists(os.path.join(output_dir, fname.split('.')[0] + '.jsonl')):
+            print(f"Skipping existing {fname.split('.')[0] + '.jsonl'}")
+            fnames.remove(fname)
+
+    print(f"Running {len(fnames)} cases")
+    return fnames
 
 def build_prompt_prefix_suffix(prompt_arg):
     with open("prompts/" + prompt_arg + ".json", 'r') as file:
@@ -97,9 +139,12 @@ def build_prompt(turns, prev_context):
             evidence_string = f"Evidence {evidence_counter}\n"
             evidence_string += f"Name: {evidence['name']}\n"
             if not args.no_description:
-                evidence_string += f"Description: {evidence['description1']}\n"
-                if 'description2' in evidence:
-                    evidence_string += f"{evidence['description2']}\n"
+                evidence_string += f"Description: "
+                descriptions = []
+                for key in evidence.keys():
+                    if 'description' in key:
+                        descriptions.append(evidence[key])
+                evidence_string += " ".join(descriptions) + "\n"
             evidences.append(evidence_string)
             evidence_counter += 1
         
@@ -144,15 +189,15 @@ def run_model(prompts, client, client_name):
     full_responses = []
     for prompt in prompts:
         #print(prompt)
-        if isinstance(client, Kani):  # Use kani api
+        if type(client).__name__ == "Kani":  # Use kani api
             async def run_model():
                 response = await client.chat_round_str(prompt, temperature=0.6)
                 #print(response)
                 return response
 
-            response = asyncio.run(run_model())
+            full_answer = asyncio.run(run_model())
 
-        elif isinstance(client, OpenAI):  # Use openai api
+        elif type(client).__name__ == "OpenAI":  # Use openai api
             response = client.chat.completions.create(
                 model=client_name,
                 messages=[
@@ -162,15 +207,19 @@ def run_model(prompts, client, client_name):
                 stream=False
             )
 
-            answer = response.choices[0].message.content
+            full_answer = response.choices[0].message.content
             try: 
                 cot = response.choices[0].message.reasoning_content
                 print(f"COT returned for {client_name}")
-                full_answer = cot + "\n\n" + answer
+                full_answer = cot + "\n\n" + full_answer
             except Exception as e:
                 print(f"When trying to get COT for {client_name}: {e}")
                 print(f"No COT for {client_name}")
-        answer_json = get_last_line(answer)
+
+        else:
+            raise ValueError(f"Unknown client: {client}")
+
+        answer_json = get_last_line(full_answer)
         answer_jsons.append(answer_json)
         full_responses.append(full_answer)
 
@@ -215,16 +264,11 @@ def load_model(model):
     return client, name
 
 if __name__ == "__main__":
-    # Make output dir
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL.split("/")[-1]}_{PROMPT}'
-    if args.context is not None:
-        output_dir += f"_context_{CONTEXT}"
-    if args.no_description:
-        output_dir += "_no_desc"
-    if CASE != "ALL":
-        output_dir += f"_{args.case}"
+
+    # Make output dir
+    output_dir = get_output_dir()
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(os.path.join(output_dir, 'metadata.json'), 'w') as file:
@@ -239,34 +283,16 @@ if __name__ == "__main__":
     client, client_name = load_model(MODEL)
 
     # Collect cases
-    all_fnames = sorted([
-            fname for fname 
-            in os.listdir(data_dir) 
-            if not int((fname.split("_")[0]).split("-")[-1]) % 2 == 1
-        ])
-    fnames = []
-    if CASE == "ALL":
-        fnames = all_fnames
-    else:
-        for i, fname in enumerate(all_fnames):
-            if fname.startswith(CASE.strip('+')):
-                if CASE.endswith('+'):
-                    fnames = all_fnames[i:]
-                else:
-                    fnames = [fname]
-                break
+    fnames = get_fnames(data_dir, output_dir)
 
     # Run cases
     for fname in fnames:
-        if os.path.exists(os.path.join(output_dir, fname.split('.')[0] + '.jsonl')):
-            print(f"Skipping existing {fname.split('.')[0] + '.jsonl'}")
-            continue
-
         # Parse and build prompt
         print(fname)
         turns, context = parse_json(os.path.join(data_dir, fname))
         prompts = build_prompt(turns, context)
         # print("\n...\n".join(prompts))
+        # import sys; sys.exit(0)
 
         # Answer
         answer_jsons, full_responses = run_model(prompts, client, client_name)
