@@ -1,0 +1,139 @@
+import * as path from "path";
+import * as fs from "fs";
+import * as fsPromises from "fs/promises";
+import consola from "consola";
+
+// Define paths
+const FINAL_DIR = path.join(
+  process.cwd(),
+  "data",
+  "aceattorney_data",
+  "final"
+);
+
+const OUTPUT_PATH = path.join(
+  process.cwd(),
+  "data",
+  "aceattorney_data",
+  "spatial",
+  "spatial_turns.json"
+);
+
+// Types
+type Testimony = {
+  testimony: string;
+  person: string;
+  present: string[];
+  source?: any;
+};
+
+type Turn = {
+  category: string;
+  newContext: string;
+  testimonies: Testimony[];
+  noPresent: boolean;
+  summarizedContext?: string;
+  summarized_context?: string;
+  labels?: string[];
+  reasoning?: string[];
+};
+
+type Case = {
+  previousContext: string;
+  characters: any[];
+  evidences: any[];
+  turns: Turn[];
+};
+
+type SpatialTurn = {
+  case_name: string;
+  context: string;
+  summarizedContext?: string;
+  summarized_context?: string;
+  testimonies: Testimony[];
+  labels?: string[];
+  reasoning?: string[];
+  source_file: string;
+};
+
+async function main() {
+  try {
+    consola.start("Finding spatial turns from all cases");
+    
+    // Create output directory if it doesn't exist
+    await fsPromises.mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
+    
+    // Get all JSON files in the final directory
+    const files = fs.readdirSync(FINAL_DIR)
+      .filter(filename => filename.endsWith('.json'));
+    
+    consola.info(`Found ${files.length} case files to process`);
+    
+    const spatialTurns: SpatialTurn[] = [];
+    
+    // Process each file
+    for (const filename of files) {
+      const filePath = path.join(FINAL_DIR, filename);
+      
+      // Extract case name from filename (remove extension and any leading numbers/dashes)
+      const caseName = filename.replace(/^\d+-\d+-\d+_/, '').replace('.json', '');
+      
+      consola.info(`Processing case: ${caseName}`);
+      
+      try {
+        // Read and parse the case file
+        const caseData = JSON.parse(fs.readFileSync(filePath, 'utf8')) as Case;
+        
+        // Build context progressively
+        let cumulativeContext = caseData.previousContext || "";
+        
+        // Process each turn
+        for (let i = 0; i < caseData.turns.length; i++) {
+          const turn = caseData.turns[i];
+          
+          // Add the current turn's newContext to the cumulative context
+          const currentTurnContext = turn.newContext || "";
+          const contextForThisTurn = cumulativeContext + (currentTurnContext ? "\n" + currentTurnContext : "");
+          
+          // Update cumulative context for next turn
+          cumulativeContext = contextForThisTurn;
+          
+          // Check if this turn has the "spatial" label
+          if (turn.labels && turn.labels.includes("spatial") && turn.noPresent === false) {
+            consola.success(`Found spatial turn in ${caseName}`);
+            
+            // Create spatial turn object
+            const spatialTurn: SpatialTurn = {
+              case_name: caseName,
+              context: contextForThisTurn,
+              summarizedContext: turn.summarizedContext,
+              summarized_context: turn.summarized_context,
+              testimonies: turn.testimonies,
+              labels: turn.labels,
+              reasoning: turn.reasoning,
+              source_file: filename
+            };
+            
+            spatialTurns.push(spatialTurn);
+          }
+        }
+      } catch (e) {
+        consola.error(`Error processing file ${filename}:`, e);
+      }
+    }
+    
+    consola.info(`Found a total of ${spatialTurns.length} spatial turns`);
+    
+    // Write to output file
+    await fsPromises.writeFile(
+      OUTPUT_PATH,
+      JSON.stringify(spatialTurns, null, 2)
+    );
+    
+    consola.success(`Successfully wrote spatial turns to ${OUTPUT_PATH}`);
+  } catch (e) {
+    consola.error("Error during execution:", e);
+  }
+}
+
+main();
