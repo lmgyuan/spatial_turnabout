@@ -87,7 +87,24 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     // "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Unspeakable_Story_-_Transcript_-_Part_2",
     // "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_The_Great_Ace_Attorney:_Adventures",
     // "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_The_Great_Ace_Attorney:_Adventures",
-    "https://aceattorney.huijiwiki.com/wiki/最初的逆转/抄本"
+    // "https://aceattorney.huijiwiki.com/wiki/最初的逆转/抄本",
+    "https://aceattorney.fandom.com/wiki/The_Adventure_of_the_Blossoming_Attorney_-_Transcript",
+    "https://aceattorney.fandom.com/wiki/The_Memoirs_of_the_Clouded_Kokoro_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/The_Memoirs_of_the_Clouded_Kokoro_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/The_Memoirs_of_the_Clouded_Kokoro_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/The_Memoirs_of_the_Clouded_Kokoro_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/The_Return_of_the_Great_Departed_Soul_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/The_Return_of_the_Great_Departed_Soul_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/The_Return_of_the_Great_Departed_Soul_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/The_Return_of_the_Great_Departed_Soul_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Twisted_Karma_and_His_Last_Bow_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/Twisted_Karma_and_His_Last_Bow_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/Twisted_Karma_and_His_Last_Bow_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/The_Resolve_of_Ryunosuke_Naruhodo_-_Transcript_-_Part_1",
+    "https://aceattorney.fandom.com/wiki/The_Resolve_of_Ryunosuke_Naruhodo_-_Transcript_-_Part_2",
+    "https://aceattorney.fandom.com/wiki/The_Resolve_of_Ryunosuke_Naruhodo_-_Transcript_-_Part_3",
+    "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_The_Great_Ace_Attorney_2:_Resolve",
+    "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_The_Great_Ace_Attorney_2:_Resolve",
 ];
 
 
