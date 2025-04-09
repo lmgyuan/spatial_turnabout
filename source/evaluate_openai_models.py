@@ -4,6 +4,7 @@ import json
 import argparse
 
 from evaluate import parse_gold, evaluate
+from run_models import get_fnames, get_output_dir
 
 from dotenv import load_dotenv
 load_dotenv("../.env")
@@ -55,13 +56,11 @@ def check_status(output_dir):
 
     return False
 
-def parse_pred(caseid, data):
-    caseid_base = os.path.join(data_dir, caseid + ".json")
-
+def parse_pred(caseid_base, data):
     full_responses = []
     responses = []
     for line in data:
-        if caseid in line["custom_id"]:
+        if caseid_base in line["custom_id"]:
             full_response = line["response"]["body"]["choices"][0]["message"]["content"]
             try:
                 last_line = full_response.splitlines()[-1]
@@ -78,30 +77,28 @@ def parse_pred(caseid, data):
             full_responses.append(full_response)
             responses.append(response)
     
-    return responses, full_responses
+    return responses, "\n".join(full_responses)
+
+def log_pred(caseid_base, pred, full_pred):
+    with open(os.path.join(output_dir, f"{caseid_base}_full_responses.txt"), "w") as f:
+        for line in full_pred:
+            f.write(line)
+            f.write(delimiter)
+    
+    with open(os.path.join(output_dir, f"{caseid_base}.jsonl"), "w") as f:
+        for line in pred:
+            f.write(json.dumps(line) + "\n")
 
 if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'../output/{MODEL}_{PROMPT}'
+    output_dir = get_output_dir()
 
     ret = check_status(output_dir)
 
     if ret:
         # Load ground truths from data dir
-        all_caseids = sorted([
-            fname.split('.')[0] for fname 
-            in os.listdir(data_dir) 
-            if not fname.startswith(('4-', '5-', '6-')) and not int((fname.split("_")[0]).split("-")[-1]) % 2 == 1
-        ])
-        # print(all_fnames)
-        caseids = []
-        if CASE == "ALL":
-            caseids = all_caseids
-        else:
-            for caseid in all_caseids:
-                if caseid.startswith(CASE):
-                    caseids = [caseid]
+        caseids = get_fnames(data_dir, output_dir, eval=True)
 
         # Load predictions from output dir
         with open(os.path.join(output_dir, "batchoutput.jsonl"), "r") as file:
@@ -111,28 +108,42 @@ if __name__ == "__main__":
         golds_indices = []
         golds_names = []
         caseids_final = []
-        
+        full_responses = []
+        golds_metadata = []
+
+        delimiter = "\n" + "="*100 + "\n"
         for i, caseid in enumerate(caseids):
-            pred, full_pred = parse_pred(caseid, data)
-            gold_indices, gold_names = parse_gold(caseid)
+            caseid_base = caseid.replace(".json", "")
+            pred, full_pred = parse_pred(caseid_base, data)
+
+            if not pred:
+                print(f"Case {caseid_base} no pred, skipping...")
+                continue
+            log_pred(caseid_base, pred, full_pred)
+
+            gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir)
 
             if len(pred) != len(gold_indices):
                 print(f"Case {caseid.split('_')[0]}, num of pred: {len(pred)} is not equal to num of turn: {len(gold_indices)}. Skipping...\n")
                 continue
 
-            with open(os.path.join(output_dir, f"{caseid}_full_responses.txt"), "w") as f:
-                for line in full_pred:
-                    f.write(line + "\n" + "*" * 30 + "\n")
-            
-            with open(os.path.join(output_dir, f"{caseid}.jsonl"), "w") as f:
-                for line in pred:
-                    f.write(json.dumps(line) + "\n")
-
             caseids_final.append(caseid)
             preds.append(pred)  # List of dicts
+            full_responses.append(full_pred)
             golds_indices.append(gold_indices)  # List of list of dicts
             golds_names.append(gold_names)
-        
+            golds_metadata.append(gold_metadata)
+
         caseids = caseids_final
         print(f"Evaluating {len(caseids)} court days...")
-        evaluate(caseids, preds, golds_indices, golds_names)
+        # import sys; sys.exit(0)
+        evaluate(
+            output_dir, 
+            data_dir,
+            caseids, 
+            preds, 
+            full_responses, 
+            golds_indices, 
+            golds_names, 
+            golds_metadata
+        )

@@ -29,7 +29,7 @@ def get_output_dir():
         output_dir += f"_case_{args.case}"
     return output_dir
 
-def get_fnames(data_dir, output_dir):
+def get_fnames(data_dir, output_dir, eval=False):
     """Return list of .json files"""
     all_fnames = sorted([
         fname for fname 
@@ -52,11 +52,12 @@ def get_fnames(data_dir, output_dir):
 
     print(f"Found {len(fnames)} cases")
 
-    fnames_to_check = fnames.copy()
-    for fname in fnames_to_check:
-        if os.path.exists(os.path.join(output_dir, fname.split('.')[0] + '.jsonl')):
-            print(f"Skipping existing {fname.split('.')[0] + '.jsonl'}")
-            fnames.remove(fname)
+    if not eval:
+        fnames_to_check = fnames.copy()
+        for fname in fnames_to_check:
+            if os.path.exists(os.path.join(output_dir, fname.split('.')[0] + '.jsonl')):
+                print(f"Skipping existing {fname.split('.')[0] + '.jsonl'}")
+                fnames.remove(fname)
 
     print(f"Running {len(fnames)} cases")
     return fnames
@@ -180,9 +181,19 @@ def build_prompt(turns, prev_context):
         prompts.append(PROMPT_PREFIX + prompt + PROMPT_SUFFIX)
     return prompts
 
-def get_last_line(multiline_string):
+def get_json_answer(multiline_string):
     lines = multiline_string.splitlines()
-    return lines[-1] if lines else ""
+    target = lines[-1]
+    try:
+        json_answer = json.loads(target)
+    except json.JSONDecodeError:
+        try:
+            target = lines[-2]
+            json_answer = json.loads(target)
+        except json.JSONDecodeError:
+            json_answer = {}
+    
+    return json_answer
 
 def run_model(prompts, client, client_name):
     answer_jsons = []
@@ -219,7 +230,7 @@ def run_model(prompts, client, client_name):
         else:
             raise ValueError(f"Unknown client: {client}")
 
-        answer_json = get_last_line(full_answer)
+        answer_json = get_json_answer(full_answer)
         answer_jsons.append(answer_json)
         full_responses.append(full_answer)
 
@@ -300,12 +311,15 @@ if __name__ == "__main__":
             print(answer_json)
 
         # Log
+        delimiter = "\n" + "="*100 + "\n"
         with open(os.path.join(output_dir, fname.split('.')[0] + '.jsonl'), 'w') as file:
             for answer_json in answer_jsons:
-                file.write(answer_json + "\n")
+                file.write(json.dumps(answer_json) + "\n")
         with open(os.path.join(output_dir, fname.split('.')[0] + '_full_responses.txt'), 'w') as file:
             for response in full_responses:
-                file.write(response + "\n")
+                file.write(response)
+                file.write(delimiter)  # Add a delimiter
         with open(os.path.join(output_dir, fname.split('.')[0] + '_prompt.txt'), 'w') as file:
             for prompt in prompts:
-                file.write(prompt + "\n\n")
+                file.write(prompt)
+                file.write(delimiter)  # Add a delimiter
