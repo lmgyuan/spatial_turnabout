@@ -10,6 +10,7 @@ parser.add_argument('-p', '--prompt', type=str)
 parser.add_argument('--context', type=str, help='new, day')
 parser.add_argument('-c', '--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
 parser.add_argument('-n', '--no_description', action='store_true')
+parser.add_argument('-verify', action='store_true', default=False)
 
 # python run_models.py --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B --prompt harry_v1.3
 
