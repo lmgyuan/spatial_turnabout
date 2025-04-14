@@ -93,6 +93,7 @@ if __name__ == "__main__":
     data_dir = '../data/aceattorney_data/final'
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = get_output_dir()
+    print(f"Output dir: {output_dir}")
 
     ret = check_status(output_dir)
 

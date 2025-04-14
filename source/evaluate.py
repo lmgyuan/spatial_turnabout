@@ -8,26 +8,14 @@ import seaborn as sns
 import traceback
 import math
 from collections import defaultdict
-from run_models import get_output_dir, get_fnames
+from run_models import get_output_dir, get_fnames, parse_arguments
 
-parser = argparse.ArgumentParser(description='')
-parser.add_argument('-m', '--model', type=str, help='model name')
-parser.add_argument('-p', '--prompt', type=str)
-parser.add_argument('--context', type=str, help='new, day')
-parser.add_argument('-c', '--case', type=str, help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
-parser.add_argument('-n', '--no_description', action='store_true')
-
-args = parser.parse_args()
-MODEL = args.model
-PROMPT = args.prompt
-CASE = args.case if args.case else "ALL"
-CONTEXT = args.context if args.context else None
-
-def parse_pred(caseid):
+def parse_pred(caseid, output_dir):
     pred_path = os.path.join(output_dir, caseid.replace(".json", ".jsonl"))
     pred = []
     reasoning = []
     if not os.path.exists(pred_path):
+        # print(f"{pred_path}: no pred. Skipping...")
         return pred, reasoning
     # Parse predictions
     with open(pred_path, 'r') as f:
@@ -42,14 +30,17 @@ def parse_pred(caseid):
                 print(f"{caseid}: {e}")
                 pred.append({})
     # Parse reasoning
-    reasoning_path = os.path.join(output_dir, caseid.replace(".json", "_full_responses.txt"))
-    idx = 0
-    lines = []
-    with open(reasoning_path, 'r') as f:
-        reasoning = f.read()
+    if os.path.exists(os.path.join(output_dir, caseid.replace(".json", "_outputs.json"))):
+        with open(os.path.join(output_dir, caseid.replace(".json", "_outputs.json")), 'r') as f:
+            output = json.load(f)
+            reasoning = [o['response'] for o in output]  # list of strings
+    # Legacy
+    elif os.path.exists(os.path.join(output_dir, caseid.replace(".json", "_full_responses.txt"))):
+        with open(os.path.join(output_dir, caseid.replace(".json", "_full_responses.txt")), 'r') as f:
+            reasoning = f.read()  # a single string
     return pred, reasoning
 
-def parse_gold(caseid, data_dir):
+def parse_gold(caseid, data_dir, not_self_contained_only=False):
     """
     Return a list of ground truth turns
     """
@@ -58,9 +49,10 @@ def parse_gold(caseid, data_dir):
     gold_metadata = {
         "turns": []
     }
-    with open(os.path.join(data_dir, caseid), 'r') as f:
-        data = json.load(f)
-        evidences = [evidence['name'] for evidence in data['evidences']]
+    try:
+        with open(os.path.join(data_dir, caseid), 'r') as f:
+            data = json.load(f)
+            evidences = [evidence['name'] for evidence in data['evidences']]
         characters = [character['name'] for character in data['characters']]
         # Parse evidence metadata
         n_evidences = len(evidences)
@@ -70,6 +62,15 @@ def parse_gold(caseid, data_dir):
             correct_pairs_indices = []
             correct_pairs_names = []
             turn_metadata = {}
+            # The caseid is already filtered by pred outside if not_self_contained_only is True
+            # This part handles what turns should be skipped if not_self_contained_only is True
+            if not_self_contained_only and not any(
+                "source" in testimony 
+                and "is_self_contained" in testimony["source"] 
+                and testimony["source"]["is_self_contained"] == "no" 
+                for testimony in turn["testimonies"]
+            ):
+                continue
             if turn["noPresent"]:
                 continue
             # Parse testimony metadata
@@ -91,6 +92,9 @@ def parse_gold(caseid, data_dir):
             gold_indices.append(correct_pairs_indices)
             gold_names.append(correct_pairs_names)
             gold_metadata["turns"].append(turn_metadata)
+    except Exception as e:
+        print(f"{caseid}: {e}. Number of turns: {len(data['turns'])}")
+        return [], [], {}  # Radically skip this case
     return gold_indices, gold_names, gold_metadata
 
 def init_correct(caseids, data_dir):
@@ -191,7 +195,10 @@ def evaluate(
         case_testimony_correct = 0
         case_total = len(gold_indices)
 
-        case_total_reasoning_tokens = len(reasoning.split(" "))
+        if isinstance(reasoning, str):  # Legacy
+            case_total_reasoning_tokens = len(reasoning.split(" "))
+        elif isinstance(reasoning, list):
+            case_total_reasoning_tokens = sum([len(r.split(" ")) for r in reasoning])
         overall_reasoning_tokens += case_total_reasoning_tokens
         case_average_reasoning_tokens = round(case_total_reasoning_tokens / case_total, 2)
 
@@ -302,6 +309,7 @@ def evaluate(
                 'mean_n_reasoning_tokens': case_average_reasoning_tokens,
                 "gold": gold,
                 "pred": out_pred,
+                "n_reasoning_tokens": len(reasoning[i].split(" ")) if isinstance(reasoning, list) else "N/A"
             })
 
         # Increment case data
@@ -324,30 +332,30 @@ def evaluate(
     # Log breakdown accuracy
     report_json["categories_accuracy"] = {
         label: {
+            **stats,  # expand stats first to avoid overwriting
             "accuracy": round(stats["correct"] / stats["total"], 4),
             "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
-            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),
-            **stats, 
+            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),  
         }
         for label, stats in sorted(categories_correct.items())
         if stats["total"] > 0
     }
     report_json["reasoning_steps_accuracy"] = {
         step: {
+            **stats,  # expand stats first to avoid overwriting
             "accuracy": round(stats["correct"] / stats["total"], 4),
             "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
             "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),
-            **stats, 
         }
         for step, stats in sorted(reasoning_correct.items())
         if stats["total"] > 0
     }
     report_json["action_space_accuracy"] = {
         action_space: {
+            **stats,
             "accuracy": round(stats["correct"] / stats["total"], 4),
             "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
             "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),
-            **stats, 
         }
         for action_space, stats in sorted(action_space_correct.items())
         if stats["total"] > 0
@@ -356,12 +364,31 @@ def evaluate(
     # Write to json
     with open(os.path.join(eval_dir, f"report.json"), 'w') as f:
         json.dump(report_json, f, indent=2)
-    print(f"Report saved to {eval_dir}/report.json")
+    print(f"<evaluate> Report saved to {eval_dir}/report.json")
 
 if __name__ == "__main__":
+    parser = parse_arguments()
+    parser.add_argument('-nsc', '--not_self_contained_only', action='store_true')
+    parser.add_argument('-d', '--disable_context_span', action='store_true')
+    args = parser.parse_args()
+    MODEL = args.model
+    PROMPT = args.prompt
+    CASE = args.case if args.case else "ALL"
+    CONTEXT = args.context if args.context else None
+    NO_DESCRIPTION = args.no_description
+    NOT_SELF_CONTAINED_ONLY = args.not_self_contained_only
+    DISABLE_CONTEXT_SPAN = args.disable_context_span
+
     data_dir = '../data/aceattorney_data/final'
-    output_dir = get_output_dir()   
-    caseids = get_fnames(data_dir, output_dir, eval=True)
+    output_dir = get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION) 
+    if NOT_SELF_CONTAINED_ONLY:
+        output_dir += "_not_self_contained"
+    if DISABLE_CONTEXT_SPAN:
+        output_dir += "_no_context"
+    if not os.path.exists(output_dir):
+        raise ValueError(f"Output directory {output_dir} does not exist")
+
+    caseids = get_fnames(data_dir, output_dir, CASE, eval=True)
 
     preds = []
     reasonings = []
@@ -370,16 +397,17 @@ if __name__ == "__main__":
     golds_metadata = []
     caseids_final = []
 
+    skips = 0
     for i, caseid in enumerate(caseids):
-        pred, reasoning = parse_pred(caseid)
+        pred, reasoning = parse_pred(caseid, output_dir)
         if not pred: 
-            print(f"Case {caseid.split('_')[0]}, no pred. Skipping...")
+            skips += 1
             continue
 
-        gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir)
+        gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir, not_self_contained_only=NOT_SELF_CONTAINED_ONLY)
 
         if len(pred) != len(gold_indices):
-            print(f"Case {caseid.split('_')[0]}, num of pred: {len(pred)} != {len(gold_indices)}. Skipping...")
+            print(f"<evaluate> Case {caseid.split('_')[0]}, num of pred: {len(pred)} != {len(gold_indices)}. Skipping...")
             continue
 
         caseids_final.append(caseid)
@@ -389,7 +417,9 @@ if __name__ == "__main__":
         golds_names.append(gold_names)
         golds_metadata.append(gold_metadata)
 
-    print(f"Evaluating {len(caseids_final)} court days...")
+    print(f"<evaluate> Evaluating {len(caseids_final)} court days...")
+    print(f"<evaluate> Skipped {skips} court days...")
+
     evaluate(
         output_dir, 
         data_dir,
