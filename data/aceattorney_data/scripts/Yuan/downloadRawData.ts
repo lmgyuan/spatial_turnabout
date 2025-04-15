@@ -105,7 +105,12 @@ const FANDOM_FIRST_TURNABOUT_TRANSCRIPT_PAGES = [
     "https://aceattorney.fandom.com/wiki/The_Resolve_of_Ryunosuke_Naruhodo_-_Transcript_-_Part_3",
     "https://aceattorney.fandom.com/wiki/List_of_Evidence_in_The_Great_Ace_Attorney_2:_Resolve",
     "https://aceattorney.fandom.com/wiki/List_of_Profiles_in_The_Great_Ace_Attorney_2:_Resolve",
-];
+    "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_4",
+    "https://aceattorney.fandom.com/wiki/Turnabout_Succession_-_Transcript_-_Part_5",
+    "http://www.aya.or.jp/%7Ekidparty/gyakuten/word001.htm",
+    "http://www.aya.or.jp/%7Ekidparty/gyakuten/word002.htm",
+    "http://www.aya.or.jp/%7Ekidparty/gyakuten/word003.htm",
+    ];
 
 
 const CASE_OBJECT_RAW_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "objects_raw");
