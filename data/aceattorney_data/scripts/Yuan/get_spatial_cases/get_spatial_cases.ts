@@ -49,8 +49,7 @@ type SpatialTurn = {
   case_name: string;
   cross_examination_id: string;
   context: string;
-  summarizedContext?: string;
-  summarized_context?: string;
+  summarizedContext: string;
   testimonies: Testimony[];
   labels?: string[];
   reasoning?: string[];
@@ -106,6 +105,8 @@ async function main() {
           // Check if this turn has the "spatial" label and is presentable
           if (turn.labels && turn.labels.includes("spatial") && turn.noPresent === false) {
             consola.success(`Found spatial turn in ${caseName}`);
+            // Ensure summarizedContext is always a string, defaulting to "" if neither field exists
+            const summarizedContext = turn.summarizedContext ?? turn.summarized_context ?? "";
             
             // Create spatial turn object, including characters and evidences
             const spatialTurn: SpatialTurn = {
@@ -114,8 +115,7 @@ async function main() {
               characters: caseData.characters || [],
               evidences: caseData.evidences || [],
               context: contextForThisTurn,
-              summarizedContext: turn.summarizedContext,
-              summarized_context: turn.summarized_context,
+              summarizedContext: summarizedContext, // Assign the guaranteed string value
               testimonies: turn.testimonies,
               labels: turn.labels,
               reasoning: turn.reasoning,
@@ -127,6 +127,10 @@ async function main() {
         }
       } catch (e) {
         consola.error(`Error processing file ${filename}:`, e);
+        // Add a check for the specific error and log the problematic turn data if possible
+        if (e instanceof TypeError && e.message.includes("summarizedContext")) {
+            consola.error("Problematic turn data:", JSON.stringify(caseData.turns.find(t => !t.summarizedContext && !t.summarized_context), null, 2));
+        }
       }
     }
     
