@@ -26,10 +26,10 @@ async function main() {
     for (let i = 0; i < OBJECTS_HTML_FILE_PATHS.length; i++) {
         let rawHtml: string;
         const HTML_FILE_PATH = OBJECTS_HTML_FILE_PATHS[i];
-        if (HTML_FILE_PATH.split("/").pop() == "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html") {
-            console.log("Skipping List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html");
-            continue;
-        }
+        // if (HTML_FILE_PATH.split("/").pop() == "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html") {
+        //     console.log("Skipping List_of_Evidence_in_Phoenix_Wright_Ace_Attorney.html");
+        //     continue;
+        // }
         if (HTML_FILE_PATH.split("/").pop() == "List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.html") {
             console.log("Skipping List_of_Evidence_in_Phoenix_Wright_Ace_Attorney_-_Justice_for_All.html");
             continue;
