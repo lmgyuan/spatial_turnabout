@@ -2,8 +2,8 @@ import os
 import re # Import regex
 
 # --- Configuration ---
-INPUT_DIR = os.path.join("data", "aceattorney_data", "generated", "japanese_crafted", "1-1-1_Context")
-FILENAME = "context_CE3.txt" # Use the same name for input and output
+INPUT_DIR = os.path.join("data", "aceattorney_data", "generated", "japanese_crafted", "AA3", "3-3_Context")
+FILENAME = "3-3_CE1.txt" # Use the same name for input and output
 # Regex to find common control characters (tab, newline, carriage return)
 CONTROL_CHARS_PATTERN = re.compile(r'[\t\n\r]')
 
