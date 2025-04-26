@@ -7,7 +7,7 @@ import openpyxl # Import openpyxl
 def count_cross_examinations(directory_path, output_excel_filename="cross_examination_counts.xlsx"):
     """
     Counts the number of turns with 'noPresent': False in JSON files
-    within the specified directory, filtering by filename pattern (1-1-1 to 6-6-4).
+    within the specified directory. Processes all JSON files and handles invalid structures.
     Outputs the results (for files with count > 0) to an Excel file.
 
     Args:
@@ -24,10 +24,6 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
 
     print(f"Scanning directory: {directory_path}")
 
-    # Define the regex pattern to match filenames like X-Y-Z_*.json
-    # X: 1-6, Y: 1-6, Z: 1-4
-    filename_pattern = re.compile(r'^([1-6])-([1-6])-([1-4])_.*\.json$')
-
     # Ensure the directory exists
     if not os.path.isdir(directory_path):
         print(f"Error: Directory not found - {directory_path}")
@@ -37,14 +33,7 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
 
     for filename in all_files:
         if filename.endswith(".json"):
-            # Check if the filename matches the desired pattern
-            match = filename_pattern.match(filename)
-            if not match:
-                # print(f" - Skipping {filename} (does not match pattern)") # Keep this commented unless debugging
-                files_skipped += 1
-                continue # Skip files that don't match the X-Y-Z pattern and ranges
-
-            # If the pattern matches, proceed with processing
+            # Process all JSON files
             file_path = os.path.join(directory_path, filename)
             file_ce_count = 0
             try:
@@ -57,11 +46,9 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
                     for turn in turns:
                         # Check if 'turn' is a dictionary and 'noPresent' key exists and is False
                         if isinstance(turn, dict) and turn.get("noPresent") is False:
-                             # Also check if 'category' is 'cross_examination' for robustness
-                             if turn.get("category") == "cross_examination":
-                                file_ce_count += 1
-                # else: # Don't warn if 'turns' is missing, just means 0 CEs
-                     # print(f"Warning: 'turns' key missing or not a list in {filename}")
+                            file_ce_count += 1
+                else:
+                    print(f"Warning: 'turns' key missing or not a list in {filename}")
 
                 # Only add to results if there's at least one CE
                 if file_ce_count > 0:
@@ -70,8 +57,6 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
                         "Filename": filename,
                         "Cross Examination Count": file_ce_count
                     })
-                # else: # Optional: print files with 0 CEs if needed for debugging
-                    # print(f" - Found 0 cross-examinations in {filename}")
 
                 files_processed += 1
 
@@ -79,14 +64,13 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
                 print(f"Error: Could not decode JSON in {filename}")
                 files_with_errors.append(filename)
             except FileNotFoundError:
-                 print(f"Error: File not found - {file_path}")
-                 files_with_errors.append(filename)
+                print(f"Error: File not found - {file_path}")
+                files_with_errors.append(filename)
             except Exception as e:
                 print(f"An unexpected error occurred processing {filename}: {e}")
                 files_with_errors.append(filename)
         else:
-             # print(f"Warning: Skipping non-JSON file - {filename}") # Keep commented unless debugging
-             files_skipped += 1 # Count non-json files as skipped too
+            files_skipped += 1 # Count non-json files as skipped
 
     # --- Generate Excel File ---
     excel_file_path = ""
@@ -104,15 +88,14 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
     else:
         print("\nNo cross-examinations found in matching files. Excel file not created.")
 
-
     # --- Final Summary ---
     print("\n--- Summary ---")
-    print(f"Total JSON files matching pattern processed: {files_processed}")
-    print(f"Total files skipped (no match or not JSON): {files_skipped}")
+    print(f"Total JSON files processed: {files_processed}")
+    print(f"Total files skipped (not JSON): {files_skipped}")
     print(f"Total files with cross-examinations (count > 0): {len(results_for_excel)}")
     if excel_file_path:
-         total_ces_in_excel = sum(item['Cross Examination Count'] for item in results_for_excel)
-         print(f"Total cross-examinations listed in Excel: {total_ces_in_excel}")
+        total_ces_in_excel = sum(item['Cross Examination Count'] for item in results_for_excel)
+        print(f"Total cross-examinations listed in Excel: {total_ces_in_excel}")
     if files_with_errors:
         print(f"Files with errors ({len(files_with_errors)}): {', '.join(files_with_errors)}")
 
