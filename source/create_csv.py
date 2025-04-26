@@ -8,8 +8,23 @@ def get_eval_data(output_root_dir):
         if os.path.isdir(os.path.join(output_root_dir, output)) \
             and output != "legacy":
             # print(output)
-            model = output.split("_")[0]
-            prompt = "_".join(output.split("_")[1:]) 
+            parts = output.split("_")
+            model, prompt, context, description = "", "", "", ""
+            model = parts[0]
+            if len(parts) > 2 and parts[1] == "prompt":  # Extract prompt
+                prompt = parts[2]
+            if "context" in parts:
+                context = parts[parts.index("context") + 1]
+            else:
+                context = "none"
+            if "desc" in parts:  # Only exist if no description
+                description = "false"
+            else:
+                description = "true"
+            if "case" in parts:
+                case = parts[parts.index("case") + 1]
+            else:
+                case = "ALL"
             output_dir = os.path.join(output_root_dir, output)
             eval_dir = os.path.join(output_dir, "eval")
             eval_json = os.path.join(eval_dir, "report.json")
@@ -21,6 +36,9 @@ def get_eval_data(output_root_dir):
             res.append({
                 "model": model,
                 "prompt": prompt,
+                "context": context,
+                "description": description,
+                "case": case,
                 "eval": eval_data
             })
 
@@ -50,6 +68,9 @@ if __name__ == "__main__":
         writer.writerow([
             "model", 
             "prompt",
+            "context",
+            "description",
+            "case",
             "overall_total",
             "overall_accuracy",
             "overall_evidence_accuracy",
@@ -67,6 +88,9 @@ if __name__ == "__main__":
             writer.writerow([
                 r["model"], 
                 r["prompt"], 
+                r["context"],
+                r["description"],
+                r["case"],
                 r["eval"].get("overall_total", "N/A"),
                 r["eval"].get("overall_accuracy", "N/A"),
                 r["eval"].get("overall_evidence_accuracy", "N/A"),

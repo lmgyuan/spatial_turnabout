@@ -6,8 +6,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import traceback
+import csv
 import math
+from tqdm import tqdm
 from collections import defaultdict
+
 from run_models import get_output_dir, get_fnames, parse_arguments
 
 def parse_pred(caseid, output_dir):
@@ -19,28 +22,83 @@ def parse_pred(caseid, output_dir):
         return pred, reasoning
     # Parse predictions
     with open(pred_path, 'r') as f:
-        for line in f:
+        for i, line in enumerate(f):
             try:
                 turn_pred = json.loads(line)
-                assert "evidence" in turn_pred, f"{caseid}: {turn_pred} missing evidence"
-                assert "testimony" in turn_pred, f"{caseid}: {turn_pred} missing testimony"
                 pred.append(turn_pred)
                 
-            except json.JSONDecodeError as e:
-                print(f"{caseid}: {e}")
-                pred.append({})
+            except Exception as e:
+                print(f"{caseid} response {i}: {e}")
+                pred.append({"evidence": -1, "testimony": -1})
     # Parse reasoning
     if os.path.exists(os.path.join(output_dir, caseid.replace(".json", "_outputs.json"))):
         with open(os.path.join(output_dir, caseid.replace(".json", "_outputs.json")), 'r') as f:
             output = json.load(f)
-            reasoning = [o['response'] for o in output]  # list of strings
-    # Legacy
-    elif os.path.exists(os.path.join(output_dir, caseid.replace(".json", "_full_responses.txt"))):
-        with open(os.path.join(output_dir, caseid.replace(".json", "_full_responses.txt")), 'r') as f:
-            reasoning = f.read()  # a single string
+            reasoning = [o['cot'] for o in output]  # list of strings
+
+    if all(ans == {} for ans in pred):
+        return [], []
     return pred, reasoning
 
-def parse_gold(caseid, data_dir, not_self_contained_only=False):
+def parse_pred_openai(caseid, input_data, output_data, output_dir):
+    caseid_base = caseid.replace(".json", "")
+    reasoning = []
+    pred = []
+    ids = []
+    # Get preds
+    for idx, line in enumerate(output_data):
+        if caseid_base in line["custom_id"]:
+            full_response = line["response"]["body"]["choices"][0]["message"]["content"]
+            try:
+                last_line = full_response.splitlines()[-1]
+                json_response = last_line[last_line.index("{") : last_line.index("}") + 1]
+                response = json.loads(json_response)
+                cot = "\n".join(full_response.splitlines()[:-1])
+            except Exception:
+                try:
+                    new_line = full_response.splitlines()[-2]
+                    json_response = new_line[new_line.index("{") : new_line.index("}") + 1]
+                    response = json.loads(json_response)
+                    cot = "\n".join(full_response.splitlines()[:-2])
+                except Exception:
+                    print(f"<parse_pred_openai> {line['custom_id']}: No json output detected")
+                    response = {"evidence": -1, "testimony": -1}
+                    cot = ""
+
+            pred.append(response)
+            reasoning.append(cot)
+            ids.append(line["custom_id"])
+    
+    if not pred:
+        return [], []
+
+    # Get prompts
+    prompts = [""] * len(ids)
+    for idx, prompt in enumerate(input_data):
+        if prompt["custom_id"] in ids:
+            prompts[ids.index(prompt["custom_id"])] = prompt["body"]["messages"][1]["content"]
+    if "" in prompts:
+        num_missing = prompts.count("")
+        print(f"<parse_pred_openai> {caseid_base}: {num_missing} prompts are missing")
+
+    # Log
+    with open(os.path.join(output_dir, caseid.split('.')[0] + '.jsonl'), 'w') as file:
+        for answer_json in pred:
+            file.write(json.dumps(answer_json) + "\n")
+    with open(os.path.join(output_dir, caseid.split('.')[0] + '_outputs.json'), 'w') as file:
+        json_response = []
+        for idx, cot in enumerate(reasoning):
+            json_response.append({
+                "idx": idx,
+                "prompt": prompts[idx],
+                "cot": cot,
+                "response_json": pred[idx]
+            })
+        file.write(json.dumps(json_response, indent=2, ensure_ascii=False))
+    
+    return pred, reasoning
+
+def parse_gold(caseid, data_dir):
     """
     Return a list of ground truth turns
     """
@@ -62,15 +120,7 @@ def parse_gold(caseid, data_dir, not_self_contained_only=False):
             correct_pairs_indices = []
             correct_pairs_names = []
             turn_metadata = {}
-            # The caseid is already filtered by pred outside if not_self_contained_only is True
-            # This part handles what turns should be skipped if not_self_contained_only is True
-            if not_self_contained_only and not any(
-                "source" in testimony 
-                and "is_self_contained" in testimony["source"] 
-                and testimony["source"]["is_self_contained"] == "no" 
-                for testimony in turn["testimonies"]
-            ):
-                continue
+
             if turn["noPresent"]:
                 continue
             # Parse testimony metadata
@@ -93,17 +143,28 @@ def parse_gold(caseid, data_dir, not_self_contained_only=False):
             gold_names.append(correct_pairs_names)
             gold_metadata["turns"].append(turn_metadata)
     except Exception as e:
-        print(f"{caseid}: {e}. Number of turns: {len(data['turns'])}")
+        # print(f"<oarse_gold> {caseid}: {e}. Number of turns: {len(data['turns'])}")
         return [], [], {}  # Radically skip this case
     return gold_indices, gold_names, gold_metadata
 
-def init_correct(caseids, data_dir):
+def init_correct(data_dir, output_dir):
     categories = []
     reasoning_steps = []
+    action_space_sizes = []
+
+    # Get complete caseids
+    caseids = get_fnames(data_dir, output_dir, "ALL", eval=True, verbose=False)
+
     for caseid in caseids:
         with open(os.path.join(data_dir, caseid), 'r') as f:
             data = json.load(f)
+            if "turns" not in data or data['turns'] == []:  # Skip if no turns
+                continue
+            n_evidences = len(data['evidences'])
             for turn in data['turns']:
+                if turn["noPresent"]:
+                    continue
+                n_testimonies = len(turn['testimonies'])
                 if "labels" in turn:
                     for label in turn['labels']:
                         if label:
@@ -112,6 +173,9 @@ def init_correct(caseids, data_dir):
                     len_of_reasoning = len(turn['reasoning'])
                     if len_of_reasoning > 0:
                         reasoning_steps.append(len_of_reasoning)
+                n_action_space = n_evidences * n_testimonies
+                # Contain duplicates to count occurrences
+                action_space_sizes.append(n_action_space)  
 
     categories = list(set(categories))
     reasoning_steps = list(set(reasoning_steps))
@@ -142,7 +206,69 @@ def init_correct(caseids, data_dir):
         } 
         for step in reasoning_steps
     }
-    return categories_correct, reasoning_correct
+
+    action_space_correct = bin_action_space(action_space_sizes)
+
+    return categories_correct, reasoning_correct, action_space_correct
+
+def bin_action_space(action_space_sizes, desired_n_bins=7):
+    res = {}
+
+    if len(np.unique(action_space_sizes)) == 1:
+        size = action_space_sizes[0]
+        bin_edges = np.array([size, size + 1])
+        action_n_bins = 1
+
+    else:
+        quantiles = np.linspace(0, 1, desired_n_bins + 1)
+        bin_edges = np.quantile(action_space_sizes, quantiles)
+        bin_edges = np.unique(bin_edges)
+
+        if len(bin_edges) > 1:
+            bin_edges[-1] += 1
+
+        actual_n_bins = len(bin_edges) - 1
+
+    bin_labels = []
+    for j in range(actual_n_bins):
+        lower_bound = bin_edges[j]
+        upper_bound = bin_edges[j + 1]
+        lower_bound_int = int(np.ceil(lower_bound))
+        upper_bound_int = int(np.floor(upper_bound))
+        if upper_bound_int <= lower_bound_int:
+            label = f"{lower_bound_int}-{lower_bound_int}"
+        else:  # upper_bound_int > lower_bound_int
+            label = f"{lower_bound_int}-{upper_bound_int - 1}"
+        bin_labels.append(label)
+
+    action_space_correct = {
+        label: {
+            "range": (int(label.split("-")[0]), int(label.split("-")[1])),
+            "correct": 0,
+            "total": 0,
+            "evidence_correct": 0,
+            "testimony_correct": 0,
+            "accuracy": -1,
+            "evidence_accuracy": -1,
+            "testimony_accuracy": -1,
+            "bad_cases": [],
+        }
+        for j, label in enumerate(bin_labels)
+    }
+
+    return action_space_correct
+
+def calculate_accuracy(correct_dict):
+    return {
+        label: {
+            **stats,  # expand stats first to avoid overwriting
+            "accuracy": round(stats["correct"] / stats["total"], 4),
+            "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
+            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),  
+        }
+        for label, stats in sorted(correct_dict.items())
+        if stats["total"] > 0
+    }
 
 def evaluate(
     output_dir, 
@@ -158,9 +284,6 @@ def evaluate(
     os.makedirs(eval_dir, exist_ok=True)
 
     report_json = {
-            'model': MODEL,
-            'prompt': PROMPT,
-            'case': CASE,
             'overall_correct': -1,
             'overall_evidence_correct': -1,
             'overall_testimony_correct': -1,
@@ -179,10 +302,13 @@ def evaluate(
     overall_evidence_correct = 0
     overall_testimony_correct = 0
     overall_reasoning_tokens = 0
+    action_space_results = []
 
     # Initialize breakdown metrics
-    categories_correct, reasoning_correct = init_correct(caseids, data_dir)
-    action_space_correct = {}
+    categories_correct, reasoning_correct, action_space_correct = init_correct(
+        data_dir,
+        output_dir
+    )
 
     for caseid, pred, reasoning, gold_indices, gold_names, gold_metadata \
         in zip(caseids, preds, reasonings, golds_indices, golds_names, golds_metadata):  # iter each case
@@ -259,27 +385,19 @@ def evaluate(
                     reasoning_correct[turn_n_reasoning]['testimony_correct'] += 1
 
             # Evaluate action space accuracy
-            n_action_space_raw = gold_metadata["turns"][i]["n_action_space"]
-            # Binned by 20 starting from 100
-            action_space = max(math.ceil(n_action_space_raw / 20), 5) * 20
-            if action_space not in action_space_correct:
-                action_space_correct[action_space] = {
-                    "correct": 0,
-                    "total": 0,
-                    "evidence_correct": 0,
-                    "testimony_correct": 0,
-                    "bad_cases": []
-                }
-            action_space_correct[action_space]["total"] += 1
-            if is_correct:
-                action_space_correct[action_space]["correct"] += 1
-            else:
-                action_space_correct[action_space]["bad_cases"].append({"caseid": caseid, "turn": i})
-
-            if is_evidence_correct:
-                action_space_correct[action_space]["evidence_correct"] += 1
-            if is_testimony_correct:
-                action_space_correct[action_space]["testimony_correct"] += 1
+            action_space = gold_metadata["turns"][i]["n_action_space"]
+            for label, stats in action_space_correct.items():
+                if action_space >= stats["range"][0] and action_space <= stats["range"][1]:
+                    action_space_correct[label]["total"] += 1
+                    if is_correct:
+                        action_space_correct[label]["correct"] += 1
+                    else:
+                        action_space_correct[label]["bad_cases"].append({"caseid": caseid, "turn": i})
+                    if is_evidence_correct:
+                        action_space_correct[label]['evidence_correct'] += 1
+                    if is_testimony_correct:
+                        action_space_correct[label]['testimony_correct'] += 1
+                    break
 
             # Log turn data
             try:
@@ -290,7 +408,7 @@ def evaluate(
                     "testimony": gold_metadata["turns"][i]["testimonies"][pred[i]["testimony"]]
                 }
             except Exception as e:
-                print(f"{caseid} - {i} - {pred[i]}: {e}")
+                print(f"<evaluate> {caseid} - {i} - {pred[i]}: {e}")
                 out_pred = {
                     "evidence_id": -1,
                     "evidence": "N/A",
@@ -321,75 +439,32 @@ def evaluate(
     # Log overall data
     report_json['overall_correct'] = overall_correct
     report_json['overall_total'] = overall_total
-    report_json["overall_accuracy"] = round(overall_correct / overall_total, 4)
-    report_json["average_reasoning_tokens"] = overall_reasoning_tokens // overall_total
-
     report_json['overall_evidence_correct'] = overall_evidence_correct
     report_json['overall_testimony_correct'] = overall_testimony_correct
-    report_json['overall_evidence_accuracy'] = round(overall_evidence_correct / overall_total, 4)
-    report_json['overall_testimony_accuracy'] = round(overall_testimony_correct / overall_total, 4)
+
+    if overall_total > 0:
+        report_json["overall_accuracy"] = round(overall_correct / overall_total, 4)
+        report_json["average_reasoning_tokens"] = overall_reasoning_tokens // overall_total
+        report_json['overall_evidence_accuracy'] = round(overall_evidence_correct / overall_total, 4)
+        report_json['overall_testimony_accuracy'] = round(overall_testimony_correct / overall_total, 4)
 
     # Log breakdown accuracy
-    report_json["categories_accuracy"] = {
-        label: {
-            **stats,  # expand stats first to avoid overwriting
-            "accuracy": round(stats["correct"] / stats["total"], 4),
-            "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
-            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),  
-        }
-        for label, stats in sorted(categories_correct.items())
-        if stats["total"] > 0
-    }
-    report_json["reasoning_steps_accuracy"] = {
-        step: {
-            **stats,  # expand stats first to avoid overwriting
-            "accuracy": round(stats["correct"] / stats["total"], 4),
-            "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
-            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),
-        }
-        for step, stats in sorted(reasoning_correct.items())
-        if stats["total"] > 0
-    }
-    report_json["action_space_accuracy"] = {
-        action_space: {
-            **stats,
-            "accuracy": round(stats["correct"] / stats["total"], 4),
-            "evidence_accuracy": round(stats["evidence_correct"] / stats["total"], 4),
-            "testimony_accuracy": round(stats["testimony_correct"] / stats["total"], 4),
-        }
-        for action_space, stats in sorted(action_space_correct.items())
-        if stats["total"] > 0
-    }
+    report_json["categories_accuracy"] = calculate_accuracy(categories_correct)
+    report_json["reasoning_steps_accuracy"] = calculate_accuracy(reasoning_correct)
+
+    action_space_correct = calculate_accuracy(action_space_correct)
+    action_space_correct = dict(sorted(
+        action_space_correct.items(), 
+        key=lambda item: int(item[0].split("-")[0])
+    ))
+    report_json["action_space_accuracy"] = action_space_correct
 
     # Write to json
     with open(os.path.join(eval_dir, f"report.json"), 'w') as f:
         json.dump(report_json, f, indent=2)
     print(f"<evaluate> Report saved to {eval_dir}/report.json")
 
-if __name__ == "__main__":
-    parser = parse_arguments()
-    parser.add_argument('-nsc', '--not_self_contained_only', action='store_true')
-    parser.add_argument('-d', '--disable_context_span', action='store_true')
-    args = parser.parse_args()
-    MODEL = args.model
-    PROMPT = args.prompt
-    CASE = args.case if args.case else "ALL"
-    CONTEXT = args.context if args.context else None
-    NO_DESCRIPTION = args.no_description
-    NOT_SELF_CONTAINED_ONLY = args.not_self_contained_only
-    DISABLE_CONTEXT_SPAN = args.disable_context_span
-
-    data_dir = '../data/aceattorney_data/final'
-    output_dir = get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION) 
-    if NOT_SELF_CONTAINED_ONLY:
-        output_dir += "_not_self_contained"
-    if DISABLE_CONTEXT_SPAN:
-        output_dir += "_no_context"
-    if not os.path.exists(output_dir):
-        raise ValueError(f"Output directory {output_dir} does not exist")
-
-    caseids = get_fnames(data_dir, output_dir, CASE, eval=True)
-
+def run_eval_job(caseids, output_dir, data_dir, client):
     preds = []
     reasonings = []
     golds_indices = []
@@ -397,17 +472,44 @@ if __name__ == "__main__":
     golds_metadata = []
     caseids_final = []
 
+    summary = defaultdict(int)
+
+    data = []
+    if type(client).__name__ == "OpenAI":
+        output_data, input_data = [], []
+        output_files = sorted([
+            os.path.join(output_dir, output_path) 
+            for output_path in os.listdir(output_dir) 
+            if output_path.startswith("batchoutput")
+        ])  # Guaranteed to be mutually exclusive
+        input_file = os.path.join(output_dir, "batchinput.jsonl")
+        for output_file in output_files:
+            with open(output_file, "r") as file:
+                output_data += [json.loads(line) for line in file]
+        with open(input_file, "r") as file:
+            input_data = [json.loads(line) for line in file]
+        print(f"<run_eval_job> {len(input_data)} input turns found, {len(output_data)} output turns found")
+
     skips = 0
     for i, caseid in enumerate(caseids):
-        pred, reasoning = parse_pred(caseid, output_dir)
+        # Summarize ground truth data stats
+        gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir)
+        if len(gold_indices) > 0:
+            summary["total"] += len(gold_indices)
+            summary[caseid] += len(gold_indices)
+
+        # Parse predictions
+        if client is not None and type(client).__name__ == "OpenAI":
+            pred, reasoning = parse_pred_openai(caseid, input_data, output_data, output_dir)
+        else:
+            pred, reasoning = parse_pred(caseid, output_dir)
+
         if not pred: 
             skips += 1
             continue
 
-        gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir, not_self_contained_only=NOT_SELF_CONTAINED_ONLY)
-
         if len(pred) != len(gold_indices):
-            print(f"<evaluate> Case {caseid.split('_')[0]}, num of pred: {len(pred)} != {len(gold_indices)}. Skipping...")
+            print(f"<run_eval_job> Case {caseid.split('_')[0]}, num of pred: {len(pred)} != num of gold: {len(gold_indices)}. Skipping...")
             continue
 
         caseids_final.append(caseid)
@@ -417,8 +519,16 @@ if __name__ == "__main__":
         golds_names.append(gold_names)
         golds_metadata.append(gold_metadata)
 
-    print(f"<evaluate> Evaluating {len(caseids_final)} court days...")
-    print(f"<evaluate> Skipped {skips} court days...")
+    eval_dir = os.path.join(output_dir, "eval")
+    os.makedirs(eval_dir, exist_ok=True)
+    with open(os.path.join(eval_dir, "data.csv"), "w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Case", "Count"])
+        for caseid, total in summary.items():
+            writer.writerow([caseid, total])
+
+    print(f"<run_eval_job> Evaluating {len(caseids_final)} court days...")
+    print(f"<run_eval_job> Skipped {skips} court days because of no preds")
 
     evaluate(
         output_dir, 
@@ -430,3 +540,119 @@ if __name__ == "__main__":
         golds_names, 
         golds_metadata
     )
+
+def check_status(output_dir):
+    # Check if the result has been saved
+    has_output = True
+    duplicate_count = 1
+    result_file_name = os.path.join(output_dir, "batchoutput.jsonl")
+    input_file_name = os.path.join(output_dir, "batchinput.jsonl")
+    while os.path.exists(result_file_name) and os.path.exists(input_file_name):
+        result_file_name = os.path.join(output_dir, f"batchoutput_{duplicate_count}.jsonl")
+        input_file_name = os.path.join(output_dir, f"batchinput_{duplicate_count}.jsonl")
+        duplicate_count += 1
+    if os.path.exists(input_file_name):  # There is a standalone input file
+        has_output = False
+
+    if has_output: return True
+        
+    from dotenv import load_dotenv
+    load_dotenv("../.env")
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+    from openai import OpenAI
+    client = OpenAI(
+        api_key=OPENAI_API_KEY
+    )
+
+    with open(os.path.join(output_dir, "batch_api_metadata.json"), "r") as file:
+        data = json.load(file)
+    batch_job_id = data["batch_job_id"]
+
+    batch_job = client.batches.retrieve(batch_job_id)
+    status = batch_job.status
+    print(f"Status: {status}")
+        
+    if status == "completed":
+        result_file_id = batch_job.output_file_id
+        print(f"file id: {result_file_id}")
+
+        if result_file_id is None:
+            print("Error file created")
+            result_file_id = batch_job.error_file_id
+        
+        result = client.files.content(result_file_id).content
+
+        with open(result_file_name, 'wb') as file:
+            file.write(result)
+
+        return True
+
+    return False
+
+def find_output_dir(args):
+    MODEL = args.model
+    PROMPT = args.prompt
+    CASE = args.case if args.case else "ALL"
+    CONTEXT = args.context if args.context else None
+    NO_DESCRIPTION = args.no_description
+    
+    output_dir = get_output_dir(
+        MODEL, 
+        PROMPT, 
+        CONTEXT, 
+        CASE, 
+        NO_DESCRIPTION
+    ) 
+    if not os.path.exists(output_dir):
+        raise ValueError(f"Output directory {output_dir} does not exist")
+
+    return output_dir
+
+def evaluate_single_run(output_dir, data_dir, MODEL, CASE="ALL"):
+    print(f"Evaluating {MODEL} with prompt {output_dir.split('_')[2]}...")
+    caseids = get_fnames(data_dir, output_dir, CASE, eval=True)
+
+    client = None
+    if any(m_name in MODEL for m_name in ["gpt", "o3", "o4"]):
+        if not check_status(output_dir):
+            import sys; sys.exit()
+        else:
+            from dotenv import load_dotenv
+            load_dotenv("../.env")
+            OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+            from openai import OpenAI
+            client = OpenAI(
+                api_key=OPENAI_API_KEY
+            )
+
+    run_eval_job(
+        caseids, 
+        output_dir, 
+        data_dir, 
+        client, 
+    )
+
+def evaluate_all(data_dir, output_root_dir):
+    output_dirs = []
+    for output in sorted(os.listdir(output_root_dir)):
+        if os.path.isdir(os.path.join(output_root_dir, output)) \
+            and output != "legacy":
+            output_dirs.append(os.path.join(output_root_dir, output))
+    for output_dir in tqdm(output_dirs, total=len(output_dirs), desc="Evaluating all models"):
+        MODEL = os.path.basename(output_dir).split("_")[0]
+        evaluate_single_run(output_dir, data_dir, MODEL, "ALL")
+
+if __name__ == "__main__":
+    parser = parse_arguments()
+    args = parser.parse_args()
+
+    data_dir = '../data/aceattorney_data/final'
+    output_root_dir = '../output'
+
+    if args.all:
+        evaluate_all(data_dir, output_root_dir)
+    else:
+        output_dir = find_output_dir(args)  
+        evaluate_single_run(output_dir, data_dir, args.model, args.case)
