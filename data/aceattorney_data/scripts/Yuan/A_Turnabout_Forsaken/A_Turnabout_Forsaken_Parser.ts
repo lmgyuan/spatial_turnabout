@@ -6,11 +6,11 @@ import { existsSync } from "fs";
 import { CASE_DATA_ROOT_DIRECTORY } from "../../legacy/utils.ts";
 
 // --- Configuration ---
-const CHAPTER_NAME = "Turnabout Trigger";
+const CHAPTER_NAME = "A Turnabout Forsaken";
 const GAME_EVIDENCE_FILE = "List_of_Evidence_in_Ace_Attorney_Investigations_2_Prosecutor%27s_Gambit.json";
 const GAME_CHARACTER_FILE = "List_of_Profiles_in_Ace_Attorney_Investigations_2_Prosecutor%27s_Gambit.json";
-const HTML_FILENAME_IDENTIFIER = "Turnabout_Trigger"; // Used to filter raw HTML files
-const OUTPUT_FILENAME_PREFIX = "10-1"; // Prefix for output JSON files (e.g., 9-2-1, 9-2-2)
+const HTML_FILENAME_IDENTIFIER = "A_Turnabout_Forsaken"; // Used to filter raw HTML files
+const OUTPUT_FILENAME_PREFIX = "10-4"; // Prefix for output JSON files (e.g., 9-2-1, 9-2-2)
 
 // --- Load Evidence Data ---
 let CURR_CHAPTER_EVIDENCES = [];
