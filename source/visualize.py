@@ -163,41 +163,75 @@ def plot_prompt_accuracy(df, output_dir, mode='cot'):
 
     print(f"{mode} prompt accuracy plot saved")
 
+def get_model_size(model):
+    if any(name in model for name in ['8b']):
+        return 'Small'
+    elif any(name in model for name in ['32b', '70b']):
+        return 'Medium'
+    elif 'mini' in model and 'gpt' in model:
+        return 'Medium'
+    else:
+        return 'Large'
+
 def plot_token_accuracy(df, output_dir):
     # Filter prompts
-    target_prompt = 'harry_v1.3'
-    df_filtered = df[df['prompt'] == target_prompt].copy()
+    df_filtered = df[
+        (df['prompt'] == 'base') &
+        (df['context'] == 'none') &
+        (df['case'] == 'ALL') & 
+        (df['description'].astype(str).str.lower() == 'true')
+    ].copy()
 
     # Filter out models
-    target_models = ['O3-mini']
+    target_models = ['o3-mini', 'o4-mini']
     df_filtered = df_filtered[~df_filtered['model'].isin(target_models)]
-
-    # Filter cases
-    df_filtered = df_filtered[df_filtered['overall_total'] >= 70]
 
     # Filter cols
     df_filtered['overall_accuracy'] = pd.to_numeric(df_filtered['overall_accuracy'], errors="coerce")
     df_filtered['average_reasoning_tokens'] = pd.to_numeric(df_filtered['average_reasoning_tokens'], errors="coerce")
 
     df_filtered.dropna(subset=['overall_accuracy', 'average_reasoning_tokens'], inplace=True)
+
+    # Categorize models
+    df_filtered['model_type'] = df_filtered['model'].apply(
+        lambda x: 'Reasoning'
+        if 'DeepSeek' in x
+        else 'Non-Reasoning'
+    )
+    df_filtered['model_size'] = df_filtered['model'].apply(get_model_size)
     
     sns.set_theme(style='whitegrid', context='paper')
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 7))
 
     ax = sns.scatterplot(
         data=df_filtered,
         x='average_reasoning_tokens',
         y='overall_accuracy',
         hue='model',
-        s=100
+        size='model_size',
+        sizes={'Small': 50, 'Medium': 100, 'Large': 150},
+        style='model_type',
+        markers={'Reasoning': 'X', 'Non-Reasoning': 'o'},
+        legend=False
     )
+
+    for i in range(df_filtered.shape[0]):
+        plt.text(
+            x=df_filtered['average_reasoning_tokens'].iloc[i] + 0.5,
+            y=df_filtered['overall_accuracy'].iloc[i] + 0.01,
+            s=df_filtered['model'].iloc[i],
+            fontdict=dict(color='black', size=10)
+        )
 
     ax.set_title('Model Accuracy vs Average Reasoning Tokens', fontsize=14, weight='bold')
     ax.set_xlabel('Average Reasoning Tokens', fontsize=12)
     ax.set_ylabel('Accuracy', fontsize=12)
     ax.set_ylim(0, 1)
+    ax.set_yticks([i / 10.0 for i in range(11)])
     ax.tick_params(axis='x', rotation=45, labelsize=10)
-    ax.legend(title='Model', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10, title_fontsize=12)
+
+    # Add legend
+    # ax.legend(title='Model', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10, title_fontsize=12)
     
     plt.tight_layout(rect=(0, 0, 0.95, 1))
     plt.savefig(os.path.join(output_dir, 'model_accuracy_vs_average_reasoning_tokens.png'), dpi=300)
@@ -288,19 +322,49 @@ def plot_grouped_accuracy(df, output_dir, mode='category', k=5):
 
     plt.figure(figsize=(12, 8))
 
-    # Pivor so rows are categories and columns are models
+    # Pivot so rows are categories and columns are models
     pivot_data = melted_data.pivot(index=var_name, columns='Model', values='Accuracy')
     if category_order is not None:
         pivot_data = pivot_data.reindex(category_order)
+
+    palette = sns.color_palette('viridis', len(top_k_models))
+
+    # Store text positions
+    last_x_index = len(pivot_data.index) - 1
+    text_x_pos = last_x_index + 0.1
+    placed_label_positions = []
+    y_closeness = 0.01
+    nudge_amount = 0.02
 
     for i, model in enumerate(top_k_models):
         plt.plot(
             pivot_data.index,
             pivot_data[model],
-            label=model,
+            # label=model,
             marker='o',
             linestyle='-',
-            color=sns.color_palette('viridis', len(top_k_models))[i]
+            color=palette[i]
+        )
+
+        last_point_y = pivot_data[model].iloc[-1]
+        final_y = last_point_y
+        is_nudged = True
+        while is_nudged:
+            is_nudged = False
+            for placed_y in placed_label_positions:
+                if abs(final_y - placed_y) < y_closeness:
+                    final_y -= nudge_amount
+                    is_nudged = True
+                    break
+        placed_label_positions.append(final_y)
+
+        plt.text(
+            x=text_x_pos,
+            y=final_y,
+            s=model,
+            color=palette[i],
+            fontsize=9,
+            va='center'
         )
 
     plt.title(f'Model Accuracy on Each {var_name}', fontsize=14, weight='bold')
@@ -313,9 +377,9 @@ def plot_grouped_accuracy(df, output_dir, mode='category', k=5):
     else:
         rotation = 0
     plt.xticks(rotation=rotation, fontsize=10)
-    plt.legend(title='Model', fontsize=10, title_fontsize=12)
+    # plt.legend(title='Model', fontsize=10, title_fontsize=12)
     
-    plt.tight_layout()
+    plt.tight_layout(rect=(0, 0, 0.95, 1))
     plt.savefig(os.path.join(output_dir, f'model_accuracy_by_{mode}.png'), dpi=300)
     plt.close()
 
@@ -344,7 +408,7 @@ if __name__ == "__main__":
     plot_prompt_accuracy(df, output_dir, mode='cot')
     plot_prompt_accuracy(df, output_dir, mode='full context')
     plot_prompt_accuracy(df, output_dir, mode='no description')
-    # plot_token_accuracy(df, output_dir)
+    plot_token_accuracy(df, output_dir)
     plot_grouped_accuracy(df, output_dir, mode='category')
     plot_grouped_accuracy(df, output_dir, mode='steps')
     plot_grouped_accuracy(df, output_dir, mode='action space')
