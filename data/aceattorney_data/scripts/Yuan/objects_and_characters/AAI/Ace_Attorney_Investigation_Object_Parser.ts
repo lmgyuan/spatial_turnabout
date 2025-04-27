@@ -3,7 +3,7 @@ import consola from "consola";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { JSDOM } from "jsdom";
 import fs from "fs";
-import { CASE_DATA_ROOT_DIRECTORY } from "../../legacy/utils.ts"; // Assuming this path is correct
+import { CASE_DATA_ROOT_DIRECTORY } from "../../../legacy/utils.ts"; // Assuming this path is correct
 
 // --- Configuration ---
 const OUTPUT_DIRECTORY = path.join(CASE_DATA_ROOT_DIRECTORY, "objects_parsed"); // Output directory for parsed objects
