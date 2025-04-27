@@ -7,7 +7,7 @@ import openpyxl # Import openpyxl
 def count_cross_examinations(directory_path, output_excel_filename="cross_examination_counts.xlsx"):
     """
     Counts the number of turns with 'noPresent': False in JSON files
-    within the specified directory. Processes all JSON files and handles invalid structures.
+    within the specified directory. Only processes JSON files starting with '9' or '10'.
     Outputs the results (for files with count > 0) to an Excel file.
 
     Args:
@@ -32,7 +32,8 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
     all_files = sorted(os.listdir(directory_path)) # Sort for consistent order
 
     for filename in all_files:
-        if filename.endswith(".json"):
+        # Only process JSON files that start with 9 or 10
+        if filename.endswith(".json") and (filename.startswith("9") or filename.startswith("10")):
             # Process all JSON files
             file_path = os.path.join(directory_path, filename)
             file_ce_count = 0
@@ -70,7 +71,7 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
                 print(f"An unexpected error occurred processing {filename}: {e}")
                 files_with_errors.append(filename)
         else:
-            files_skipped += 1 # Count non-json files as skipped
+            files_skipped += 1 # Count non-matching files as skipped
 
     # --- Generate Excel File ---
     excel_file_path = ""
@@ -91,7 +92,7 @@ def count_cross_examinations(directory_path, output_excel_filename="cross_examin
     # --- Final Summary ---
     print("\n--- Summary ---")
     print(f"Total JSON files processed: {files_processed}")
-    print(f"Total files skipped (not JSON): {files_skipped}")
+    print(f"Total files skipped (not matching criteria): {files_skipped}")
     print(f"Total files with cross-examinations (count > 0): {len(results_for_excel)}")
     if excel_file_path:
         total_ces_in_excel = sum(item['Cross Examination Count'] for item in results_for_excel)
@@ -109,6 +110,6 @@ if __name__ == "__main__":
     # final_data_dir = '/path/to/your/aceattorney_data/final'
 
     # Define the desired name for the output Excel file
-    excel_filename = "ace_attorney_cross_examinations.xlsx"
+    excel_filename = "ace_attorney_cross_examinations_9_10.xlsx"
 
     count_cross_examinations(final_data_dir, output_excel_filename=excel_filename)
