@@ -212,8 +212,6 @@ def init_correct(data_dir, output_dir):
     return categories_correct, reasoning_correct, action_space_correct
 
 def bin_action_space(action_space_sizes, desired_n_bins=7):
-    res = {}
-
     if len(np.unique(action_space_sizes)) == 1:
         size = action_space_sizes[0]
         bin_edges = np.array([size, size + 1])
@@ -521,11 +519,6 @@ def run_eval_job(caseids, output_dir, data_dir, client):
 
     eval_dir = os.path.join(output_dir, "eval")
     os.makedirs(eval_dir, exist_ok=True)
-    with open(os.path.join(eval_dir, "data.csv"), "w", newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Case", "Count"])
-        for caseid, total in summary.items():
-            writer.writerow([caseid, total])
 
     print(f"<run_eval_job> Evaluating {len(caseids_final)} court days...")
     print(f"<run_eval_job> Skipped {skips} court days because of no preds")
