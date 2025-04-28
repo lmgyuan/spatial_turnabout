@@ -147,7 +147,7 @@
     },
     {
       "currentChapter": "A Turnabout Forsaken",
-      "name": "Coroner's Findings → Autopsy Report",
+      "name": "Autopsy Report",
       "description1": "Initial findings of Dr. Hilda Hertz. Cause of death: Stab wounds to chest. Head injury sustained post mortem.",
       "description2": "Death occurred as a result of a heavy blow to the head with a circular object. Chest wounds inflicted post-mortem."
     },
@@ -165,7 +165,7 @@
       "currentChapter": "A Turnabout Forsaken",
       "name": "Broken Plushie",
       "description1": "The stuffed animal we originally found in the Zheng Fa presidential plane. Missing its left horn.",
-      "description2": "Fitted with a recording device that captured part of a conversation. One of the people recorded had a prominent burn."
+      "description2": "Fitted with a recording device that captured part of a conversation. Based on the conversation, one of the people recorded was identified by having a prominent burn."
     },
     {
       "currentChapter": "A Turnabout Forsaken",
@@ -181,12 +181,12 @@
     {
       "currentChapter": "A Turnabout Forsaken",
       "name": "Ms. Hart's Picture",
-      "description1": "A photograph of the mysterious figure in the red raincoat. Click here for details."
+      "description1": "A photograph of the mysterious figure in the red raincoat. Click here for details. [caption] The figure's left hand is stained with blood. The figure is in the storeroom, walking towards a ladder that goes upwards. [info] The assult of Ms. Crane took place just before this photo was taken."
     },
     {
       "currentChapter": "A Turnabout Forsaken",
       "name": "Ms. Hart's Statement",
-      "description1": "Ms. Hart's observations about what happened during the mysterious auction."
+      "description1": "Ms. Hart's observations about what happened during the mysterious auction. [info] Illicit auction held in Bigg Building. Items on sale were mainly items of police evidence related to homicide cases.\nEleven attendees altogether. All were wearing masks.\nAuction continued even after Ringer's murder, but the sound of the auctioneer's hammer could no longer be heard."
     },
     {
       "currentChapter": "A Turnabout Forsaken",
@@ -248,11 +248,33 @@
           "testimony": "The proof is the bloodstain we found here in the meeting room! That settles it, Miles Edgeworth.",
           "person": "Franziska",
           "present": [
-            "Blood on Hidden Lift"
-          ]
+            "Elevator Blood"
+          ],
+          "source": {
+            "evidence_span": "Blood was detected on the secret elevator. It looks like it dripped through to the floor below.",
+            "testimony_span": [
+              "the crime scene was right here in this room: the P.I.C. meeting room.",
+              "The proof is the bloodstain we found here in the meeting room"
+            ],
+            "is_self_contained": "no",
+            "context_span": [
+              "Lotta:\nIt was a black market auction, after all. They followed a fairly detailed procedure. First, the participants entered the storeroom from the viewin' platform one at a time. When they got in, they each took one of those masks on the wall over there... Funny thing 'bout those masks... They're all equipped with voice changers. Itty bitty ones. That way they wouldn't be recognized. They wanted to protect their... \"an anemone\"?\nEma:\nYou mean... their \"anonymity\"?\nLotta:\nYeah, that's it! Their \"anomnintany\"!\nEdgeworth:\n(Why not just say \"identity\" and make things easier for all of us...?)\nLotta:\nAfter puttin' on the mask, they'd go down the lift, and the next feller would come right in. On the way back, it was the exact same thing, but in reverse. They'd come up one by one, return the mask, and head up outta the storeroom.",
+              "Ema:\nWell then, let's head on down!\nRay:\nOh, have we decided on our next destination? Heeeey, Kay!\nKay:\nY-Yes, Mr. Shields!\nRay:\nWe wouldn't want you to get lost, so make sure you stay real close to Uncle Ray, kay?\nKay:\nRight! I'll follow you closely, Mr. Shields.\nEdgeworth:\n(These two... Since when did they get along like that?)\nInvestigation Complete\nApril 5, 7:43 PMGrand TowerP.I.C. Meeting Room"
+            ]
+          }
         }
       ],
-      "noPresent": false
+      "summarizedContext": "Prosecutor Franziska explains that the crime scene is the P.I.C. meeting room on the 50th floor. One floor above, reachable by a hidden elevator, is the storeroom.",
+      "noPresent": false,
+      "labels": [
+        "spatial"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims the blood found in the meeting room proves the crime happened there.",
+        "Fact 2: The evidence suggests blood dripped from the elevator to the floor below.",
+        "Fact 3: The context suggests the floor below the elevator is the meeting room.",
+        "Prop 1: If blood from a location comes from another location, the blood cannot be used to prove the first location is the crime scene."
+      ]
     },
     {
       "category": "rebuttal",
@@ -282,8 +304,14 @@
           "testimony": "I believe the crime occurred after the auction ended.",
           "person": "Franziska",
           "present": [
-            "Lotta's Testimony"
-          ]
+            "Ms. Hart's Statement"
+          ],
+          "source": {
+            "evidence_span": "Auction continued even after Ringer's murder",
+            "testimony_span": "the crime occurred after the auction ended",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "Then, they stabbed the victim in the chest with the candelabra in the storeroom.",
@@ -291,7 +319,16 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "summarizedContext": "Prosecutor Franziska explains what happened during the crime.",
+      "noPresent": false,
+      "labels": [
+        "temporal"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims the crime happened after the auction ended.",
+        "Fact 2: The evidence suggests the auction continued after the crime.",
+        "Prop 1: If an event A continues after another event B, event B cannot have happened after event A ends."
+      ]
     },
     {
       "category": "rebuttal",
@@ -321,8 +358,17 @@
           "testimony": "Ms. Crane went out to the viewing platform, where she was attacked by Kay Faraday.",
           "person": "Courtney",
           "present": [
-            "Lotta's Photo"
-          ]
+            "Ms. Hart's Picture"
+          ],
+          "source": {
+            "evidence_span": [
+              "The figure is in the storeroom",
+              "The assult of Ms. Crane took place just before this photo was taken."
+            ],
+            "testimony_span": "Ms. Crane went out to the viewing platform, where she was attacked by Kay Faraday.",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "That was how she met her end. And that concludes my summary of the case.",
@@ -330,7 +376,19 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "summarizedContext": "Prosecutor Courtney is summarizing the case.",
+      "noPresent": false,
+      "labels": [
+        "spatial"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims Ms. Courtney was assulted on the viewing platform.",
+        "Fact 2: The evidence suggests Ms. Courtney was assulted just before the photo was taken.",
+        "Fact 3: The evidence also suggests the assailent was in the storeroon when the photo was taken.",
+        "Prop 1: If an assailent is in a location just before they assult someone, the assault happens in the same place.",
+        "Prop 2: If an assault happens in the storeroom, it does not happen in the viewing platform."
+      ]
+
     },
     {
       "category": "rebuttal",
@@ -351,7 +409,13 @@
           "person": "Courtney",
           "present": [
             "Red Raincoat"
-          ]
+          ],
+          "source": {
+            "evidence_span": "Worn by the victim, whose fingerprints and blood were found on the hood.",
+            "testimony_span": "she was stabbed in the heart",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "Is there any person who could survive such an injury?",
@@ -364,7 +428,17 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "summarizedContext": "Prosecutor Courtney is describing the wounds on the victim's body.",
+      "noPresent": false,
+      "labels": [
+        "object property"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims the victim was stabbed in the heart.",
+        "Fact 2: The evidence suggests the raincoat that the victim was wearing only had blood on the hood.",
+        "Prop 1: If a person is stabbed in the heart, blood would not only be on the hood of their clothing, but also the front."
+      ]
+
     },
     {
       "category": "rebuttal",
@@ -418,11 +492,17 @@
           "present": []
         },
         {
-          "testimony": "\"I relayed everything to Karin. After that, it was none of my beeswax!\"",
+          "testimony": "\"The wounds on her chest were postmortem. I relayed everything to Karin. After that, it was none of my beeswax!\"",
           "person": "Karin",
           "present": [
             "Autopsy Report"
-          ]
+          ],
+          "source": {
+            "evidence_span": "Cause of death: Stab wounds to chest. Head injury sustained post mortem.",
+            "testimony_span": "The wounds on her chest were postmortem",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "\"I got nothing to gain from falsifying the autopsy report.\"",
@@ -435,7 +515,16 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "summarizedContext": "The witness Karin, a mouthpiece of her grandmother who drafted the autopsy report, is adamant that there are no mistakes in the report.",
+      "noPresent": false,
+      "labels": [
+        "object property"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims the chest wounds were postmortem.",
+        "Fact 2: The evidence suggests the chest wounds were the cause of death.",
+        "Prop 1: If a wound is the cause of death, it cannot be postmortem."
+      ]
     },
     {
       "category": "rebuttal",
@@ -460,8 +549,14 @@
           "testimony": "Maybe she was always wearing gloves in order to hide the burn mark, y'know.",
           "person": "Blaise",
           "present": [
-            "Stuffed Animal"
-          ]
+            "Broken Plushie"
+          ],
+          "source": {
+            "evidence_span": "Based on the conversation, one of the people recorded was identified by having a prominent burn.",
+            "testimony_span": "she was always wearing gloves in order to hide the burn mark",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "Either way, it's not like I had a motive to murder her, y'know.",
@@ -474,7 +569,16 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "summarizedContext": "The witness Blaise argues why she has no motive to kill the victim.",
+      "noPresent": false,
+      "labels": [
+        "object property"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims Crane always wears gloves to hide a burn mark.",
+        "Fact 2: The evidence suggests Crane was identified by her burn mark.",
+        "Prop 1: If a person always conceal their burn mark, they cannot be identified by it."
+      ]
     }
   ]
 }
