@@ -632,7 +632,7 @@ def evaluate_single_run(output_dir, data_dir, MODEL, CASE="ALL"):
     client = None
     if any(m_name in MODEL for m_name in ["gpt", "o3", "o4"]):
         if not check_status(output_dir):
-            import sys; sys.exit()
+            return
         else:
             from dotenv import load_dotenv
             load_dotenv("../.env")

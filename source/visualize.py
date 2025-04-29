@@ -86,7 +86,7 @@ def plot_prompt_accuracy(df, output_dir, mode='cot'):
         df_filtered = df[
             (df['prompt'] == 'base') &
             (df['case'] == 'ALL') &
-            (df['context'].isin(['today', 'none'])) &
+            (df['context'].isin(['full', 'none'])) &
             (df['description'].astype(str).str.lower() == 'true')
         ].copy()
         prompt_section = 'context'
@@ -121,7 +121,7 @@ def plot_prompt_accuracy(df, output_dir, mode='cot'):
     elif mode == 'full context':
         prompt_name_map = {
             'none': 'Base',
-            'today': 'Full Context'
+            'full': 'Full Context'
         }
         hue_order = ['Base', 'Full Context']
         
