@@ -11,7 +11,7 @@ def parse_arguments():
     # General args
     parser.add_argument('-m', '--model', type=str, help='model name')
     parser.add_argument('-p', '--prompt', type=str, help='prompt name')
-    parser.add_argument('--context', type=str, help='sofar, today, sum')
+    parser.add_argument('--context', type=str, help='full, sum')
     parser.add_argument('--case', type=str, default="ALL", help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
     parser.add_argument('--no_description', action='store_true')
     parser.add_argument('--data', type=str, default='aceattorney', help='dataset name, aceattorney or danganronpa')
@@ -106,14 +106,26 @@ def parse_json(file_path):
                 'characters': characters,
                 'evidences': evidences,
                 'testimonies': testimonies,
-                'newContext': re.sub(r'\n+', ' ', turn['newContext'])
+                'newContext': re.sub(r'\n+', ' ', turn['newContext']),
+                'summarizedContext': turn.get('summarizedContext', "")
             }
-            summarized_context = ""
-            if 'summarizedContext' in turn: summarized_context = turn['summarizedContext']
-            elif 'summarized_context' in turn: summarized_context = turn['summarized_context']
-            turn_dict['summarized_context'] = summarized_context
             turns.append(turn_dict)
         return turns, prev_context
+
+def truncate_context(context, MODEL):
+    context_size = len(context)  # Count characters, not tokens
+
+    # Truncate context for specific models
+    max_context_size = -1
+    if "deepseek" in MODEL or "deepseek-chat" in MODEL:  # Roughly 66000 tokens for deepseek
+        max_context_size = 230000
+    # elif "70b" in MODEL:  # Roughtly 20000 tokens for 70b
+    #     max_context_size = 80000
+    if max_context_size != -1:
+        start_idx = context_size - max_context_size
+        context = "..." + context[start_idx:]
+
+    return context
 
 def build_prompt(
     turns, 
@@ -136,23 +148,12 @@ def build_prompt(
         else:
             prompt = "Story:\n"
             full_context = "" 
-            if CONTEXT == "today":
-                full_context += prev_context + "\n" + new_context + "\n"
-            elif CONTEXT == "sofar":
+            if CONTEXT == "full":
                 full_context += prev_context + "\n" + context_sofar + "\n"
             elif CONTEXT == "sum":
-                full_context += turn['summarized_context'] + "\n"
-            context_size = len(full_context)  # Count characters, not tokens
+                full_context += turn['summarizedContext'] + "\n"
 
-            # Truncate context for specific models
-            max_context_size = -1
-            if "deepseek-reasoner" in MODEL or "deepseek-chat" in MODEL:  # Roughly 66000 tokens for deepseek
-                max_context_size = 230000
-            elif "70b" in MODEL:
-                max_context_size = 80000
-            if max_context_size != -1:
-                start_idx = context_size - max_context_size
-                full_context = "..." + full_context[start_idx:]
+            full_context = truncate_context(full_context, MODEL)
 
             prompt += full_context
 
@@ -190,10 +191,17 @@ def build_prompt(
             testimony_string += f"Person: {testimony['person']}\n"
             # Provide context if needed
             if "source" in testimony and \
-            all(
-                field in testimony["source"] 
-                for field in ["is_self_contained", "context_span"]
-            ) and \
+                testimony["source"].get("is_self_contained", "yes") == "no" and \
+                CONTEXT is None:
+                context_span = testimony["source"]["context_span"]
+                if not context_is_added and not NO_DESCRIPTION:
+                    for i, evidence_string in enumerate(evidences):
+                        evidence_spans = testimony["source"]["evidence_span"]
+                        if isinstance(evidence_spans, str):
+                            evidence_spans = [evidence_spans]
+                        for evidence_span in evidence_spans:
+                            if evidence_span in evidence_string: # Find evidence
+                                evidences[i] += f"{context_span}\n"  # Add context span
             testimony["source"]["is_self_contained"] == "no" and \
             CONTEXT is None:  # Always and only add context span if no context provided
                 context_span = testimony["source"]["context_span"]
