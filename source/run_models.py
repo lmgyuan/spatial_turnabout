@@ -202,17 +202,6 @@ def build_prompt(
                         for evidence_span in evidence_spans:
                             if evidence_span in evidence_string: # Find evidence
                                 evidences[i] += f"{context_span}\n"  # Add context span
-            testimony["source"]["is_self_contained"] == "no" and \
-            CONTEXT is None:  # Always and only add context span if no context provided
-                context_span = testimony["source"]["context_span"]
-                if not context_is_added and not NO_DESCRIPTION:
-                    for i, evidence_string in enumerate(evidences):
-                        evidence_spans = testimony["source"]["evidence_span"]
-                        if isinstance(evidence_spans, str):
-                            evidence_spans = [evidence_spans]
-                        for evidence_span in evidence_spans:
-                            if evidence_span in evidence_string: # Find evidence
-                                evidences[i] += f"{context_span}\n"  # Add context span
                     context_is_added = True
             testimony_counter += 1
             testimonies.append(testimony_string)
