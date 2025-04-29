@@ -97,6 +97,10 @@ def parse_pred_openai(caseid, input_data, output_data, output_dir):
                 "cot": cot,
                 "response_json": pred[idx]
             })
+        json_response = sorted(
+            json_response,
+            key=lambda x: int(x["idx"])
+        )  # Sort by idx, to match the order of gold_indices
         file.write(json.dumps(json_response, indent=2, ensure_ascii=False))
     
     return pred, reasoning
