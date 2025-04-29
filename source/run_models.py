@@ -103,7 +103,7 @@ def parse_json(file_path):
                 'characters': characters,
                 'evidences': evidences,
                 'testimonies': testimonies,
-                'new_context': re.sub(r'\n+', ' ', turn['newContext'])
+                'newContext': re.sub(r'\n+', ' ', turn['newContext'])
             }
             summarized_context = ""
             if 'summarizedContext' in turn: summarized_context = turn['summarizedContext']
@@ -125,7 +125,7 @@ def build_prompt(
     context_sofar = ""
     for turn in turns:
         context_is_added = False
-        new_context = turn['new_context']  
+        new_context = turn['newContext']  
         new_context = re.sub(r'\n+', ' ', new_context)  # Remove newlines
         context_sofar += new_context
         if CONTEXT is None:
