@@ -117,13 +117,13 @@ def parse_gold(caseid, data_dir):
     try:
         with open(os.path.join(data_dir, caseid), 'r') as f:
             data = json.load(f)
-            evidences = [evidence['name'] for evidence in data['evidences']]
-        characters = [character['name'] for character in data['characters']]
+            evidences = [evidence['name'] for evidence in data.get('evidences', [])]
+        characters = [character['name'] for character in data.get('characters', [])]
         # Parse evidence metadata
         n_evidences = len(evidences)
         gold_metadata["evidences"] = evidences
         # Iterate over turns
-        for turn in data['turns']:
+        for turn in data.get('turns', []):
             correct_pairs_indices = []
             correct_pairs_names = []
             turn_metadata = {}
@@ -150,8 +150,7 @@ def parse_gold(caseid, data_dir):
             gold_names.append(correct_pairs_names)
             gold_metadata["turns"].append(turn_metadata)
     except Exception as e:
-        # print(f"<oarse_gold> {caseid}: {e}. Number of turns: {len(data['turns'])}")
-        return [], [], {}  # Radically skip this case
+        raise Exception(f"<parse_gold> {caseid}: {traceback.format_exc()}")
     return gold_indices, gold_names, gold_metadata
 
 def init_correct(data_dir, output_dir):
@@ -319,19 +318,21 @@ def evaluate(
         in zip(caseids, preds, reasonings, golds_indices, golds_names, golds_metadata):  # iter each case
         report_json["case_details"][caseid] = {
             "case_accuracy": -1,
+            "case_evidence_accuracy": -1,
+            "case_testimony_accuracy": -1,
+            "mean_n_reasoning_tokens": -1,
             "turns": []
         }
+
         case_correct = 0
         case_evidence_correct = 0
         case_testimony_correct = 0
         case_total = len(gold_indices)
 
-        if isinstance(reasoning, str):  # Legacy
-            case_total_reasoning_tokens = len(reasoning.split(" "))
-        elif isinstance(reasoning, list):
-            case_total_reasoning_tokens = sum([len(r.split(" ")) for r in reasoning])
+        case_total_reasoning_tokens = sum([len(r.split(" ")) for r in reasoning])
         overall_reasoning_tokens += case_total_reasoning_tokens
         case_average_reasoning_tokens = round(case_total_reasoning_tokens / case_total, 2)
+        report_json["case_details"][caseid]["mean_n_reasoning_tokens"] = case_average_reasoning_tokens
 
         for i in range(len(gold_indices)):  # iter each turn
             # Init correctness count
@@ -405,24 +406,24 @@ def evaluate(
                     break
 
             # Log turn data
+            out_pred = {
+                "evidence_id": -1,
+                "evidence": "N/A",
+                "testimony_id": -1,
+                "testimony": "N/A"
+            }
             try:
-                out_pred = {
-                    "evidence_id": pred[i]["evidence"],
-                    "evidence": gold_metadata["evidences"][pred[i]["evidence"]],
-                    "testimony_id": pred[i]["testimony"],
-                    "testimony": gold_metadata["turns"][i]["testimonies"][pred[i]["testimony"]]
-                }
+                out_pred["evidence_id"] = pred[i]["evidence"]
+                out_pred["testimony_id"] = pred[i]["testimony"]
+                out_pred["evidence"] = gold_metadata["evidences"][out_pred["evidence_id"]]
+                out_pred["testimony"] = gold_metadata["turns"][i]["testimonies"][out_pred["testimony_id"]]
+
             except Exception as e:
                 print(
                     f"<evaluate> Case {caseid.split('_')[0]} turn {i} "
                     f"pred: {pred[i]}: {e}"
                 )
-                out_pred = {
-                    "evidence_id": -1,
-                    "evidence": "N/A",
-                    "testimony_id": -1,
-                    "testimony": "N/A"
-                }
+                
             gold = [{
                     "evidence_id": a["evidence"],
                     "evidence": b["evidence"],
@@ -430,11 +431,13 @@ def evaluate(
                     "testimony": b["testimony"]
                 } for a,b in zip(gold_indices[i], gold_names[i])
             ]
+
             report_json["case_details"][caseid]["turns"].append({
-                'case_accuracy': round(case_correct / case_total, 4),
-                'mean_n_reasoning_tokens': case_average_reasoning_tokens,
                 "gold": gold,
                 "pred": out_pred,
+                'is_correct': is_correct,
+                'is_evidence_correct': is_evidence_correct,
+                'is_testimony_correct': is_testimony_correct,
                 "n_reasoning_tokens": len(reasoning[i].split(" ")) if isinstance(reasoning, list) else "N/A"
             })
 
@@ -443,6 +446,11 @@ def evaluate(
         overall_total += case_total 
         overall_evidence_correct += case_evidence_correct
         overall_testimony_correct += case_testimony_correct
+
+        if case_total > 0:
+            report_json["case_details"][caseid]["case_accuracy"] = round(case_correct / case_total, 4)
+            report_json["case_details"][caseid]["case_evidence_accuracy"] = round(case_evidence_correct / case_total, 4)
+            report_json["case_details"][caseid]["case_testimony_accuracy"] = round(case_testimony_correct / case_total, 4)
 
     # Log overall data
     report_json['overall_correct'] = overall_correct
@@ -482,18 +490,26 @@ def run_eval_job(caseids, output_dir, data_dir, client):
 
     data = []
     if type(client).__name__ == "OpenAI":
-        output_data, input_data = [], []
+        output_data, input_data = [], {}
         output_files = sorted([
             os.path.join(output_dir, output_path) 
             for output_path in os.listdir(output_dir) 
             if output_path.startswith("batchoutput")
         ])  # Guaranteed to be mutually exclusive
-        input_file = os.path.join(output_dir, "batchinput.jsonl")
+        input_files = sorted([
+            os.path.join(output_dir, input_path)
+            for input_path in os.listdir(output_dir)
+            if input_path.startswith("batchinput")
+        ])  # Not guaranteed to be mutually exclusive
         for output_file in output_files:
             with open(output_file, "r") as file:
                 output_data += [json.loads(line) for line in file]
-        with open(input_file, "r") as file:
-            input_data = [json.loads(line) for line in file]
+        for input_file in input_files:
+            with open(input_file, "r") as file:
+                for line in file:
+                    input_line = json.loads(line)
+                    input_data[input_line["custom_id"]] = input_line
+        input_data = list(input_data.values())
         print(f"<run_eval_job> {len(input_data)} input turns found, {len(output_data)} output turns found")
 
     skips = 0
