@@ -46,7 +46,7 @@ def parse_pred_openai(caseid, input_data, output_data, output_dir):
     pred = []
     ids = []
     # Get preds
-    for idx, line in enumerate(output_data):
+    for line in output_data:
         if caseid_base in line["custom_id"]:
             full_response = line["response"]["body"]["choices"][0]["message"]["content"]
             try:
@@ -61,7 +61,10 @@ def parse_pred_openai(caseid, input_data, output_data, output_dir):
                     response = json.loads(json_response)
                     cot = "\n".join(full_response.splitlines()[:-2])
                 except Exception:
-                    print(f"<parse_pred_openai> {line['custom_id']}: No json output detected")
+                    print(
+                        f"<parse_pred_openai> Case {line['custom_id'].split('_')[0]} "
+                        f"turn {line['custom_id'].split('_')[-1]}: No json output detected"
+                    )
                     response = {"evidence": -1, "testimony": -1}
                     cot = ""
 
@@ -74,7 +77,7 @@ def parse_pred_openai(caseid, input_data, output_data, output_dir):
 
     # Get prompts
     prompts = [""] * len(ids)
-    for idx, prompt in enumerate(input_data):
+    for prompt in input_data:
         if prompt["custom_id"] in ids:
             prompts[ids.index(prompt["custom_id"])] = prompt["body"]["messages"][1]["content"]
     if "" in prompts:
@@ -89,7 +92,7 @@ def parse_pred_openai(caseid, input_data, output_data, output_dir):
         json_response = []
         for idx, cot in enumerate(reasoning):
             json_response.append({
-                "idx": idx,
+                "idx": int(ids[idx].split("_")[-1]),  # May not be idx
                 "prompt": prompts[idx],
                 "cot": cot,
                 "response_json": pred[idx]
@@ -406,7 +409,10 @@ def evaluate(
                     "testimony": gold_metadata["turns"][i]["testimonies"][pred[i]["testimony"]]
                 }
             except Exception as e:
-                print(f"<evaluate> {caseid} - {i} - {pred[i]}: {e}")
+                print(
+                    f"<evaluate> Case {caseid.split('_')[0]} turn {i} "
+                    f"pred: {pred[i]}: {e}"
+                )
                 out_pred = {
                     "evidence_id": -1,
                     "evidence": "N/A",
@@ -470,8 +476,6 @@ def run_eval_job(caseids, output_dir, data_dir, client):
     golds_metadata = []
     caseids_final = []
 
-    summary = defaultdict(int)
-
     data = []
     if type(client).__name__ == "OpenAI":
         output_data, input_data = [], []
@@ -492,9 +496,6 @@ def run_eval_job(caseids, output_dir, data_dir, client):
     for i, caseid in enumerate(caseids):
         # Summarize ground truth data stats
         gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir)
-        if len(gold_indices) > 0:
-            summary["total"] += len(gold_indices)
-            summary[caseid] += len(gold_indices)
 
         # Parse predictions
         if client is not None and type(client).__name__ == "OpenAI":
@@ -507,7 +508,7 @@ def run_eval_job(caseids, output_dir, data_dir, client):
             continue
 
         if len(pred) != len(gold_indices):
-            print(f"<run_eval_job> Case {caseid.split('_')[0]}, num of pred: {len(pred)} != num of gold: {len(gold_indices)}. Skipping...")
+            print(f"<run_eval_job> Case {caseid.split('_')[0]}, num of pred: {len(pred)}, num of gold: {len(gold_indices)}. Skipping...")
             continue
 
         caseids_final.append(caseid)

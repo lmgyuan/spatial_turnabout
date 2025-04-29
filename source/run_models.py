@@ -367,7 +367,7 @@ def load_model(model):
 
 def create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir):
     max_token_key = "max_tokens" if "gpt" in MODEL else "max_completion_tokens"
-    max_token_val = 1000 if "gpt" in MODEL else 5000
+    max_token_val = 1000 if "gpt" in MODEL else 7000
     batch = []
     skip_count = 0
     for fname in fnames:
@@ -424,8 +424,10 @@ def submit_batch_job(jsonl_path, client, output_dir):
     return batch_job_id
 
 def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output_dir, data_dir):
-    jsonl_path = os.path.join(output_dir, "batchinput.jsonl")
+    # Create batch
+    batch = create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir)
 
+    jsonl_path = os.path.join(output_dir, "batchinput.jsonl")
     # If exists, run the incomplete batch job instead
     if os.path.exists(jsonl_path):
         # Create duplicate file
@@ -437,8 +439,6 @@ def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output
         print(f"<run_batch_job> Creating duplicate batch input file: {os.path.basename(new_jsonl_path)}")
 
         # Filter incomplete input
-        with open(jsonl_path, "r") as f:
-            input_data = [json.loads(line) for line in f]
         output_data = []
         output_files = sorted([
             os.path.join(output_dir, output_path) 
@@ -448,9 +448,9 @@ def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output
         for output_file in output_files:
             with open(output_file, "r") as f:
                 output_data += [json.loads(line) for line in f]
-        output_ids = set([item["custom_id"] for item in output_data])
+        output_ids = sorted(set([item["custom_id"] for item in output_data]))
         new_input_data = []
-        for input_item in input_data:
+        for input_item in batch:
             if input_item["custom_id"] not in output_ids:
                 new_input_data.append(input_item)
         print(f"<run_batch_job> Found {len(new_input_data)} incomplete cases")
@@ -462,7 +462,6 @@ def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output
         jsonl_path = new_jsonl_path
 
     else:
-        batch = create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir)
         with open(jsonl_path, "w") as f:
             for request in batch:
                 f.write(json.dumps(request, ensure_ascii=False) + "\n")
