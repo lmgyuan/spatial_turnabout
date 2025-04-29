@@ -589,13 +589,15 @@ def find_output_dir(args):
     CASE = args.case if args.case else "ALL"
     CONTEXT = args.context if args.context else None
     NO_DESCRIPTION = args.no_description
-    
+    DATA = args.data
+
     output_dir = get_output_dir(
         MODEL, 
         PROMPT, 
         CONTEXT, 
         CASE, 
-        NO_DESCRIPTION
+        NO_DESCRIPTION,
+        DATA
     ) 
     if not os.path.exists(output_dir):
         raise ValueError(f"Output directory {output_dir} does not exist")
@@ -628,11 +630,21 @@ def evaluate_single_run(output_dir, data_dir, MODEL, CASE="ALL"):
     )
 
 def evaluate_all(data_dir, output_root_dir):
+    # Find data name
+    if "danganronpa" in data_dir:
+        data_name = "danganronpa"
+    else:
+        data_name = "aceattorney"
+    # Filter output dirs
     output_dirs = []
     for output in sorted(os.listdir(output_root_dir)):
         if os.path.isdir(os.path.join(output_root_dir, output)) \
             and output != "legacy":
-            output_dirs.append(os.path.join(output_root_dir, output))
+            if data_name == "danganronpa" and "danganronpa" in output:
+                output_dirs.append(os.path.join(output_root_dir, output))
+            elif data_name == "aceattorney" and "danganronpa" not in output:
+                output_dirs.append(os.path.join(output_root_dir, output))
+    # Evaluate all models
     for output_dir in tqdm(output_dirs, total=len(output_dirs), desc="Evaluating all models"):
         MODEL = os.path.basename(output_dir).split("_")[0]
         evaluate_single_run(output_dir, data_dir, MODEL, "ALL")
@@ -641,7 +653,11 @@ if __name__ == "__main__":
     parser = parse_arguments()
     args = parser.parse_args()
 
-    data_dir = '../data/aceattorney_data/final'
+    DATA = args.data
+    if DATA == 'aceattorney':
+        data_dir = '../data/aceattorney_data/final'
+    elif DATA == 'danganronpa':
+        data_dir = '../data/danganronpa_data/final'
     output_root_dir = '../output'
 
     if args.all:

@@ -14,12 +14,13 @@ def parse_arguments():
     parser.add_argument('--context', type=str, help='sofar, today, sum')
     parser.add_argument('--case', type=str, default="ALL", help='If ALL, run all cases; if a case number like 3-4-1, run that case; if a case number followed by a "+" like 3-4-1+, run that case and all cases after it.')
     parser.add_argument('--no_description', action='store_true')
+    parser.add_argument('--data', type=str, default='aceattorney', help='dataset name, aceattorney or danganronpa')
 
     # Evaluation args
     parser.add_argument('-a', '--all', action='store_true', help='Evaluate all existing models')
     return parser
 
-def get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION):
+def get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA):
     output_dir = f'../output/{MODEL.split("/")[-1]}_prompt_{PROMPT}'
     if CONTEXT is not None:
         output_dir += f"_context_{CONTEXT}"
@@ -27,6 +28,8 @@ def get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION):
         output_dir += "_desc_none"    
     if CASE != "ALL":
         output_dir += f"_case_{CASE}"
+    if DATA == 'danganronpa':
+        output_dir += f"_data_{DATA}"
     return output_dir
 
 def get_fnames(data_dir, output_dir, CASE, eval=False, verbose=True):
@@ -35,7 +38,7 @@ def get_fnames(data_dir, output_dir, CASE, eval=False, verbose=True):
         fname for fname 
         in os.listdir(data_dir) 
         if fname.endswith('.json')
-        if not fname.startswith(('7-', '8-'))  # skip test split
+        # if not fname.startswith(('7-', '8-'))  # skip test split
     ])
     fnames = []
     if CASE == "ALL":
@@ -521,12 +524,17 @@ if __name__ == "__main__":
     CASE = args.case if args.case else "ALL"
     CONTEXT = args.context
     NO_DESCRIPTION = args.no_description
+    DATA = args.data
 
-    data_dir = '../data/aceattorney_data/final'
+    if DATA == 'aceattorney':
+        data_dir = '../data/aceattorney_data/final'
+    elif DATA == 'danganronpa':
+        data_dir = '../data/danganronpa_data/final'
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Make output dir
-    output_dir = get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION)
+    output_dir = get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(os.path.join(output_dir, 'metadata.json'), 'w') as file:
@@ -536,6 +544,7 @@ if __name__ == "__main__":
             'context': "none" if CONTEXT is None else CONTEXT,
             'case': CASE if CASE != "ALL" else "all",
             'no_description': NO_DESCRIPTION,
+            'data': DATA,
             'timestamp': timestamp
         }, file, indent=2)
     # Load model
