@@ -82,7 +82,7 @@ def plot_prompt_accuracy(df, output_dir, mode='cot'):
         # Convert description to true or false
         df_filtered[prompt_section] = df_filtered[prompt_section].astype(str).str.lower()
 
-    elif mode == 'full context':  # Context can be today or none
+    elif mode == 'full context':  # Context can be full or none
         df_filtered = df[
             (df['prompt'] == 'base') &
             (df['case'] == 'ALL') &
@@ -199,9 +199,19 @@ def plot_token_accuracy(df, output_dir):
         else 'Non-Reasoning'
     )
     df_filtered['model_size'] = df_filtered['model'].apply(get_model_size)
+
+    short_model_names = {
+        'Llama3.1-70B': 'Llama-70B',
+        'Llama3.1-8B': 'Llama-8B',
+        'DeepSeek-R1-671B': 'R1-671B',
+        'DeepSeek-V3-671B': 'V3-671B',
+        'DeepSeek-R1-70B': 'R1-70B',
+        'DeepSeek-R1-32B': 'R1-32B',
+        'DeepSeek-R1-8B': 'R1-8B',
+    }
     
     sns.set_theme(style='whitegrid', context='paper')
-    plt.figure(figsize=(12, 7))
+    plt.figure(figsize=(6, 6))
 
     ax = sns.scatterplot(
         data=df_filtered,
@@ -215,19 +225,48 @@ def plot_token_accuracy(df, output_dir):
         legend=False
     )
 
-    for i in range(df_filtered.shape[0]):
-        plt.text(
-            x=df_filtered['average_reasoning_tokens'].iloc[i] + 0.5,
-            y=df_filtered['overall_accuracy'].iloc[i] + 0.01,
-            s=df_filtered['model'].iloc[i],
-            fontdict=dict(color='black', size=10)
-        )
+    placed_positions = []
+    initial_x_offset = 0.5
+    initial_y_offset = 0.01
+    nudge_x = 0.2
+    nudge_y = 0.005
+    thresh_x = 1.5  # Increase x threshold for long text
+    thresh_y = 0.015  # Increase y threshold to enable AND conditions
+    max_nudge = 5
 
-    ax.set_title('Model Accuracy vs Average Reasoning Tokens', fontsize=14, weight='bold')
+    for i in range(df_filtered.shape[0]):
+        model_name = df_filtered['model'].iloc[i]
+        short_name = short_model_names.get(model_name, model_name)
+        x = df_filtered['average_reasoning_tokens'].iloc[i]
+        y = df_filtered['overall_accuracy'].iloc[i]
+        target_x = x + initial_x_offset
+        target_y = y + initial_y_offset
+        nudge_count = 0
+        while nudge_count < max_nudge:
+            overlap = False
+            for px, py in placed_positions:
+                if abs(px - target_x) < thresh_x:
+                    overlap = True
+                    target_x += nudge_x
+                    target_y -= nudge_y
+                    break
+            if not overlap:
+                break
+            nudge_count += 1
+
+        plt.text(
+            x=target_x,
+            y=target_y,
+            s=short_name,
+            fontdict=dict(color='black', size=8)
+        )
+        placed_positions.append((target_x, target_y))
+
+    # ax.set_title('Model Accuracy vs Average Reasoning Tokens', fontsize=14, weight='bold')
     ax.set_xlabel('Average Reasoning Tokens', fontsize=12)
     ax.set_ylabel('Accuracy', fontsize=12)
-    ax.set_ylim(0, 1)
-    ax.set_yticks([i / 10.0 for i in range(11)])
+    ax.set_ylim(0, 0.6)
+    ax.set_yticks([i / 10.0 for i in range(7)])
     ax.tick_params(axis='x', rotation=45, labelsize=10)
 
     # Add legend
