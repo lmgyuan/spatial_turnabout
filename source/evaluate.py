@@ -411,14 +411,15 @@ def evaluate(
                 "evidence_id": -1,
                 "evidence": "N/A",
                 "testimony_id": -1,
-                "testimony": "N/A"
+                "testimony": "N/A",
+                "reasoning": "N/A"
             }
             try:
                 out_pred["evidence_id"] = pred[i]["evidence"]
                 out_pred["testimony_id"] = pred[i]["testimony"]
                 out_pred["evidence"] = gold_metadata["evidences"][out_pred["evidence_id"]]
                 out_pred["testimony"] = gold_metadata["turns"][i]["testimonies"][out_pred["testimony_id"]]["testimony"]
-
+                out_pred["reasoning"] = reasoning[i]
             except Exception as e:
                 print(
                     f"<evaluate> Case {caseid.split('_')[0]} turn {i} "
