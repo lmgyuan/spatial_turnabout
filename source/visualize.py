@@ -439,7 +439,7 @@ def prepare_data(df):
     return df
 
 if __name__ == "__main__":
-    output_dir = "../output"
+    output_dir = "../output/evals"
     df = pd.read_csv(os.path.join(output_dir, "eval.csv"))
     df = prepare_data(df)
 

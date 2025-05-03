@@ -5,8 +5,7 @@ import csv
 def get_eval_data(output_root_dir):
     res = []
     for output in sorted(os.listdir(output_root_dir)):
-        if os.path.isdir(os.path.join(output_root_dir, output)) \
-            and output != "legacy":
+        if output.endswith("report.json"):
             # print(output)
             parts = output.split("_")
             model, prompt, context, description = "", "", "", ""
@@ -25,13 +24,8 @@ def get_eval_data(output_root_dir):
                 case = parts[parts.index("case") + 1]
             else:
                 case = "ALL"
-            output_dir = os.path.join(output_root_dir, output)
-            eval_dir = os.path.join(output_dir, "eval")
-            eval_json = os.path.join(eval_dir, "report.json")
-            if not os.path.exists(eval_json):
-                print(f"eval for [{output}] does not exist. Skipping...")
-                continue
-            with open(eval_json, "r") as f:
+
+            with open(os.path.join(output_root_dir, output), "r") as f:
                 eval_data = json.load(f)
             res.append({
                 "model": model,
@@ -59,7 +53,7 @@ def get_eval_data(output_root_dir):
     return res, metadata_keys
 
 if __name__ == "__main__":
-    output_root_dir = "../output"
+    output_root_dir = "../output/evals"
     res, metadata_keys = get_eval_data(output_root_dir)
 
     # Write to csv

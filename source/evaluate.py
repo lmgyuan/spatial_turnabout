@@ -284,8 +284,6 @@ def evaluate(
     golds_names, 
     golds_metadata
 ):
-    eval_dir = os.path.join(output_dir, "eval")
-    os.makedirs(eval_dir, exist_ok=True)
 
     report_json = {
             'overall_correct': -1,
@@ -482,9 +480,9 @@ def evaluate(
     report_json["action_space_accuracy"] = action_space_correct
 
     # Write to json
-    with open(os.path.join(eval_dir, f"report.json"), 'w') as f:
+    with open(os.path.join('../output/evals', f"{os.path.basename(output_dir)}_report.json"), 'w') as f:
         json.dump(report_json, f, indent=2)
-    print(f"<evaluate> Report saved to {eval_dir}/report.json")
+    print(f"<evaluate> Report saved to {os.path.join('../output/evals', f'{os.path.basename(output_dir)}_report.json')}")
 
 def run_eval_job(caseids, output_dir, data_dir, client):
     preds = []
@@ -543,9 +541,6 @@ def run_eval_job(caseids, output_dir, data_dir, client):
         golds_indices.append(gold_indices)  # List of list of dicts
         golds_names.append(gold_names)
         golds_metadata.append(gold_metadata)
-
-    eval_dir = os.path.join(output_dir, "eval")
-    os.makedirs(eval_dir, exist_ok=True)
 
     print(f"<run_eval_job> Evaluating {len(caseids_final)} court days...")
     print(f"<run_eval_job> Skipped {skips} court days because of no preds")
@@ -666,7 +661,7 @@ def evaluate_all(data_dir, output_root_dir):
     output_dirs = []
     for output in sorted(os.listdir(output_root_dir)):
         if os.path.isdir(os.path.join(output_root_dir, output)) \
-            and output != "legacy":
+            and "prompt" in output:
             if data_name == "danganronpa" and "danganronpa" in output:
                 output_dirs.append(os.path.join(output_root_dir, output))
             elif data_name == "aceattorney" and "danganronpa" not in output:
@@ -686,6 +681,9 @@ if __name__ == "__main__":
     elif DATA == 'danganronpa':
         data_dir = '../data/danganronpa_data/final'
     output_root_dir = '../output'
+
+    if not os.path.exists("../output/evals"):
+        os.makedirs("../output/evals")
 
     if args.all:
         evaluate_all(data_dir, output_root_dir)
