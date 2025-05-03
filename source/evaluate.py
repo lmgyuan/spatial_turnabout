@@ -195,7 +195,7 @@ def init_correct(data_dir, output_dir):
             "accuracy": 0, 
             'evidence_accuracy': 0,
             'testimony_accuracy': 0,
-            "bad_cases": []
+            # "bad_cases": []
         } 
         for label in categories
     }
@@ -208,7 +208,7 @@ def init_correct(data_dir, output_dir):
             "accuracy": 0, 
             'evidence_accuracy': 0,
             'testimony_accuracy': 0,
-            "bad_cases": []
+            # "bad_cases": []
         } 
         for step in reasoning_steps
     }
@@ -369,7 +369,8 @@ def evaluate(
                     if is_correct:
                         categories_correct[label]["correct"] += 1
                     else:
-                        categories_correct[label]["bad_cases"].append({"caseid": caseid, "turn": i})
+                        # categories_correct[label]["bad_cases"].append(f"{caseid} turn {i}")
+                        pass
 
                     if is_evidence_correct:
                         categories_correct[label]['evidence_correct'] += 1
@@ -383,7 +384,8 @@ def evaluate(
                 if is_correct:
                     reasoning_correct[turn_n_reasoning]["correct"] += 1
                 else:
-                    reasoning_correct[turn_n_reasoning]["bad_cases"].append({"caseid": caseid, "turn": i})
+                    # reasoning_correct[turn_n_reasoning]["bad_cases"].append(f"{caseid} turn {i}")
+                    pass
 
                 if is_evidence_correct:
                     reasoning_correct[turn_n_reasoning]['evidence_correct'] += 1
@@ -398,7 +400,8 @@ def evaluate(
                     if is_correct:
                         action_space_correct[label]["correct"] += 1
                     else:
-                        action_space_correct[label]["bad_cases"].append({"caseid": caseid, "turn": i})
+                        # action_space_correct[label]["bad_cases"].append(f"{caseid} turn {i}")
+                        pass
                     if is_evidence_correct:
                         action_space_correct[label]['evidence_correct'] += 1
                     if is_testimony_correct:
@@ -416,7 +419,7 @@ def evaluate(
                 out_pred["evidence_id"] = pred[i]["evidence"]
                 out_pred["testimony_id"] = pred[i]["testimony"]
                 out_pred["evidence"] = gold_metadata["evidences"][out_pred["evidence_id"]]
-                out_pred["testimony"] = gold_metadata["turns"][i]["testimonies"][out_pred["testimony_id"]]
+                out_pred["testimony"] = gold_metadata["turns"][i]["testimonies"][out_pred["testimony_id"]]["testimony"]
 
             except Exception as e:
                 print(
@@ -428,7 +431,7 @@ def evaluate(
                     "evidence_id": a["evidence"],
                     "evidence": b["evidence"],
                     "testimony_id": a["testimony"],
-                    "testimony": b["testimony"]
+                    "testimony": gold_metadata["turns"][i]["testimonies"][a["testimony"]]
                 } for a,b in zip(gold_indices[i], gold_names[i])
             ]
 
@@ -438,6 +441,9 @@ def evaluate(
                 'is_correct': is_correct,
                 'is_evidence_correct': is_evidence_correct,
                 'is_testimony_correct': is_testimony_correct,
+                'labels': turn_labels,
+                'n_steps': turn_n_reasoning,
+                'n_action_space': action_space,
                 "n_reasoning_tokens": len(reasoning[i].split(" ")) if isinstance(reasoning, list) else "N/A"
             })
 
