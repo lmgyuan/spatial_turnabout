@@ -81,7 +81,7 @@
       "type": "",
       "obtained": "",
       "description1": "An article about poison that was stolen from a laboratory at Yumei University. Even my father, who is responsible for the lab, knew nothing of the incident.",
-      "description2": "An article about poison that was stolen from a laboratory at Yumei University. The reporter, Menimemo-san, based it on information he gleaned by eavesdropping."
+      "description2": "An article about poison that was stolen from a laboratory at Yumei University. The reporter, Menimemo-san, based it on information he gleaned by eavesdropping. The article reveals the following property about the poison in question: When the toxin enters the body on a knife laced with the poison, it's rapidly absorbed and causes death in minutes. In the newspaper article, there's the following information about the stolen poison: 'Onset of symptoms occurs in minutes...ending with acute contraction of the pupils prior to death."
     },
     {
       "currentChapter": "The Adventure of the Blossoming Attorney",
@@ -142,10 +142,26 @@
           "person": "Hosonaga",
           "present": [
             "Post-Mortem Report"
-          ]
+          ],
+          "source": {
+            "evidence_span": "Time of death just after 2 p.m. Death is believed to be due to trauma to the victim's lung from a knife blade. Only a single wound was identified.",
+            "testimony_span": "I saw blood on the blade. It proved to me that she'd stabbed the victim multiple times.",
+            "explanation": "If only one single wound was identified on the post-mortem report, the victim could not have been stabbed multiple times.",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "summarizedContext": "The witness Hosonaga is testifying about the events that took place on the day of the incident.",
+      "labels": [
+        "numerical"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims the victim was stabbed multiple times.",
+        "Fact 2: The evidence suggests the victim has only one single wound.",
+        "Prop 1: If a person was stabbed multiple times, then he or she would have multiple wounds."
+      ]
     },
     {
       "category": "cross_examination",
@@ -166,7 +182,14 @@
           "person": "Hosonaga",
           "present": [
             "Poison Article"
-          ]
+          ],
+          "source": {
+            "evidence_span": "An article about poison that was stolen from a laboratory at Yumei University. The reporter, Menimemo-san, based it on information he gleaned by eavesdropping. The article reveals the following property about the poison in question: When the toxin enters the body on a knife laced with the poison, it's rapidly absorbed and causes death in minutes.",
+            "testimony_span": "In other words, there's no good reason why the defendant would have tried to pull the knife from the victim.",
+            "explanation": "If the knife is laced with the poison, the defendant would have had a reason to pull the knife out of the victim. The poison would have been absorbed into the body, and the defendant would have wanted to save the victim's life.",
+            "is_self_contained": "yes",
+            "context_span": ""
+          }
         },
         {
           "testimony": "Let's not forget that the young student did have a motive for killing the victim.",
@@ -179,7 +202,16 @@
           "present": []
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "summarizedContext": "The witness Hosonaga is testifying about the events that took place on the day of the incident.",
+      "labels": [
+        "physical"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims the defendant had no reason to pull the knife from the victim.",
+        "Fact 2: The evidence suggests the knife was laced with poison.",
+        "Prop 1: If one is stabbed with a poisoned knife, then one possible reason to pull the knife out is to save the victim's life."
+      ]
     },
     {
       "category": "cross_examination",
@@ -215,10 +247,28 @@
           "person": "Menimemo",
           "present": [
             "Fountain Pen"
-          ]
+          ],
+          "source": {
+            "evidence_span": "The fountain pen that the victim was found grasping in her hand. It carries the initials 'R.M.' as well as an emblem of some description.",
+            "testimony_span": "I never once set foot in the hut, nor spoke with the Englishwoman. I was there only as an observer.",
+            "explanation": "If the witness was only an observer, then his pen would not have been found at the scene of the crime.",
+            "is_self_contained": "no",
+            "context_span": "Menimemo:\nRaiten Menimemo of the Shoyu News. I'm what people like to call a journo!"
+          }
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "summarizedContext": "The witness Menimemo is testifying about the events that took place in the beach hut.",
+      "labels": [
+        "physical",
+        "spelling"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims he have never set foot in the hut.",
+        "Fact 2: The evidence suggests a pen with initial 'R.M.' was found at the scene of the crime.",
+        "Prop 1: If one's pen was found at the scene of the crime, then he must have been there.",
+        "Prop 2: If a pen is engraved with one's initial, then the pen is likely to belong to that person."
+      ]
     },
     {
       "category": "cross_examination",
@@ -298,10 +348,29 @@
           "person": "Menimemo",
           "present": [
             "Poison Article"
-          ]
+          ],
+          "source": {
+            "evidence_span": "In the newspaper article, there's the following information about the stolen poison: 'Onset of symptoms occurs in minutes...ending with acute contraction of the pupils prior to death.",
+            "testimony_span": "The point is...if you'd poisoned someone, there'd be no reason to then go and stab the person as well!",
+            "explanation": "If a person die with acute contraction of the pupils, it can be inferred that he or she is died from this specific poison. Since the poison is very controlled, it is easier to induce who has contacted and steal the poison. Stab the victim by a dagger is to hopefully kill the victim before the symptom is shown, and thus enlarge the scope of possible suspects. ",
+            "is_self_contained": "no",
+            "context_span": "Under normal circumstances, the pupils dilate when someone dies. If there was extreme constriction instead...that's most certainly unusual, yes. A special indicator solution for a new poison under development by my father's team. It's been created in strict secrecy and exists only in my father's laboratory"
+          }
         }
       ],
-      "noPresent": false
+      "noPresent": false,
+      "summarizedContext": "The witness Menimemo is testifying about the incident involving the Englishwoman and the poison article. ",
+      "labels": [
+        "behavior"
+      ],
+      "reasoning": [
+        "Fact 1: The witness claims there is no reason to stab the victim if the poison was already used.",
+        "Fact 2: The evidence suggests the posion was stolen and the symptoms of the poison would be visible before death.",
+        "Fact 3: The poison is very controlled, and it is easier to induce who has contacted and steal the poison.",
+        "Prop 1: If a person is killed by the poison, then he or she will show the unusual symptoms before death.",
+        "Prop 2: If the poison is very well controlled, then the person who has contacted the poison can be easily induced.",
+        "Prop 3: If the victim does not show the symptom, then it is possible to enlarge the scope of possible suspects."
+      ]
     }
   ]
 }
