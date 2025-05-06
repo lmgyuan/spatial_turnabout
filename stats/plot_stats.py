@@ -240,12 +240,14 @@ def main():
   chapters = get_all_chapters()
   all_turns = get_all_turns(chapters)
 
-  # categorized_stats = get_categorized_stats(all_turns)
-  # print(categorized_stats)
-
+  # 1. For Main stats table
   per_title_stats = get_per_title_stats(all_turns)
   json.dump(per_title_stats, open("stats/per_title_stats.json", "w"), indent=2)
 
+  # 2. For testimony_evidence scatter density plot
+  dump_testimony_evidence_stats(all_turns)
+
+  # 3. For reasoning kind plot
   dump_reasoning_kind_stats(all_turns)
 
 
