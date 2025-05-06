@@ -210,13 +210,13 @@ def get_per_title_stats(all_turns):
 
 
 def dump_testimony_evidence_stats(all_turns):
-  lines = ["testimonies,evidences,count\n"]
+  lines = ["testimonies evidences count\n"]
   stats = collections.defaultdict(lambda: 0)
   for turn in all_turns:
     stats[(turn.num_testimonies(), turn.num_evidences())] += 1
   for ((x, y), count) in stats.items():
-    lines.append(f"{x},{y},{count}\n")
-  with open("stats/testimony_evidence_distr.csv", "w") as f:
+    lines.append(f"{x} {y} {count}\n")
+  with open("stats/testimonies_evidences.txt", "w") as f:
     f.writelines(lines)
 
 
