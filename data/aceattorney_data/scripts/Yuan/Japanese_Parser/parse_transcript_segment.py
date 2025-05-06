@@ -1,3 +1,32 @@
+"""
+parse_transcript_segment.py
+
+This script parses a range of raw HTML transcript files from the Ace Attorney Japanese game script,
+extracts testimony and evidence presentation segments, and outputs a structured JSON file for use in
+downstream NLP or game data pipelines.
+
+What it does:
+- Reads a specified range of HTML files (e.g., word113.htm.html to word117.htm.html) from the raw data directory.
+- Extracts all text, identifies testimony lines and evidence presentation events using regular expressions.
+- Segments the transcript into cross-examination "turns" with associated testimonies and evidence.
+- Assembles a JSON object containing chapter, character, evidence, and turn/testimony data.
+- Writes the output JSON to the specified output directory.
+
+How to use:
+1. Place the raw HTML files in the directory: data/aceattorney_data/generated/raw/
+2. Adjust FILE_RANGE_START and FILE_RANGE_END to the desired file indices.
+3. Optionally, change OUTPUT_FILENAME and OUTPUT_DIR as needed.
+4. Run the script:
+       python parse_transcript_segment.py
+5. The parsed JSON will be written to the output directory.
+
+Dependencies:
+- BeautifulSoup4 (bs4)
+- Python 3.x
+
+Note: This script is tailored for the Japanese Ace Attorney script format and may require adaptation for other formats.
+"""
+
 import os
 import re
 import json
@@ -7,11 +36,12 @@ import codecs
 # --- Configuration ---
 RAW_HTML_DIR = os.path.join("data", "aceattorney_data", "generated", "raw")
 OUTPUT_DIR = os.path.join("data", "aceattorney_data", "generated", "japanese_parsed") # Or a different output dir if needed
-OUTPUT_FILENAME = "parsed_segment_113_117.json"
+OUTPUT_FILENAME = "parsed_segment_135_152.json"
 
 # Files to process
-FILE_RANGE_START = 113
-FILE_RANGE_END = 117
+FILE_RANGE_START = 135
+FILE_RANGE_END = 152
+currentChapter = "逆転のレシピ"
 
 # Regex patterns
 CHARACTER_PATTERN = re.compile(r"^(.*?)：") # Matches "成：" -> "成"
@@ -158,13 +188,13 @@ def main():
 
     # Create Character Objects (with placeholders)
     character_list = [
-        {"currentChapter": "思い出の逆転", "name": name, "age": "不明", "gender": "不明", "description1": ""}
+        {"currentChapter": currentChapter, "name": name, "age": "不明", "gender": "不明", "description1": ""}
         for name in sorted(list(all_characters))
     ]
 
     # Create Evidence Objects (with placeholders)
     evidence_list = [
-        {"currentChapter": "思い出の逆転", "name": name, "type": "不明", "obtained": "不明", "description1": ""}
+        {"currentChapter": currentChapter, "name": name, "type": "不明", "obtained": "不明", "description1": ""}
         for name in sorted(list(all_evidence))
     ]
 
@@ -238,7 +268,7 @@ def main():
             print(f"Warning: No testimony data found for evidence match {i+1}")
     
     output_data = {
-        "currentChapter": "思い出の逆転",
+        "currentChapter": currentChapter,
         "characters": character_list,
         "evidence": evidence_list,
         "turns": turns_data

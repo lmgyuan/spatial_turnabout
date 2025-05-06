@@ -1,3 +1,19 @@
+"""
+process_context_file.py
+
+This script removes all control characters (tab, newline, carriage return) from a specified Japanese context text file,
+flattening its content into a single line. It overwrites the original file with the cleaned, single-line version.
+
+Usage:
+- By default, the script processes the file "3-3_CE1.txt" located in:
+  data/aceattorney_data/generated/japanese_crafted/AA3/3-3_Context/
+- To use, simply run this script:
+    python process_context_file.py
+- The script will read the file, remove all tab, newline, and carriage return characters, and overwrite the file in place.
+
+Modify the INPUT_DIR and FILENAME variables if you wish to process a different file.
+"""
+
 import os
 import re # Import regex
 
