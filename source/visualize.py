@@ -439,8 +439,13 @@ def prepare_data(df):
     return df
 
 if __name__ == "__main__":
-    output_dir = "../output/evals"
-    df = pd.read_csv(os.path.join(output_dir, "eval.csv"))
+    output_root_dir = "../eval"
+
+    output_dir = os.path.join(output_root_dir, "figs")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
+    df = pd.read_csv(os.path.join(output_root_dir, "eval.csv"))
     df = prepare_data(df)
 
     plot_accuracy(df, output_dir)

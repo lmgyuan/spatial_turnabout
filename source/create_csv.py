@@ -53,7 +53,7 @@ def get_eval_data(output_root_dir):
     return res, metadata_keys
 
 if __name__ == "__main__":
-    output_root_dir = "../output/evals"
+    output_root_dir = "../eval"
     res, metadata_keys = get_eval_data(output_root_dir)
 
     # Write to csv

@@ -82,7 +82,7 @@ def parse_pred_openai(caseid, input_data, output_data, output_dir):
             prompts[ids.index(prompt["custom_id"])] = prompt["body"]["messages"][1]["content"]
     if "" in prompts:
         num_missing = prompts.count("")
-        print(f"<parse_pred_openai> {caseid_base}: {num_missing} prompts are missing")
+        print(f"<parse_pred_openai> {caseid_base}: {num_missing} out of {len(ids)} prompts are missing")
 
     # Log
     with open(os.path.join(output_dir, caseid.split('.')[0] + '.jsonl'), 'w') as file:
@@ -481,9 +481,9 @@ def evaluate(
     report_json["action_space_accuracy"] = action_space_correct
 
     # Write to json
-    with open(os.path.join('../output/evals', f"{os.path.basename(output_dir)}_report.json"), 'w') as f:
+    with open(os.path.join('../eval', f"{os.path.basename(output_dir)}_report.json"), 'w') as f:
         json.dump(report_json, f, indent=2)
-    print(f"<evaluate> Report saved to {os.path.join('../output/evals', f'{os.path.basename(output_dir)}_report.json')}")
+    print(f"<evaluate> Report saved to {os.path.join('../eval', f'{os.path.basename(output_dir)}_report.json')}")
 
 def run_eval_job(caseids, output_dir, data_dir, client):
     preds = []
@@ -683,8 +683,8 @@ if __name__ == "__main__":
         data_dir = '../data/danganronpa_data/final'
     output_root_dir = '../output'
 
-    if not os.path.exists("../output/evals"):
-        os.makedirs("../output/evals")
+    if not os.path.exists("../eval"):
+        os.makedirs("../eval")
 
     if args.all:
         evaluate_all(data_dir, output_root_dir)
