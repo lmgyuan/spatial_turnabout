@@ -36,12 +36,12 @@ import codecs
 # --- Configuration ---
 RAW_HTML_DIR = os.path.join("data", "aceattorney_data", "generated", "raw")
 OUTPUT_DIR = os.path.join("data", "aceattorney_data", "generated", "japanese_parsed") # Or a different output dir if needed
-OUTPUT_FILENAME = "parsed_segment_135_152.json"
+OUTPUT_FILENAME = "3-2_The_Stolen_Turnabout.json"
 
 # Files to process
-FILE_RANGE_START = 135
-FILE_RANGE_END = 152
-currentChapter = "逆転のレシピ"
+FILE_RANGE_START = 118
+FILE_RANGE_END = 134
+currentChapter = "盗まれた逆転"
 
 # Regex patterns
 CHARACTER_PATTERN = re.compile(r"^(.*?)：") # Matches "成：" -> "成"
