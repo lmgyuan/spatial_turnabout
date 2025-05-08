@@ -105,6 +105,7 @@ def get_all_chapters():
   all_chapters = []
   for folder in FOLDERS:
     for filename in os.listdir(folder):
+      print(filename)
       if filename.endswith(".json") and not filename.startswith("_"):
         chapter = Chapter(f"{folder}/{filename}")
         all_chapters.append(chapter)
@@ -114,7 +115,10 @@ def get_all_chapters():
 def get_all_turns(chapters):
   all_turns = []
   for chapter in chapters:
-    all_turns += chapter.turns()
+    # Yuan Edit: only include turns with noPresent = False
+    for turn in chapter.turns():
+      if turn.turn["noPresent"] == False:
+        all_turns.append(turn)
   return all_turns
 
 
@@ -239,6 +243,12 @@ def dump_reasoning_kind_stats(all_turns):
 def main():
   chapters = get_all_chapters()
   all_turns = get_all_turns(chapters)
+
+  is_noPresent = False
+  for turn in all_turns:
+    if turn.turn["noPresent"] == True:
+      is_noPresent = True
+  print(is_noPresent)
 
   # 1. For Main stats table
   per_title_stats = get_per_title_stats(all_turns)
