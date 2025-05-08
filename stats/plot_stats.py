@@ -181,6 +181,10 @@ def get_avg_len_reasoning_chain(turns):
   return sum([turn.len_reasoning_chain() for turn in turns]) / len(turns)
 
 
+def get_max_len_reasoning_chain(turns):
+  return max([turn.len_reasoning_chain() for turn in turns])
+
+
 DIFFICULTIES = ["easy", "medium", "hard"]
 
 
@@ -195,6 +199,7 @@ STAT_FNS = {
   "max_evidences": get_max_evidences,
   "avg_reasoning_kinds": get_avg_num_reasoning_kinds,
   "avg_len_reasoning_chain": get_avg_len_reasoning_chain,
+  "max_len_reasoning_chain": get_max_len_reasoning_chain,
 }
 
 
@@ -243,12 +248,6 @@ def dump_reasoning_kind_stats(all_turns):
 def main():
   chapters = get_all_chapters()
   all_turns = get_all_turns(chapters)
-
-  is_noPresent = False
-  for turn in all_turns:
-    if turn.turn["noPresent"] == True:
-      is_noPresent = True
-  print(is_noPresent)
 
   # 1. For Main stats table
   per_title_stats = get_per_title_stats(all_turns)
