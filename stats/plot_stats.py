@@ -184,6 +184,9 @@ def get_avg_len_reasoning_chain(turns):
 def get_max_len_reasoning_chain(turns):
   return max([turn.len_reasoning_chain() for turn in turns])
 
+def get_num_self_contained_problems(turns):
+  return len([turn for turn in turns if "is_self_contained" in turn.turn and turn.turn["is_self_contained"] == "yes"])
+
 
 DIFFICULTIES = ["easy", "medium", "hard"]
 
@@ -191,6 +194,7 @@ DIFFICULTIES = ["easy", "medium", "hard"]
 STAT_FNS = {
   "num_problems": get_num_problems,
   "num_characters": get_num_characters,
+  "num_self_contained_problems": get_num_self_contained_problems,
   "avg_num_characters": get_avg_num_characters,
   "avg_context_length": get_avg_context_length,
   "avg_testimonies": get_avg_testimonies,
