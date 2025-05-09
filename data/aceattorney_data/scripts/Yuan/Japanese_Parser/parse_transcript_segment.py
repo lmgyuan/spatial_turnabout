@@ -36,12 +36,12 @@ import codecs
 # --- Configuration ---
 RAW_HTML_DIR = os.path.join("data", "aceattorney_data", "generated", "raw")
 OUTPUT_DIR = os.path.join("data", "aceattorney_data", "generated", "japanese_parsed") # Or a different output dir if needed
-OUTPUT_FILENAME = "3-2_The_Stolen_Turnabout.json"
+OUTPUT_FILENAME = "3-4_Turnabout_Beginnings.json"
 
 # Files to process
-FILE_RANGE_START = 118
-FILE_RANGE_END = 134
-currentChapter = "盗まれた逆転"
+FILE_RANGE_START = 153
+FILE_RANGE_END = 158
+currentChapter = "始まりの逆転"
 
 # Regex patterns
 CHARACTER_PATTERN = re.compile(r"^(.*?)：") # Matches "成：" -> "成"
@@ -91,6 +91,7 @@ def main():
 
         if not os.path.exists(filepath):
             # Try without .html suffix if the first attempt failed (less likely now)
+            print(f"Warning: File not found, trying without .html suffix: {filename}")
             filename = f"word{i:03d}.htm"
             filepath = os.path.join(RAW_HTML_DIR, filename)
             if not os.path.exists(filepath):

@@ -11,8 +11,8 @@ ENGLISH_EVIDENCE_FILE = os.path.join("data", "aceattorney_data", "generated", "o
 ENGLISH_CHARACTERS_FILE = os.path.join("data", "aceattorney_data", "generated", "characters_parsed", "List_of_Profiles_in_Phoenix_Wright_Ace_Attorney.json")
 
 # Files to process (adjust range if needed)
-FILE_RANGE_START = 1
-FILE_RANGE_END = 46 # Assuming word001.htm.html to word046.htm.html
+FILE_RANGE_START = 113
+FILE_RANGE_END = 184 # Assuming word001.htm.html to word046.htm.html
 
 # Regex patterns
 EVIDENCE_PATTERN = re.compile(r"証拠品<<(.+?)>>") # Extracts name inside << >> after 証拠品
