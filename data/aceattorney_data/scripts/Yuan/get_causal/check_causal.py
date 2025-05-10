@@ -4,6 +4,9 @@ import time
 from openai import OpenAI
 from tqdm import tqdm
 import argparse
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- Configuration ---
 INPUT_DIR = "data/aceattorney_data/final"
@@ -11,7 +14,7 @@ OUTPUT_DIR = "stats/causal/updated_cases"
 MODEL = "gpt-4o"
 
 # Initialize OpenAI client
-client = OpenAI()  # Uses API key from OPENAI_API_KEY environment variable
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))  # Explicitly use the environment variable
 
 def check_causal_relationship(proposition):
     """
