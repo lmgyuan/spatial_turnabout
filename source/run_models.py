@@ -20,6 +20,8 @@ def parse_arguments():
     parser.add_argument('-a', '--all', action='store_true', help='Evaluate all existing models')
     return parser
 
+# OS operations
+
 def get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA):
     output_dir = f'../output/{MODEL.split("/")[-1]}_prompt_{PROMPT}'
     if CONTEXT is not None:
@@ -63,6 +65,8 @@ def get_fnames(data_dir, output_dir, CASE, eval=False, verbose=True):
 
     if verbose:print(f"<get_fnames> Running {len(fnames)} new cases")
     return fnames
+
+# Prompt builders
 
 def build_prompt_prefix_suffix(prompt_arg):
     with open("prompts/" + prompt_arg + ".json", 'r') as file:
@@ -210,6 +214,8 @@ def build_prompt(
         prompt += f"Evidences:\n{''.join(evidences)}\nTestimonies:\n{''.join(testimonies)}\n"
         prompts.append(PROMPT_PREFIX + prompt + PROMPT_SUFFIX)
     return prompts
+
+# Model runners
 
 def get_json_answer(multiline_string):
     lines = multiline_string.splitlines()
@@ -468,6 +474,8 @@ def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output
     
     batch_job_id = submit_batch_job(jsonl_path, client, output_dir)
     return batch_job_id
+
+# Main loop
 
 def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir):
     error_count = 0
