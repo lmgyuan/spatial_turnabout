@@ -21,7 +21,7 @@ os.makedirs(CHAT_HISTORY_DIR, exist_ok=True)
 def save_chat_history(turn_idx, chat_history):
     """Save the chat history for a turn to a file."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"turn_{turn_idx}_{timestamp}.json"
+    filename = f"1-2-2_turn_{turn_idx}_{timestamp}.json"
     path = os.path.join(CHAT_HISTORY_DIR, filename)
     try:
         with open(path, "w", encoding="utf-8") as f:

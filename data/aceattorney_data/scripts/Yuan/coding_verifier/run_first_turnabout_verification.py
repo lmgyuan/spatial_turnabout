@@ -12,7 +12,7 @@ if not os.environ.get("OPENAI_API_KEY"):
     exit(1)
 
 # Verify that the required files exist
-case_file = "data/aceattorney_data/final/1-1-1_The_First_Turnabout.json"
+case_file = "data/aceattorney_data/final/1-2-2_Turnabout_Sisters.json"
 verifier_file = "data/aceattorney_data/scripts/Yuan/coding_verifier/verifier_prompt.txt"
 
 if not os.path.exists(case_file):
