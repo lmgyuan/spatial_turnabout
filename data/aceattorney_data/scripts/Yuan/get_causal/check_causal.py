@@ -18,7 +18,7 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))  # Explicitly use the 
 
 def check_causal_relationship(proposition):
     """
-    Ask GPT-4o if a proposition contains a causal relationship
+    Ask GPT-4o if a proposition contains a causal relationship, using a schema to restrict output to 'Yes' or 'No'.
     
     Args:
         proposition: The proposition text to analyze
@@ -26,28 +26,61 @@ def check_causal_relationship(proposition):
     Returns:
         bool: True if the proposition contains a causal relationship, False otherwise
     """
+    # Define the schema to restrict output to 'Yes' or 'No'
+    causal_schema = {
+        "name": "causal_rater_schema",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "answer": {
+                    "type": "string",
+                    "description": "Does the proposition involve a causal relationship? Only 'Yes' or 'No' are allowed.",
+                    "enum": ["Yes", "No"]
+                }
+            },
+            "required": ["answer"],
+            "additionalProperties": False
+        }
+    }
+
     try:
-        # Construct the prompt
-        prompt = f"I have a proposition: \"{proposition}\"\nDoes this proposition involve causal relationship? Answer only with 'Yes' or 'No'."
-        
-        # Make API call to OpenAI
+        prompt = (
+            f"I have a proposition: \"{proposition}\"\n"
+            "Does this proposition involve a causal relationship? "
+            "Answer only with 'Yes' or 'No'."
+        )
+
         response = client.chat.completions.create(
             model=MODEL,
             messages=[
-                {"role": "system", "content": "You analyze propositions to determine if they involve causal relationships. Causal relationships show how one event, action, or state leads to or causes another. Keywords like 'because', 'therefore', 'as a result', 'due to', 'leads to', 'causes', etc. often indicate causality."},
+                {
+                    "role": "system",
+                    "content": (
+                        "You analyze propositions to determine if they involve causal relationships. "
+                        "Respond strictly with the schema: only 'Yes' or 'No' for the answer."
+                    )
+                },
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.1,  # Lower temperature for more deterministic outputs
-            max_tokens=10     # We only need a short response
+            temperature=0.1,
+            max_tokens=10,
+            response_format={"type": "json_object", "schema": causal_schema["schema"]}
         )
-        
-        # Extract and process the response
-        answer = response.choices[0].message.content.strip().lower()
-        return "yes" in answer
-        
+
+        # Parse the JSON response
+        import json as _json
+        content = response.choices[0].message.content
+        try:
+            data = _json.loads(content)
+            answer = data.get("answer", "").strip().lower()
+        except Exception:
+            # Fallback: try to extract answer from raw content
+            answer = content.strip().lower()
+        return answer == "yes"
+
     except Exception as e:
         print(f"Error checking causal relationship: {e}")
-        # Wait a bit in case of rate limiting
         time.sleep(2)
         return False
 
@@ -87,7 +120,8 @@ def process_json_file(file_path, dry_run=False):
         # Process each step in the reasoning
         for reasoning_step in turn["reasoning"]:
             # Skip reasoning steps without a proposition
-            if "Prop" not in reasoning_step:
+            reasoning_step = reasoning_step.strip()
+            if not reasoning_step.lower().startswith("prop"):
                 continue
             
             stats["props_processed"] += 1
