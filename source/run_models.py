@@ -291,23 +291,14 @@ def run_model(prompts, client, client_name):
 
     return answer_jsons, cots, has_error
 
-def load_model(model):
-    if any(m_name in model for m_name in ["llama", "deepseek-R1-70b", "deepseek-R1-32b", "deepseek-R1-8b"]) or \
-    "/" in model:  # a huggingface model
+def load_model(model, config_path="models.json"):
+    with open(config_path, 'r') as file:
+        config = json.load(file)
+    model = config.get(model, model)
+    if "/" in model:  # a huggingface model
         from kani import Kani
         from kani.engines.huggingface import HuggingEngine
         import torch
-
-        if model == "llama-3.1-70b":
-            model = "meta-llama/Llama-3.1-70B-Instruct"
-        elif model == "llama-3.1-8b":
-            model = "meta-llama/Llama-3.1-8B-Instruct"
-        elif model == "deepseek-R1-70b":
-            model = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"
-        elif model == "deepseek-R1-32b":
-            model = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
-        elif model == "deepseek-R1-8b":
-            model = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
 
         torch.cuda.empty_cache()
         engine = HuggingEngine(
@@ -329,18 +320,6 @@ def load_model(model):
 
         if any(m_name in model for m_name in ["gpt", "o3", "o4"]):
             model_key = "openai"
-            if model == "gpt-4o":
-                model = "gpt-4o-2024-08-06"
-            elif model == "gpt-4o-mini":
-                model = "gpt-4o-2024-07-18"
-            elif model == "o3-mini":
-                model = "o3-mini-2025-01-31"
-            elif model == "o4-mini":
-                model = "o4-mini-2025-04-16"
-            elif model == "gpt-4.1":
-                model = "gpt-4.1-2025-04-14"
-            elif model == "gpt-4.1-mini":
-                model = "gpt-4.1-mini-2025-04-14"
 
         elif "deepseek" in model:  # deepseek-reasoner (R1), deepseek-chat (V3)
             model_key = "deepseek"

@@ -13,6 +13,8 @@ from collections import defaultdict
 
 from run_models import get_output_dir, get_fnames, parse_arguments
 
+# Parsing functions
+
 def parse_pred(caseid, output_dir):
     pred_path = os.path.join(output_dir, caseid.replace(".json", ".jsonl"))
     pred = []
@@ -153,6 +155,8 @@ def parse_gold(caseid, data_dir):
         raise Exception(f"<parse_gold> {caseid}: {traceback.format_exc()}")
     return gold_indices, gold_names, gold_metadata
 
+# Stats functions
+
 def init_correct(data_dir, output_dir):
     categories = []
     reasoning_steps = []
@@ -273,6 +277,8 @@ def calculate_accuracy(correct_dict):
         for label, stats in sorted(correct_dict.items())
         if stats["total"] > 0
     }
+
+# Eval functions
 
 def evaluate(
     output_dir, 
@@ -606,27 +612,6 @@ def check_status(output_dir):
 
     return False
 
-def find_output_dir(args):
-    MODEL = args.model
-    PROMPT = args.prompt
-    CASE = args.case if args.case else "ALL"
-    CONTEXT = args.context if args.context else None
-    NO_DESCRIPTION = args.no_description
-    DATA = args.data
-
-    output_dir = get_output_dir(
-        MODEL, 
-        PROMPT, 
-        CONTEXT, 
-        CASE, 
-        NO_DESCRIPTION,
-        DATA
-    ) 
-    if not os.path.exists(output_dir):
-        raise ValueError(f"Output directory {output_dir} does not exist")
-
-    return output_dir
-
 def evaluate_single_run(output_dir, data_dir, MODEL, CASE="ALL"):
     print(f"Evaluating {MODEL} with prompt {output_dir.split('_')[2]}...")
     caseids = get_fnames(data_dir, output_dir, CASE, eval=True)
@@ -671,6 +656,29 @@ def evaluate_all(data_dir, output_root_dir):
     for output_dir in tqdm(output_dirs, total=len(output_dirs), desc="Evaluating all models"):
         MODEL = os.path.basename(output_dir).split("_")[0]
         evaluate_single_run(output_dir, data_dir, MODEL, "ALL")
+
+# OS related functions
+
+def find_output_dir(args):
+    MODEL = args.model
+    PROMPT = args.prompt
+    CASE = args.case if args.case else "ALL"
+    CONTEXT = args.context if args.context else None
+    NO_DESCRIPTION = args.no_description
+    DATA = args.data
+
+    output_dir = get_output_dir(
+        MODEL, 
+        PROMPT, 
+        CONTEXT, 
+        CASE, 
+        NO_DESCRIPTION,
+        DATA
+    ) 
+    if not os.path.exists(output_dir):
+        raise ValueError(f"Output directory {output_dir} does not exist")
+
+    return output_dir
 
 if __name__ == "__main__":
     parser = parse_arguments()
