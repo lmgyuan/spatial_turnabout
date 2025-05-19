@@ -4,12 +4,18 @@ import math
 from collections import defaultdict
 
 MODELS = [
+  "deepseek-chat",
   "deepseek-R1-8b",
   "deepseek-R1-32b",
   "deepseek-R1-70b",
+  "deepseek-reasoner",
+  "gpt-4.1",
   "gpt-4.1-mini",
   "llama-3.1-8b",
   "llama-3.1-70b",
+  "o3-mini",
+  "o4-mini",
+  "QwQ-32B"
 ]
 
 def wilson_score(total, n_correct, z=1.0):
