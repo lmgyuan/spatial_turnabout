@@ -34,18 +34,24 @@ The output a model is a contradicting pair of evidence and a testimony. While mo
 
 ## Evaluation
 
-To use an LLM with a prompt to make inference on the dataset, go to `/source` and run
+For a complete explanation on how to evaluate the models, see [this README](source/README.md).
 
-> python run_models.py --model MODEL --prompt PROMPT --case CASE --context CONTEXT
+In short, to use an LLM with a prompt to make inference on the dataset, go to `/source` and run
 
-where `MODEL` is the name of a HuggingFace model such as `deepseek-ai/DeepSeek-R1`. PROMPT is the ID of a prompt stored in `/source/prompt`. CASE is "ALL" to run all cases, a case ID like 1-2-2 to run a particular case, or 1-2-2+ to run all cases including and after this one. CONTEXT is ...
+> python run_models.py --model MODEL --prompt PROMPT --context CONTEXT
+
+*   `MODEL` is the name of a HuggingFace model such as `deepseek-ai/DeepSeek-R1` or an API model such as `deepseek-reasoner` or `gpt-4.1`. You can also customize acronyms in `/source/model_names.json`. 
+
+*   `PROMPT` is the name of a prompt stored in `/source/prompts`. 
+
+*   `CONTEXT` is either left blank, or `full` to provide the full context, or `sum` to provide a context summary.
 
 Running this command will produce `/output/MODEL_PROMPT`, storing models' output.
 
 To evaluate said output, run
-> python evaluate.py --model MODEL --prompt PROMPT --case CASE --context CONTEXT
+> python evaluate.py --model MODEL --prompt PROMPT --context CONTEXT
 
-This will create a `report.json` in the same output folder. 
+This will create a `MODEL_PROMPT_report.json` in `/eval`. 
 
 ## License
 Following the source of our data, [fandom.com](https://www.fandom.com/licensing), our resources are licensed under Creative Commons Attribution-Share Alike License 3.0 (Unported) (CC BY-SA). 
