@@ -197,6 +197,7 @@ STAT_FNS = {
   "num_self_contained_problems": get_num_self_contained_problems,
   "avg_num_characters": get_avg_num_characters,
   "avg_context_length": get_avg_context_length,
+  "avg_context_tokens": get_avg_context_tokens,
   "avg_testimonies": get_avg_testimonies,
   "max_testimonies": get_max_testimonies,
   "avg_evidences": get_avg_evidences,
