@@ -1,5 +1,7 @@
 # Evaluating on TurnaboutLLM
 
+NOTE: To evaluate the dataset, put the other `data/` dir in the same root dir as the current dir to enable correct path matching.
+
 There are two simple steps to a complete model evaluation run. The first step is to use `run_models.py` to run the model to get the outputs. The second step is to use `evaluate.py` to evaluate the outputs and summarize the results.
 
 ## Run models
