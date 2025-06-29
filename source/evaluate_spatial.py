@@ -133,9 +133,9 @@ def parse_pred_openai(caseid, input_data, output_data, output_dir):
     
     return pred, reasoning
 
-def parse_gold(caseid, data_dir):
+def parse_gold(caseid, data_dir, label_filter=None):
     """
-    Return a list of ground truth turns
+    Return a list of ground truth turns, optionally filtered by label
     """
     gold_indices = []
     gold_names = []
@@ -143,7 +143,7 @@ def parse_gold(caseid, data_dir):
         "turns": []
     }
     try:
-        with open(os.path.join(data_dir, caseid), 'r') as f:
+        with open(os.path.join(data_dir, caseid), 'r', encoding='utf-8') as f:
             data = json.load(f)
             evidences = [evidence['name'] for evidence in data.get('evidences', [])]
         characters = [character['name'] for character in data.get('characters', [])]
@@ -158,6 +158,20 @@ def parse_gold(caseid, data_dir):
 
             if turn["noPresent"]:
                 continue
+                
+            # Apply label filtering at turn level (same logic as run_models_spatial.py)
+            if label_filter is not None:
+                turn_labels = turn.get("labels", [])
+                has_label = False
+                if isinstance(turn_labels, list) and label_filter in turn_labels:
+                    has_label = True
+                elif isinstance(turn_labels, str) and turn_labels == label_filter:
+                    has_label = True
+                
+                # Skip this turn if it doesn't have the required label
+                if not has_label:
+                    continue
+                    
             # Parse testimony metadata
             n_testimonies = len(turn['testimonies'])
             n_action_space = n_evidences * n_testimonies
@@ -192,7 +206,7 @@ def init_correct(data_dir, output_dir):
     caseids = get_fnames(data_dir, output_dir, "ALL", eval=True, verbose=False)
 
     for caseid in caseids:
-        with open(os.path.join(data_dir, caseid), 'r') as f:
+        with open(os.path.join(data_dir, caseid), 'r', encoding='utf-8') as f:
             data = json.load(f)
             if "turns" not in data or data['turns'] == []:  # Skip if no turns
                 continue
@@ -517,7 +531,7 @@ def evaluate(
         json.dump(report_json, f, indent=2)
     print(f"<evaluate> Report saved to {os.path.join('../eval', f'{os.path.basename(output_dir)}_report.json')}")
 
-def run_eval_job(caseids, output_dir, data_dir, client):
+def run_eval_job(caseids, output_dir, data_dir, client, label_filter=None):
     preds = []
     reasonings = []
     golds_indices = []
@@ -552,7 +566,7 @@ def run_eval_job(caseids, output_dir, data_dir, client):
     skips = 0
     for i, caseid in enumerate(caseids):
         # Summarize ground truth data stats
-        gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir)
+        gold_indices, gold_names, gold_metadata = parse_gold(caseid, data_dir, label_filter)
 
         # Parse predictions
         if client is not None and type(client).__name__ == "OpenAI":
@@ -638,7 +652,7 @@ def check_status(output_dir):
 
     return False
 
-def evaluate_single_run(output_dir, data_dir, MODEL, CASE="ALL"):
+def evaluate_single_run(output_dir, data_dir, MODEL, CASE="ALL", label_filter=None):
     print(f"Evaluating {MODEL} with prompt {output_dir.split('_')[2]}...")
     caseids = get_fnames(data_dir, output_dir, CASE, eval=True)
 
@@ -660,7 +674,8 @@ def evaluate_single_run(output_dir, data_dir, MODEL, CASE="ALL"):
         caseids, 
         output_dir, 
         data_dir, 
-        client, 
+        client,
+        label_filter
     )
 
 def evaluate_all(data_dir, output_root_dir):
@@ -693,6 +708,7 @@ def find_output_dir(args):
     NO_DESCRIPTION = args.no_description
     DATA = args.data
     LABEL = args.label if hasattr(args, 'label') and args.label else None
+    REASONING = args.reasoning if hasattr(args, 'reasoning') and args.reasoning else 'none'
 
     output_dir = get_output_dir(
         MODEL, 
@@ -701,7 +717,8 @@ def find_output_dir(args):
         CASE, 
         NO_DESCRIPTION,
         DATA,
-        LABEL
+        LABEL,
+        REASONING
     ) 
     if not os.path.exists(output_dir):
         raise ValueError(f"Output directory {output_dir} does not exist")
@@ -726,4 +743,5 @@ if __name__ == "__main__":
         evaluate_all(data_dir, output_root_dir)
     else:
         output_dir = find_output_dir(args)  
-        evaluate_single_run(output_dir, data_dir, args.model, args.case)
+        label_filter = args.label if hasattr(args, 'label') and args.label else None
+        evaluate_single_run(output_dir, data_dir, args.model, args.case, label_filter)

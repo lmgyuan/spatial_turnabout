@@ -45,6 +45,8 @@ def parse_arguments():
     parser.add_argument('--no_description', action='store_true')
     parser.add_argument('--data', type=str, default='aceattorney', help='dataset name, aceattorney or danganronpa')
     parser.add_argument('--label', type=str, default=None, help='filter cases by label (e.g., spatial, temporal, etc.)')
+    parser.add_argument('--reasoning', type=str, default='none', choices=['none', 'full', 'facts', 'props'], 
+                        help='Include reasoning in prompts: none (default), full (all reasoning), facts (only facts), props (only propositions)')
 
     # Evaluation args
     parser.add_argument('-a', '--all', action='store_true', help='Evaluate all existing models')
@@ -52,7 +54,7 @@ def parse_arguments():
 
 # OS operations
 
-def get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA, LABEL):
+def get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA, LABEL, REASONING):
     output_dir = f'../output_spatial/{MODEL.split("/")[-1]}_prompt_{PROMPT}'
     if CONTEXT is not None:
         output_dir += f"_context_{CONTEXT}"
@@ -64,6 +66,8 @@ def get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA, LABEL):
         output_dir += f"_data_{DATA}"
     if LABEL is not None:
         output_dir += f"_label_{LABEL}"
+    if REASONING != 'none':
+        output_dir += f"_reasoning_{REASONING}"
     return output_dir
 
 def get_fnames(data_dir, output_dir, CASE, eval=False, verbose=True):
@@ -158,7 +162,8 @@ def parse_json(file_path, label_filter=None):
                 'evidences': evidences,
                 'testimonies': testimonies,
                 'newContext': re.sub(r'\n+', ' ', turn['newContext']),
-                'summarizedContext': turn.get('summarizedContext', "")
+                'summarizedContext': turn.get('summarizedContext', ""),
+                'reasoning': turn.get('reasoning', [])  # Extract reasoning, default to empty list
             }
             turns.append(turn_dict)
         return turns, prev_context
@@ -185,7 +190,8 @@ def build_prompt(
     PROMPT_SUFFIX, 
     CONTEXT, 
     NO_DESCRIPTION, 
-    MODEL
+    MODEL,
+    REASONING
 ):
     prompts = []
     context_sofar = ""
@@ -257,8 +263,25 @@ def build_prompt(
             testimony_counter += 1
             testimonies.append(testimony_string)
         
+        # Add reasoning if requested
+        reasoning_section = ""
+        if REASONING != 'none' and turn['reasoning']:
+            reasoning_section = "Reasoning:\n"
+            reasoning_items = []
+            
+            if REASONING == 'full':
+                reasoning_items = turn['reasoning']
+            elif REASONING == 'facts':
+                reasoning_items = [item for item in turn['reasoning'] if item.startswith('Fact')]
+            elif REASONING == 'props':
+                reasoning_items = [item for item in turn['reasoning'] if item.startswith('Prop')]
+            
+            for i, item in enumerate(reasoning_items, 1):
+                reasoning_section += f"{i}. {item}\n"
+            reasoning_section += "\n"
+        
         # Build rest of the prompt
-        prompt += f"Evidences:\n{''.join(evidences)}\nTestimonies:\n{''.join(testimonies)}\n"
+        prompt += f"Evidences:\n{''.join(evidences)}\nTestimonies:\n{''.join(testimonies)}\n{reasoning_section}"
         prompts.append(PROMPT_PREFIX + prompt + PROMPT_SUFFIX)
     return prompts
 
@@ -312,10 +335,14 @@ def run_model(prompts, client, client_name):
                 try: 
                     cot = response.choices[0].message.reasoning_content
                     print(f"<run_model> COT returned for {client_name}")
-                    full_answer = cot + "\n\n" + full_answer
+                    if cot is not None:  # Only concatenate if COT is not None
+                        full_answer = cot + "\n\n" + full_answer
+                    else:
+                        cot = ""  # Set to empty string if None
                 except Exception as e:
                     print(f"<run_model> When trying to get COT for {client_name}: {e}")
                     print(f"<run_model> No COT for {client_name}")
+                    cot = ""
 
             else:
                 raise ValueError(f"<run_model> Unknown client: {client}")
@@ -341,8 +368,22 @@ def run_model(prompts, client, client_name):
 def load_model(model, config_path="models.json"):
     with open(config_path, 'r') as file:
         config = json.load(file)
+    
+    # Store original model key for type detection
+    original_model = model
+    
+    # Resolve model name from config
     model = config.get(model, model)
-    if "/" in model:  # a huggingface model
+    
+    # Check for API models first using the original model key (before checking for "/" which indicates HuggingFace)
+    is_api_model = False
+    
+    if any(m_name in original_model for m_name in ["gpt", "o3", "o4"]) or \
+       "deepseek" in original_model or \
+       "nebius" in original_model:
+        is_api_model = True
+    
+    if not is_api_model and "/" in model:  # a huggingface model
         from kani import Kani
         from kani.engines.huggingface import HuggingEngine
         import torch
@@ -363,13 +404,16 @@ def load_model(model, config_path="models.json"):
 
         load_dotenv("../.env")
 
-        model_key = model
+        model_key = original_model
 
-        if any(m_name in model for m_name in ["gpt", "o3", "o4"]):
+        if any(m_name in original_model for m_name in ["gpt", "o3", "o4"]):
             model_key = "openai"
 
-        elif "deepseek" in model:  # deepseek-reasoner (R1), deepseek-chat (V3)
+        elif "deepseek" in original_model:  # deepseek-reasoner (R1), deepseek-chat (V3)
             model_key = "deepseek"
+
+        elif "nebius" in original_model:  # nebius models
+            model_key = "nebius"
 
         auth = {
             "deepseek": {
@@ -379,6 +423,11 @@ def load_model(model, config_path="models.json"):
             },
             "openai": {
                 "api_key": os.getenv("OPENAI_API_KEY"),
+                "name": model
+            },
+            "nebius": {
+                "api_key": os.getenv("NEBIUS_API_KEY"),
+                "base_url": "https://api.studio.nebius.com/v1/",
                 "name": model
             }
         }
@@ -397,7 +446,7 @@ def load_model(model, config_path="models.json"):
 
     return client, name
 
-def create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None):
+def create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None):
     max_token_key = "max_tokens" if "gpt" in MODEL else "max_completion_tokens"
     max_token_val = 1000 if "gpt" in MODEL else 7000
     batch = []
@@ -408,7 +457,7 @@ def create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label
             skip_count += 1
             continue
         PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
-        prompts = build_prompt(turns, prev_context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL)
+        prompts = build_prompt(turns, prev_context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning)
         # print(prompts)
         for i, prompt in enumerate(prompts):
             request = {
@@ -455,9 +504,9 @@ def submit_batch_job(jsonl_path, client, output_dir):
 
     return batch_job_id
 
-def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output_dir, data_dir, label_filter=None):
+def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output_dir, data_dir, label_filter=None, reasoning=None):
     # Create batch
-    batch = create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter)
+    batch = create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning)
 
     jsonl_path = os.path.join(output_dir, "batchinput.jsonl")
     # If exists, run the incomplete batch job instead
@@ -503,12 +552,12 @@ def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output
 
 # Main loop
 
-def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, label_filter=None):
+def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, label_filter=None, reasoning=None):
     error_count = 0
     skip_count = 0
     for fname in fnames:
         # Parse and build prompt
-        if error_count > 5:
+        if error_count > 11:
             print(f"<run_job> Terminating due to {error_count}+ json parsing errors")
             break
 
@@ -518,7 +567,7 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
             skip_count += 1
             continue
         PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
-        prompts = build_prompt(turns, context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL)
+        prompts = build_prompt(turns, context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning)
 
         # Answer
         answer_jsons, cots, has_error = run_model(prompts, client, client_name)
@@ -556,6 +605,7 @@ if __name__ == "__main__":
     NO_DESCRIPTION = args.no_description
     DATA = args.data
     LABEL = args.label
+    REASONING = args.reasoning
 
     if DATA == 'aceattorney':
         data_dir = '../data/aceattorney_data/final'
@@ -565,7 +615,7 @@ if __name__ == "__main__":
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Make output dir
-    output_dir = get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA, LABEL)
+    output_dir = get_output_dir(MODEL, PROMPT, CONTEXT, CASE, NO_DESCRIPTION, DATA, LABEL, REASONING)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(os.path.join(output_dir, 'metadata.json'), 'w') as file:
@@ -577,6 +627,7 @@ if __name__ == "__main__":
             'no_description': NO_DESCRIPTION,
             'data': DATA,
             'label': LABEL if LABEL is not None else "none",
+            'reasoning': REASONING,
             'timestamp': timestamp
         }, file, indent=2)
     # Load model
@@ -587,6 +638,6 @@ if __name__ == "__main__":
 
     # Run cases
     if any(name in MODEL for name in ["o3", "o4", "gpt"]):
-        run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output_dir, data_dir, LABEL)
+        run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output_dir, data_dir, LABEL, REASONING)
     else:
-        run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, LABEL)
+        run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, LABEL, REASONING)
