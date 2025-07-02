@@ -22,7 +22,7 @@ USAGE EXAMPLES:
 - Run on all turns: python run_models_spatial.py -m gpt-4.1-mini -p base --context sum
 - Run on temporal turns: python run_models_spatial.py -m gpt-4.1-mini -p base --context sum --label temporal
 
-NOTE: Use evaluate.py with appropriate modifications to evaluate spatial results,
+NOTE: Use evaluate_spatial.py with appropriate modifications to evaluate spatial results,
       or copy results from ../output_spatial/ to ../output/ for standard evaluation.
 =============================================================================
 """
@@ -191,7 +191,11 @@ def build_prompt(
     CONTEXT, 
     NO_DESCRIPTION, 
     MODEL,
-    REASONING
+    REASONING,
+    PROMPT_ARG=None,
+    case_name=None,
+    label_filter=None,
+    data='aceattorney'
 ):
     prompts = []
     context_sofar = ""
@@ -282,7 +286,29 @@ def build_prompt(
         
         # Build rest of the prompt
         prompt += f"Evidences:\n{''.join(evidences)}\nTestimonies:\n{''.join(testimonies)}\n{reasoning_section}"
-        prompts.append(PROMPT_PREFIX + prompt + PROMPT_SUFFIX)
+        
+        # Enhance prompt with RAG if using RAG prompt
+        enhanced_prefix = PROMPT_PREFIX
+        if PROMPT_ARG and "rag" in PROMPT_ARG and "{dynamic_rules}" in PROMPT_PREFIX:
+            try:
+                from rag import enhance_prompt_with_rag, log_rules_usage
+                # Parse top_k from prompt name (e.g., rulesv3_rag_t10 -> top_k=10)
+                top_k = 5  # Default value
+                match = re.search(r'_t(\d+)', PROMPT_ARG)
+                if match:
+                    top_k = int(match.group(1))
+                enhanced_prefix, rules_metadata, used_top_k = enhance_prompt_with_rag(PROMPT_PREFIX, turn, top_k, return_rules_metadata=True)
+                
+                # Log rules usage
+                if case_name:
+                    turn_idx = prompts.__len__()  # Current turn index
+                    log_rules_usage(case_name, turn_idx, rules_metadata, used_top_k, MODEL, PROMPT_ARG, CONTEXT, label_filter, NO_DESCRIPTION, data, REASONING)
+            except ImportError:
+                print("[WARNING] RAG module not available, using original prompt")
+            except Exception as e:
+                print(f"[WARNING] RAG enhancement failed: {e}, using original prompt")
+        
+        prompts.append(enhanced_prefix + prompt + PROMPT_SUFFIX)
     return prompts
 
 # Model runners
@@ -327,7 +353,8 @@ def run_model(prompts, client, client_name):
                     {"role": "system", "content": "You are a helpful assistant"},
                     {"role": "user", "content": prompt},
                 ],
-                    stream=False
+                    stream=False,
+                    temperature=0.6
                 )
                 full_answer = response.choices[0].message.content
 
@@ -457,7 +484,8 @@ def create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label
             skip_count += 1
             continue
         PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
-        prompts = build_prompt(turns, prev_context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning)
+        prompts = build_prompt(turns, prev_context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT, 
+                              case_name=fname.split('.')[0], label_filter=label_filter, data=data_dir.split('/')[-2])
         # print(prompts)
         for i, prompt in enumerate(prompts):
             request = {
@@ -567,7 +595,8 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
             skip_count += 1
             continue
         PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
-        prompts = build_prompt(turns, context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning)
+        prompts = build_prompt(turns, context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT,
+                              case_name=fname.split('.')[0], label_filter=label_filter, data=data_dir.split('/')[-2])
 
         # Answer
         answer_jsons, cots, has_error = run_model(prompts, client, client_name)
