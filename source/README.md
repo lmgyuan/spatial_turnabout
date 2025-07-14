@@ -37,22 +37,22 @@ The benchmark categorizes reasoning tasks into multiple types:
 ### Basic Model Evaluation
 ```bash
 # Run a model on spatial reasoning tasks
-python run_models_spatial.py -m gpt-4.1 -p rulesv4_explicit --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
 
 # Run on temporal reasoning tasks  
-python run_models_spatial.py -m gpt-4.1 -p base --context sum --label temporal
+python run_models_spatial.py -m nebius-qwen-32b -p base --context sum --label temporal
 
 # Run on behavioral reasoning tasks
-python run_models_spatial.py -m gpt-4.1 -p cot_one_shot --context sum --label behavioral
+python run_models_spatial.py -m nebius-qwen3-32b -p cot_one_shot --context sum --label behavioral
 
 # Evaluate results
-python evaluate_spatial.py -m gpt-4.1 -p rulesv4_explicit --context sum --label spatial
+python evaluate_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
 ```
 
 ### Advanced Analysis
 ```bash
 # Run with different rule sets (primarily for spatial reasoning)
-python run_models_spatial.py -m gpt-4.1 -p rulesa_explicit --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesa_explicit --label spatial
 python run_models_spatial.py -m llama-3.1-70b -p rulesv3a_explicit --label physical
 
 # Compare multiple models across reasoning types
@@ -76,13 +76,26 @@ python evaluate_spatial.py --all --data aceattorney
 python run_models_spatial.py [OPTIONS]
 
 Options:
-  -m, --model TEXT          Model name (gpt-4.1, llama-3.1-70b, deepseek-R1-70b, etc.)
-  -p, --prompt TEXT         Prompt type (base, rulesv4_explicit, cot_one_shot, etc.)
+  -m, --model TEXT          Model name (nebius-llama3.3-70b, llama-3.1-70b, deepseek-R1-70b, etc.)
+  -p, --prompt TEXT         Prompt type (base, rulesv4_explicit, prop_generated_explicit, cot_one_shot, etc.)
   --context TEXT            Context strategy (full, sum, or none)
   --label TEXT              Reasoning type filter (spatial, temporal, behavioral, physical, numerical, causal)
   --case TEXT               Run specific case (e.g., "3-4-1") or range (e.g., "3-4-1+")
   --no_description          Exclude character/evidence descriptions
   --data TEXT               Dataset (aceattorney or danganronpa, default: aceattorney)
+  --reasoning TEXT          Include reasoning in prompts: none (default), full (all reasoning), facts (only facts), props (only propositions)
+```
+
+**Reasoning Parameter Examples:**
+```bash
+# Include all reasoning steps in prompts
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --reasoning full
+
+# Include only facts from reasoning
+python run_models_spatial.py -m nebius-qwen-32b -p base --context sum --reasoning facts
+
+# Include only propositions from reasoning  
+python run_models_spatial.py -m nebius-qwen3-32b -p base --context sum --reasoning props
 ```
 
 ### 2. **Advanced Evaluator** (`evaluate_spatial.py`)
@@ -104,6 +117,45 @@ Options:
 - **Auto-naming**: Generates output filenames automatically
 
 **Note:** Rule-based prompts are primarily designed for **spatial reasoning** tasks, but can be applied to other reasoning types as well.
+
+### 4. **Proposition Generator** (`source/prop_generator.py`)
+
+**Revolutionary Feature:**
+- **Dynamic proposition generation**: Automatically generates turn-specific spatial propositions for each case
+- **Context-aware reasoning**: Creates logical principles tailored to specific evidences and testimonies  
+- **LLM-powered extraction**: Uses the same evaluation model to generate propositions for reasoning
+- **Enhanced spatial logic**: Provides more nuanced rules than static general rules
+
+**How It Works:**
+1. **Analysis Phase**: For each turn, analyzes evidences, testimonies, and context
+2. **Generation Phase**: Uses LLM to generate turn-specific spatial propositions based on case elements
+3. **Integration Phase**: Incorporates generated propositions into the reasoning prompt
+4. **Application Phase**: Models apply these context-aware propositions to identify contradictions
+
+**Key Features:**
+- **Automatic activation**: Triggered when using prompts containing "prop_generated"
+- **Rich context integration**: Uses same format as main prompt (characters, evidences, testimonies)
+- **Comprehensive logging**: Saves all generated propositions with metadata for analysis
+- **Quality control**: Parses and validates generated propositions before use
+
+**Generated Proposition Examples:**
+```
+Prop 1: If something is blocked from view, it cannot be seen.
+Prop 2: If someone is stabbed to the left chest, her left pocket would be stabbed too.  
+Prop 3: If a person A goes to a location where person B is at, person B would have seen person A pass through.
+```
+
+**Usage:**
+```bash
+# Use dynamic proposition generation for spatial reasoning
+python run_models_spatial.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial
+
+# Compare with static rule-based approach
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
+```
+
+**Logging and Analysis:**
+The system automatically logs all generated propositions to `{output_dir}/props_log_{model}_{timestamp}.json` for detailed analysis of proposition quality and usage patterns.
 
 ## Spatial Reasoning Rule System
 
@@ -139,6 +191,7 @@ Based on **empirical analysis** of model usage patterns:
 | **Rule-based** | `rules.json`, `rulesv2.json`, etc. | Explicit spatial rules | Spatial reasoning tasks |
 | **Explicit** | `*_explicit.json` | Enhanced rule reference instructions | Spatial reasoning with detailed analysis |
 | **RAG-enabled** | `*_rag*.json` | Dynamic rule retrieval | Adaptive spatial reasoning |
+| **Proposition-based** | `prop_generation.json`, `prop_generated_explicit.json` | Dynamic proposition generation | Advanced spatial reasoning with context-aware rules |
 
 ### RAG (Retrieval-Augmented Generation) System
 
@@ -174,7 +227,7 @@ The `top_k` parameter (number of rules to retrieve) is **automatically parsed fr
 
 ```bash
 # Use RAG with 5 most relevant rules
-python run_models_spatial.py -m gpt-4.1 -p rulesv3_rag_t5 --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv3_rag_t5 --context sum --label spatial
 
 # Use RAG with 10 most relevant rules  
 python run_models_spatial.py -m llama-3.1-70b -p rulesv3_rag_t10 --context sum --label spatial
@@ -247,6 +300,7 @@ source/
 ├── run_models_spatial.py          # Enhanced model evaluation (all reasoning types)
 ├── evaluate_spatial.py            # Advanced result analysis (all reasoning types)
 ├── extract_rule_usage.py          # Rule usage analysis (spatial rules)
+├── prop_generator.py              # Dynamic proposition generation system
 ├── rag.py                         # RAG system for dynamic rule retrieval
 ├── prompts/                       # Prompt engineering
 │   ├── base.json                  # Basic prompts (all reasoning types)
@@ -254,6 +308,8 @@ source/
 │   ├── rules*.json               # Rule-based prompts (spatial focus)
 │   ├── *_explicit.json           # Enhanced explicit prompts (spatial focus)
 │   ├── *_rag*.json               # RAG-enabled prompts (spatial focus)
+│   ├── prop_generation.json      # Proposition generation prompt
+│   ├── prop_generated_explicit.json  # Proposition-enhanced explicit prompt
 │   └── ...
 ├── README.md                      # This documentation
 └── README_legacy.md               # Original documentation
@@ -272,6 +328,7 @@ Rule Files (Spatial Reasoning):
 │   ├── RuleTexta.txt             # 35 filtered (from RuleText.txt)
 │   ├── RuleText3a.txt            # 58 filtered (from RuleText3.txt)
 │   ├── RuleText4a.txt            # 39 filtered (from RuleText4.txt)
+│   ├── props_spatial.txt         # 82+ extracted spatial propositions
 │   └── *_rules_analysis.txt      # Generated rule usage analyses
 ```
 
@@ -320,11 +377,11 @@ Each case contains:
 ### 1. **Comprehensive Multi-Reasoning Evaluation**
 ```bash
 # Test across different reasoning types
-python run_models_spatial.py -m gpt-4.1 -p base --context sum --label spatial
-python run_models_spatial.py -m gpt-4.1 -p base --context sum --label temporal
-python run_models_spatial.py -m gpt-4.1 -p base --context sum --label behavioral
-python run_models_spatial.py -m gpt-4.1 -p base --context sum --label physical
-python run_models_spatial.py -m gpt-4.1 -p base --context sum --label numerical
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label temporal
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label behavioral
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label physical
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label numerical
 
 # Analyze and compare
 python evaluate_spatial.py --all --data aceattorney
@@ -333,13 +390,13 @@ python evaluate_spatial.py --all --data aceattorney
 ### 2. **Spatial Reasoning Rule Optimization** 
 ```bash
 # Test original vs. filtered spatial rules
-python run_models_spatial.py -m gpt-4.1 -p rulesv4_explicit --context sum --label spatial
-python run_models_spatial.py -m gpt-4.1 -p rulesv4a_explicit --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4a_explicit --context sum --label spatial
 
 # Compare spatial rule usage (run from source directory)
 cd source
-python extract_rule_usage.py -r ../Rules/RuleText4.txt -i ../output_spatial/gpt-4.1_prompt_rulesv4_explicit_*
-python extract_rule_usage.py -r ../Rules/RuleText4a.txt -i ../output_spatial/gpt-4.1_prompt_rulesv4a_explicit_*
+python extract_rule_usage.py -r ../Rules/RuleText4.txt -i ../output_spatial/nebius-llama3.3-70b_prompt_rulesv4_explicit_*
+python extract_rule_usage.py -r ../Rules/RuleText4a.txt -i ../output_spatial/nebius-llama3.3-70b_prompt_rulesv4a_explicit_*
 cd ..
 ```
 
@@ -359,25 +416,50 @@ python evaluate_spatial.py -m llama-3.1-70b -p cot_one_shot --context sum --labe
 ### 4. **RAG-Enhanced Spatial Reasoning Analysis**
 ```bash
 # Compare different RAG configurations
-python run_models_spatial.py -m gpt-4.1 -p rulesv3_rag_t5 --context sum --label spatial
-python run_models_spatial.py -m gpt-4.1 -p rulesv3_rag_t10 --context sum --label spatial
-python run_models_spatial.py -m gpt-4.1 -p rulesv3_rag_t15 --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv3_rag_t5 --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv3_rag_t10 --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv3_rag_t15 --context sum --label spatial
 
 # Compare RAG vs. non-RAG approaches
-python run_models_spatial.py -m gpt-4.1 -p rulesv3_explicit --context sum --label spatial
-python run_models_spatial.py -m gpt-4.1 -p rulesv3_rag_t10 --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv3_explicit --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv3_rag_t10 --context sum --label spatial
 
 # Evaluate RAG performance
-python evaluate_spatial.py -m gpt-4.1 -p rulesv3_rag_t10 --context sum --label spatial
+python evaluate_spatial.py -m nebius-llama3.3-70b -p rulesv3_rag_t10 --context sum --label spatial
 
 # Analyze which rules were selected by RAG (check ../Rules/ for log files)
-ls ../Rules/rag_rules_used_gpt-4.1_prompt_rulesv3_rag_t10_*.txt
+ls ../Rules/rag_rules_used_nebius-llama3.3-70b_prompt_rulesv3_rag_t10_*.txt
+```
+
+### 5. **Dynamic Proposition Generation Analysis**
+```bash
+# Test proposition-enhanced reasoning across different models
+python run_models_spatial.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial
+python run_models_spatial.py -m nebius-qwen-32b -p prop_generated_explicit --context sum --label spatial  
+python run_models_spatial.py -m nebius-qwen3-32b -p prop_generated_explicit --context sum --label spatial
+
+# Compare against static rule-based approaches
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label spatial
+
+# Evaluate proposition generation performance
+python evaluate_spatial.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial
+python evaluate_spatial.py -m nebius-qwen-32b -p prop_generated_explicit --context sum --label spatial
+
+# Analyze generated propositions (check output directory for proposition logs)
+ls ../output_spatial/nebius-llama3.3-70b_prompt_prop_generated_explicit_*/props_log_*.json
+ls ../output_spatial/nebius-qwen-32b_prompt_prop_generated_explicit_*/props_log_*.json
+
+# Compare proposition generation with different reasoning parameter settings
+python run_models_spatial.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial --reasoning full
+python run_models_spatial.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial --reasoning props
 ```
 
 ## Advanced Configuration
 
 ### Model Configuration
 The system supports various LLM providers through flexible configuration:
+- **Nebius models**: nebius-llama3.3-70b, nebius-qwen-32b, nebius-qwen3-32b, etc.
 - **OpenAI models**: GPT-4.1, O3/O4-mini, etc.
 - **DeepSeek models**: DeepSeek-R1 variants, DeepSeek-Chat, etc.  
 - **Open source models**: Llama-3.1, Qwen-2.5, etc.

@@ -35,6 +35,9 @@ import argparse
 import traceback
 from datetime import datetime
 
+# Global variable for prop generator
+current_prop_generator = None
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
     # General args
@@ -199,7 +202,21 @@ def build_prompt(
 ):
     prompts = []
     context_sofar = ""
-    for turn in turns:
+    
+    # Use global prop generator if needed (ONLY for prop_generated prompts)
+    prop_generator = None
+    if PROMPT_ARG and "prop_generated" in PROMPT_ARG:
+        global current_prop_generator
+        if current_prop_generator is None:
+            try:
+                from prop_generator import PropGenerator
+                current_prop_generator = PropGenerator()
+                print(f"[INFO] Prop generation mode activated for prompt: {PROMPT_ARG}")
+            except ImportError:
+                print(f"[WARNING] PropGenerator not available, falling back to standard prompt")
+        prop_generator = current_prop_generator
+    
+    for turn_idx, turn in enumerate(turns):
         context_is_added = False
         new_context = turn['newContext']  
         new_context = re.sub(r'\n+', ' ', new_context)  # Remove newlines
@@ -287,9 +304,30 @@ def build_prompt(
         # Build rest of the prompt
         prompt += f"Evidences:\n{''.join(evidences)}\nTestimonies:\n{''.join(testimonies)}\n{reasoning_section}"
         
-        # Enhance prompt with RAG if using RAG prompt
+        # Generate turn-specific props ONLY if prop_generated prompt is used
         enhanced_prefix = PROMPT_PREFIX
-        if PROMPT_ARG and "rag" in PROMPT_ARG and "{dynamic_rules}" in PROMPT_PREFIX:
+        if prop_generator is not None:
+            try:
+                # Load model for prop generation (same as main model)
+                client, client_name = load_model(MODEL)
+                
+                generated_props = prop_generator.generate_turn_props(
+                    turn, client, client_name, case_name, turn_idx
+                )
+                props_text = "\n".join([f"Prop {i+1}: {prop}" 
+                                      for i, prop in enumerate(generated_props)])
+                enhanced_prefix = PROMPT_PREFIX.replace("{generated_props}", props_text)
+                
+                print(f"[INFO] Generated {len(generated_props)} props for {case_name} turn {turn_idx} (Total logged: {len(prop_generator.props_log)})")
+                print(f"[DEBUG] Props for turn {turn_idx}: {generated_props[0][:50]}...")  # Show first prop snippet for verification
+                
+            except Exception as e:
+                print(f"[WARNING] Prop generation failed for turn {turn_idx}: {e}")
+                enhanced_prefix = PROMPT_PREFIX.replace("{generated_props}", 
+                                                       "No specific propositions generated.")
+        
+        # Enhance prompt with RAG if using RAG prompt
+        elif PROMPT_ARG and "rag" in PROMPT_ARG and "{dynamic_rules}" in PROMPT_PREFIX:
             try:
                 from rag import enhance_prompt_with_rag, log_rules_usage
                 # Parse top_k from prompt name (e.g., rulesv3_rag_t10 -> top_k=10)
@@ -308,7 +346,13 @@ def build_prompt(
             except Exception as e:
                 print(f"[WARNING] RAG enhancement failed: {e}, using original prompt")
         
+        # Debug: Show when using props for a turn
+        if prop_generator is not None and "Prop 1:" in enhanced_prefix:
+            evidence_names = [ev.get('name', 'Unknown') for ev in turn.get('evidences', [])]
+            print(f"[DEBUG] Using generated props in prompt for turn {turn_idx}, evidences: {evidence_names[:3]}...")
+        
         prompts.append(enhanced_prefix + prompt + PROMPT_SUFFIX)
+    
     return prompts
 
 # Model runners
@@ -340,7 +384,7 @@ def run_model(prompts, client, client_name):
             cot = ""
             if type(client).__name__ == "Kani":  # Use kani api
                 async def run_async_model():
-                    response = await client.chat_round_str(prompt, temperature=0.6)
+                    response = await client.chat_round_str(prompt, temperature=0)
                     #print(response)
                     return response
 
@@ -354,7 +398,7 @@ def run_model(prompts, client, client_name):
                     {"role": "user", "content": prompt},
                 ],
                     stream=False,
-                    temperature=0.6
+                    temperature=0
                 )
                 full_answer = response.choices[0].message.content
 
@@ -581,8 +625,15 @@ def run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output
 # Main loop
 
 def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, label_filter=None, reasoning=None):
+    global current_prop_generator
+    
+    # Reset prop generator for new run
+    if PROMPT and "prop_generated" in PROMPT:
+        current_prop_generator = None
+    
     error_count = 0
     skip_count = 0
+    
     for fname in fnames:
         # Parse and build prompt
         if error_count > 11:
@@ -597,6 +648,8 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
         PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
         prompts = build_prompt(turns, context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT,
                               case_name=fname.split('.')[0], label_filter=label_filter, data=data_dir.split('/')[-2])
+        
+
 
         # Answer
         answer_jsons, cots, has_error = run_model(prompts, client, client_name)
@@ -623,6 +676,16 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
             file.write(json.dumps(json_response, indent=2))
     
     print(f"Skipped {skip_count} cases")
+    
+    # Save props log if prop generation was used
+    try:
+        if 'current_prop_generator' in globals() and current_prop_generator is not None:
+            print(f"[INFO] Saving props log with {len(current_prop_generator.props_log)} total turns")
+            current_prop_generator.save_props_log(output_dir, MODEL.split("/")[-1], PROMPT)
+        elif PROMPT and "prop_generated" in PROMPT:
+            print(f"[WARNING] Prop generation was expected but no props were logged")
+    except Exception as e:
+        print(f"[WARNING] Failed to save props log: {e}")
 
 if __name__ == "__main__":
     parser = parse_arguments()
