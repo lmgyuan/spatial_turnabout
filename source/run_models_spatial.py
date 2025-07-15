@@ -398,7 +398,8 @@ def run_model(prompts, client, client_name):
                     {"role": "user", "content": prompt},
                 ],
                     stream=False,
-                    temperature=0
+                    temperature=0,
+                    seed=42  # Add deterministic seed for consistency
                 )
                 full_answer = response.choices[0].message.content
 
