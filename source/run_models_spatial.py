@@ -198,7 +198,8 @@ def build_prompt(
     PROMPT_ARG=None,
     case_name=None,
     label_filter=None,
-    data='aceattorney'
+    data='aceattorney',
+    output_dir=None
 ):
     prompts = []
     context_sofar = ""
@@ -212,6 +213,11 @@ def build_prompt(
                 from prop_generator import PropGenerator
                 current_prop_generator = PropGenerator()
                 print(f"[INFO] Prop generation mode activated for prompt: {PROMPT_ARG}")
+                
+                # Initialize cache if we have output_dir
+                if output_dir:
+                    model_name = MODEL.split("/")[-1]
+                    current_prop_generator.set_cache_file(output_dir, model_name, PROMPT_ARG)
             except ImportError:
                 print(f"[WARNING] PropGenerator not available, falling back to standard prompt")
         prop_generator = current_prop_generator
@@ -648,7 +654,7 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
             continue
         PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
         prompts = build_prompt(turns, context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT,
-                              case_name=fname.split('.')[0], label_filter=label_filter, data=data_dir.split('/')[-2])
+                              case_name=fname.split('.')[0], label_filter=label_filter, data=data_dir.split('/')[-2], output_dir=output_dir)
         
 
 
@@ -681,7 +687,7 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
     # Save props log if prop generation was used
     try:
         if 'current_prop_generator' in globals() and current_prop_generator is not None:
-            print(f"[INFO] Saving props log with {len(current_prop_generator.props_log)} total turns")
+            print(f"[INFO] Saving props log with {len(current_prop_generator.props_log)} turns from this run")
             current_prop_generator.save_props_log(output_dir, MODEL.split("/")[-1], PROMPT)
         elif PROMPT and "prop_generated" in PROMPT:
             print(f"[WARNING] Prop generation was expected but no props were logged")

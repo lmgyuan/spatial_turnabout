@@ -12,13 +12,79 @@ class PropGenerator:
             self.prompt_template = json.load(f)
         
         self.props_log = []  # Store generated props for logging
+        self.cache_file = None  # Will be set when output_dir is known
+        self.props_cache = {}  # In-memory cache
+    
+    def set_cache_file(self, output_dir, model_name, prompt_name):
+        """Set the cache file path and load existing cache"""
+        self.cache_file = os.path.join(output_dir, f"props_cache_{model_name}_{prompt_name}.json")
+        self.load_cache()
+    
+    def load_cache(self):
+        """Load existing props cache from file"""
+        if self.cache_file and os.path.exists(self.cache_file):
+            try:
+                with open(self.cache_file, 'r', encoding='utf-8') as f:
+                    self.props_cache = json.load(f)
+                print(f"[CACHE] Loaded {len(self.props_cache)} cached prop entries")
+            except Exception as e:
+                print(f"[CACHE] Failed to load cache: {e}")
+                self.props_cache = {}
+        else:
+            self.props_cache = {}
+    
+    def save_cache(self):
+        """Save props cache to file"""
+        if self.cache_file:
+            try:
+                os.makedirs(os.path.dirname(self.cache_file), exist_ok=True)
+                with open(self.cache_file, 'w', encoding='utf-8') as f:
+                    json.dump(self.props_cache, f, indent=2, ensure_ascii=False)
+            except Exception as e:
+                print(f"[CACHE] Failed to save cache: {e}")
+    
+    def get_cache_key(self, case_name, turn_idx):
+        """Generate cache key for a specific case and turn"""
+        return f"{case_name}_turn_{turn_idx}"
+    
+    def get_cached_props(self, case_name, turn_idx):
+        """Get cached props for a specific case and turn"""
+        cache_key = self.get_cache_key(case_name, turn_idx)
+        if cache_key in self.props_cache:
+            cached_entry = self.props_cache[cache_key]
+            print(f"[CACHE HIT] Using cached props for {cache_key} (generated {cached_entry.get('generated_at', 'unknown')})")
+            return cached_entry.get('props', [])
+        return None
+    
+    def cache_props(self, case_name, turn_idx, props):
+        """Cache props for a specific case and turn"""
+        cache_key = self.get_cache_key(case_name, turn_idx)
+        self.props_cache[cache_key] = {
+            'props': props,
+            'generated_at': datetime.now().isoformat(),
+            'case_name': case_name,
+            'turn_idx': turn_idx
+        }
+        print(f"[CACHE] Cached {len(props)} props for {cache_key}")
+        # Save cache immediately to persist across runs
+        self.save_cache()
     
     def generate_turn_props(self, turn_data, client, client_name, case_name=None, turn_idx=None):
-        """Generate turn-specific propositions"""
+        """Generate turn-specific propositions with caching"""
         # Debug: Show which turn we're processing
         evidence_names = [ev.get('name', 'Unknown') for ev in turn_data.get('evidences', [])]
         print(f"[DEBUG] Generating props for turn {turn_idx}, evidences: {evidence_names[:3]}...")
         
+        # Try to get from cache first
+        if case_name is not None and turn_idx is not None:
+            cached_props = self.get_cached_props(case_name, turn_idx)
+            if cached_props is not None:
+                # Still log for debugging purposes, but don't re-generate
+                self._log_props(cached_props, turn_data, case_name, turn_idx, "[CACHED] Props retrieved from cache", "[CACHED] Props retrieved from cache")
+                return cached_props
+        
+        # Generate new props via API
+        print(f"[CACHE MISS] Generating new props for {case_name}_turn_{turn_idx}")
         prompt = self._build_prop_prompt(turn_data)
         
         # Use same LLM calling logic as run_models_spatial.py
@@ -33,6 +99,10 @@ class PropGenerator:
         
         full_answer = response.choices[0].message.content
         props = self._parse_props(full_answer)
+        
+        # Cache the successful generation
+        if case_name is not None and turn_idx is not None:
+            self.cache_props(case_name, turn_idx, props)
         
         # Enhanced logging with full prompt and response
         self._log_props(props, turn_data, case_name, turn_idx, prompt, full_answer)
@@ -121,7 +191,7 @@ class PropGenerator:
         self.props_log.append(log_entry)
     
     def save_props_log(self, output_dir, model_name, prompt_name):
-        """Save generated props log to file for debugging"""
+        """Save generated props log to file for debugging with append mode and run tracking"""
         if not self.props_log:
             return
             
@@ -129,17 +199,32 @@ class PropGenerator:
         log_filename = f"props_debug_log_{model_name}_{prompt_name}.txt"
         log_path = os.path.join(output_dir, log_filename)
         
-        with open(log_path, 'w', encoding='utf-8') as f:
-            f.write("PROP GENERATION DEBUG LOG\n")
-            f.write("=" * 100 + "\n\n")
-            f.write(f"Model: {model_name}\n")
-            f.write(f"Prompt Template: {prompt_name}\n")
+        # Check if this is a new file or append to existing
+        is_new_file = not os.path.exists(log_path)
+        current_run_id = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        with open(log_path, 'a', encoding='utf-8') as f:  # Changed from 'w' to 'a' for append mode
+            if is_new_file:
+                # Write header only for new files
+                f.write("PROP GENERATION DEBUG LOG\n")
+                f.write("=" * 100 + "\n\n")
+                f.write(f"Model: {model_name}\n")
+                f.write(f"Prompt Template: {prompt_name}\n")
+                f.write("=" * 100 + "\n\n")
+            else:
+                # Add separator for new run in existing file
+                f.write("\n" + "=" * 100 + "\n")
+                f.write("NEW RUN STARTED\n")
+                f.write("=" * 100 + "\n\n")
+            
+            # Add run-specific header
+            f.write(f"RUN ID: {current_run_id}\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"Total turns processed: {len(self.props_log)}\n")
+            f.write(f"Turns processed in this run: {len(self.props_log)}\n")
             f.write("=" * 100 + "\n\n")
             
             for i, entry in enumerate(self.props_log):
-                f.write(f"TURN {i+1}: {entry['case_name']} (Turn {entry['turn_idx']})\n")
+                f.write(f"TURN {i+1}: {entry['case_name']} (Turn {entry['turn_idx']}) [RUN: {current_run_id}]\n")
                 f.write("=" * 60 + "\n\n")
                 
                 # Input context
@@ -173,4 +258,4 @@ class PropGenerator:
                 
                 f.write("\n" + "=" * 100 + "\n\n")
         
-        print(f"Props debug log saved to: {log_path}") 
+        print(f"Props debug log {'created' if is_new_file else 'appended to'}: {log_path}") 
