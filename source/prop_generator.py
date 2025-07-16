@@ -58,6 +58,11 @@ class PropGenerator:
     
     def cache_props(self, case_name, turn_idx, props):
         """Cache props for a specific case and turn"""
+        # Don't cache empty props
+        if not props:
+            print(f"[CACHE] Skipping cache for {case_name}_turn_{turn_idx} - no props to cache")
+            return
+        
         cache_key = self.get_cache_key(case_name, turn_idx)
         self.props_cache[cache_key] = {
             'props': props,

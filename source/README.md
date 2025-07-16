@@ -36,14 +36,17 @@ The benchmark categorizes reasoning tasks into multiple types:
 
 ### Basic Model Evaluation
 ```bash
-# Run a model on spatial reasoning tasks
-python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
+# Run a model on spatial reasoning tasks (parallel version for faster processing)
+python run_models_parallel.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial --max_workers 30
 
 # Run on temporal reasoning tasks  
-python run_models_spatial.py -m nebius-qwen-32b -p base --context sum --label temporal
+python run_models_parallel.py -m nebius-qwen-32b -p base --context sum --label temporal --max_workers 25
 
 # Run on behavioral reasoning tasks
-python run_models_spatial.py -m nebius-qwen3-32b -p cot_one_shot --context sum --label behavioral
+python run_models_parallel.py -m nebius-qwen3-32b -p cot_one_shot --context sum --label behavioral --max_workers 25
+
+# Alternative: Use sequential version for smaller datasets or debugging
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
 
 # Evaluate results
 python evaluate_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
@@ -98,7 +101,51 @@ python run_models_spatial.py -m nebius-qwen-32b -p base --context sum --reasonin
 python run_models_spatial.py -m nebius-qwen3-32b -p base --context sum --reasoning props
 ```
 
-### 2. **Advanced Evaluator** (`evaluate_spatial.py`)
+### 2. **Global Parallel Model Runner** (`run_models_parallel.py`)
+
+**Note:** High-performance parallel version that handles **all reasoning types** with dramatically improved efficiency.
+
+**Key Advantages over `run_models_spatial.py`:**
+- **Global parallelization**: Processes ALL turns from ALL cases simultaneously
+- **Superior efficiency**: Much faster for datasets where cases have few turns each
+- **Scalable processing**: Configurable worker threads for optimal resource utilization
+- **Identical output format**: Drop-in replacement with same command-line interface
+- **Enhanced throughput**: Processes hundreds of turns in parallel instead of sequentially
+
+**When to Use:**
+- **Large-scale evaluations**: Processing many cases across multiple reasoning types
+- **Time-sensitive research**: When rapid results are needed
+- **Resource optimization**: Making full use of available computational resources
+- **Batch processing**: Running comprehensive model comparisons
+
+**Usage:**
+```bash
+python run_models_parallel.py [OPTIONS]
+
+Options:
+  # Same as run_models_spatial.py, plus:
+  --max_workers INT         Number of parallel API calls (default: 20, recommended for global parallelization)
+```
+
+**Performance Examples:**
+```bash
+# High-throughput spatial reasoning evaluation with 57 parallel workers
+python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label spatial --max_workers 57
+
+# Efficient multi-model comparison with 20 parallel workers
+python run_models_parallel.py -m nebius-qwen-32b -p rulesv4_explicit --context sum --label spatial --max_workers 20
+
+# Large-scale proposition generation with parallel processing
+python run_models_parallel.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial --max_workers 30
+```
+
+**Performance Guidelines:**
+- **API rate limits**: Adjust `--max_workers` based on provider limits
+- **Memory considerations**: Higher worker counts require more system memory
+- **Network bandwidth**: Ensure sufficient bandwidth for parallel API calls
+- **Recommended settings**: 20-57 workers for most API providers
+
+### 3. **Advanced Evaluator** (`evaluate_spatial.py`)
 
 **Note:** Also handles **all reasoning types** despite the name.
 
@@ -107,16 +154,6 @@ python run_models_spatial.py -m nebius-qwen3-32b -p base --context sum --reasoni
 - **Statistical reporting**: Confidence intervals, significance testing
 - **Comparative analysis**: Multi-model performance comparison
 - **Error categorization**: Detailed failure mode analysis across reasoning types
-
-### 3. **Rule Usage Analyzer** (`source/extract_rule_usage.py`)
-
-**Features:**
-- **Dynamic rule loading**: Works with any rule text file
-- **Pattern recognition**: Detects explicit and implicit rule usage
-- **Usage statistics**: Quantifies which rules are most/least used
-- **Auto-naming**: Generates output filenames automatically
-
-**Note:** Rule-based prompts are primarily designed for **spatial reasoning** tasks, but can be applied to other reasoning types as well.
 
 ### 4. **Proposition Generator** (`source/prop_generator.py`)
 
@@ -156,6 +193,34 @@ python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --contex
 
 **Logging and Analysis:**
 The system automatically logs all generated propositions to `{output_dir}/props_log_{model}_{timestamp}.json` for detailed analysis of proposition quality and usage patterns.
+
+## Choosing the Right Model Runner
+
+### Performance Comparison: Sequential vs Parallel
+
+| Scenario | Recommended Runner | Reason |
+|----------|-------------------|---------|
+| **Large-scale evaluations** | `run_models_parallel.py` | Dramatically faster with global parallelization |
+| **Multiple reasoning types** | `run_models_parallel.py` | Efficient batch processing across categories |
+| **Proposition generation** | `run_models_parallel.py` | Parallel prop generation + parallel evaluation |
+| **RAG-enhanced prompts** | `run_models_parallel.py` | Parallel RAG processing + parallel evaluation |
+| **Development/debugging** | `run_models_spatial.py` | Sequential processing easier to debug |
+| **Single case testing** | `run_models_spatial.py` | Simpler for small-scale experiments |
+| **Resource-constrained environments** | `run_models_spatial.py` | Lower memory and network requirements |
+
+### Performance Guidelines
+
+**Parallel Version (`run_models_parallel.py`):**
+- **Best for**: Production runs, comprehensive evaluations, time-sensitive research
+- **Worker count**: 20-57 workers depending on API rate limits
+- **Memory usage**: Higher due to parallel processing
+- **Speed improvement**: 3-10x faster depending on dataset characteristics
+
+**Sequential Version (`run_models_spatial.py`):**
+- **Best for**: Development, debugging, single case analysis
+- **Resource usage**: Lower memory and network requirements
+- **Debugging**: Easier to trace issues and monitor progress
+- **Compatibility**: Better for environments with strict resource limits
 
 ## Spatial Reasoning Rule System
 
@@ -298,8 +363,8 @@ Most Used Rules:
 ```
 source/
 ├── run_models_spatial.py          # Enhanced model evaluation (all reasoning types)
+├── run_models_parallel.py         # Global parallel model evaluation (all reasoning types)
 ├── evaluate_spatial.py            # Advanced result analysis (all reasoning types)
-├── extract_rule_usage.py          # Rule usage analysis (spatial rules)
 ├── prop_generator.py              # Dynamic proposition generation system
 ├── rag.py                         # RAG system for dynamic rule retrieval
 ├── prompts/                       # Prompt engineering
@@ -376,12 +441,15 @@ Each case contains:
 
 ### 1. **Comprehensive Multi-Reasoning Evaluation**
 ```bash
-# Test across different reasoning types
+# Test across different reasoning types (use parallel version for faster processing)
+python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label spatial --max_workers 30
+python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label temporal --max_workers 30
+python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label behavioral --max_workers 30
+python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label physical --max_workers 30
+python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label numerical --max_workers 30
+
+# Alternative: Use sequential version for smaller datasets or debugging
 python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label spatial
-python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label temporal
-python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label behavioral
-python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label physical
-python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label numerical
 
 # Analyze and compare
 python evaluate_spatial.py --all --data aceattorney
@@ -393,11 +461,9 @@ python evaluate_spatial.py --all --data aceattorney
 python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
 python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4a_explicit --context sum --label spatial
 
-# Compare spatial rule usage (run from source directory)
-cd source
-python extract_rule_usage.py -r ../Rules/RuleText4.txt -i ../output_spatial/nebius-llama3.3-70b_prompt_rulesv4_explicit_*
-python extract_rule_usage.py -r ../Rules/RuleText4a.txt -i ../output_spatial/nebius-llama3.3-70b_prompt_rulesv4a_explicit_*
-cd ..
+# Compare spatial rule usage by evaluating the different rule sets
+python evaluate_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
+python evaluate_spatial.py -m nebius-llama3.3-70b -p rulesv4a_explicit --context sum --label spatial
 ```
 
 ### 3. **Cross-Reasoning Type Analysis**
@@ -433,10 +499,13 @@ ls ../Rules/rag_rules_used_nebius-llama3.3-70b_prompt_rulesv3_rag_t10_*.txt
 
 ### 5. **Dynamic Proposition Generation Analysis**
 ```bash
-# Test proposition-enhanced reasoning across different models
+# Test proposition-enhanced reasoning across different models (use parallel version for faster proposition generation)
+python run_models_parallel.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial --max_workers 25
+python run_models_parallel.py -m nebius-qwen-32b -p prop_generated_explicit --context sum --label spatial --max_workers 25  
+python run_models_parallel.py -m nebius-qwen3-32b -p prop_generated_explicit --context sum --label spatial --max_workers 25
+
+# Alternative: Sequential processing (for debugging or limited resources)
 python run_models_spatial.py -m nebius-llama3.3-70b -p prop_generated_explicit --context sum --label spatial
-python run_models_spatial.py -m nebius-qwen-32b -p prop_generated_explicit --context sum --label spatial  
-python run_models_spatial.py -m nebius-qwen3-32b -p prop_generated_explicit --context sum --label spatial
 
 # Compare against static rule-based approaches
 python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
