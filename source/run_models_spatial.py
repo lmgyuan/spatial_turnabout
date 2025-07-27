@@ -388,42 +388,35 @@ def run_model(prompts, client, client_name):
         #print(prompt)
         try:
             cot = ""
-            if type(client).__name__ == "Kani":  # Use kani api
-                async def run_async_model():
-                    response = await client.chat_round_str(prompt, temperature=0)
-                    #print(response)
-                    return response
-
-                full_answer = asyncio.run(run_async_model())
-
-            elif type(client).__name__ == "OpenAI":  # Use openai api
-                response = client.chat.completions.create(
-                    model=client_name,
-                    messages=[
-                    {"role": "system", "content": "You are a helpful assistant"},
-                    {"role": "user", "content": prompt},
-                ],
-                    stream=False,
-                    temperature=0,
-                    seed=42  # Add deterministic seed for consistency
-                )
-                full_answer = response.choices[0].message.content
-
-                # Get COT
-                try: 
-                    cot = response.choices[0].message.reasoning_content
-                    print(f"<run_model> COT returned for {client_name}")
-                    if cot is not None:  # Only concatenate if COT is not None
-                        full_answer = cot + "\n\n" + full_answer
-                    else:
-                        cot = ""  # Set to empty string if None
-                except Exception as e:
-                    print(f"<run_model> When trying to get COT for {client_name}: {e}")
-                    print(f"<run_model> No COT for {client_name}")
-                    cot = ""
-
-            else:
+            # Validate client type
+            if type(client).__name__ != "OpenAI":
                 raise ValueError(f"<run_model> Unknown client: {client}")
+            
+            # Use OpenAI API (all supported models use OpenAI-compatible interface)
+            response = client.chat.completions.create(
+                model=client_name,
+                messages=[
+                {"role": "system", "content": "You are a helpful assistant"},
+                {"role": "user", "content": prompt},
+            ],
+                stream=False,
+                temperature=0,
+                seed=42  # Add deterministic seed for consistency
+            )
+            full_answer = response.choices[0].message.content
+
+            # Get COT
+            try: 
+                cot = response.choices[0].message.reasoning_content
+                print(f"<run_model> COT returned for {client_name}")
+                if cot is not None:  # Only concatenate if COT is not None
+                    full_answer = cot + "\n\n" + full_answer
+                else:
+                    cot = ""  # Set to empty string if None
+            except Exception as e:
+                print(f"<run_model> When trying to get COT for {client_name}: {e}")
+                print(f"<run_model> No COT for {client_name}")
+                cot = ""
 
             answer_json, parsed_cot = get_json_answer(full_answer)
 
@@ -443,86 +436,7 @@ def run_model(prompts, client, client_name):
 
     return answer_jsons, cots, has_error
 
-def load_model(model, config_path="models.json"):
-    with open(config_path, 'r') as file:
-        config = json.load(file)
-    
-    # Store original model key for type detection
-    original_model = model
-    
-    # Resolve model name from config
-    model = config.get(model, model)
-    
-    # Check for API models first using the original model key (before checking for "/" which indicates HuggingFace)
-    is_api_model = False
-    
-    if any(m_name in original_model for m_name in ["gpt", "o3", "o4"]) or \
-       "deepseek" in original_model or \
-       "nebius" in original_model:
-        is_api_model = True
-    
-    if not is_api_model and "/" in model:  # a huggingface model
-        from kani import Kani
-        from kani.engines.huggingface import HuggingEngine
-        import torch
-
-        torch.cuda.empty_cache()
-        engine = HuggingEngine(
-            model_id = model, 
-            use_auth_token=True, 
-            model_load_kwargs={"device_map": "auto"}
-        )
-        client = Kani(engine, system_prompt="")
-
-        name = model.split("/")[-1]
-
-    else:  # an api model
-        from dotenv import load_dotenv
-        from openai import OpenAI
-
-        load_dotenv("../.env")
-
-        model_key = original_model
-
-        if any(m_name in original_model for m_name in ["gpt", "o3", "o4"]):
-            model_key = "openai"
-
-        elif "deepseek" in original_model:  # deepseek-reasoner (R1), deepseek-chat (V3)
-            model_key = "deepseek"
-
-        elif "nebius" in original_model:  # nebius models
-            model_key = "nebius"
-
-        auth = {
-            "deepseek": {
-                "api_key": os.getenv("DEEPSEEK_API_KEY"),
-                "base_url": "https://api.deepseek.com",
-                "name": model
-            },
-            "openai": {
-                "api_key": os.getenv("OPENAI_API_KEY"),
-                "name": model
-            },
-            "nebius": {
-                "api_key": os.getenv("NEBIUS_API_KEY"),
-                "base_url": "https://api.studio.nebius.com/v1/",
-                "name": model
-            }
-        }
-
-        if "base_url" in auth[model_key]:
-            client = OpenAI(
-                api_key=auth[model_key]["api_key"],
-                base_url=auth[model_key]["base_url"]
-            )
-        else:
-            client = OpenAI(
-                api_key=auth[model_key]["api_key"],
-            )
-
-        name = auth[model_key]["name"]
-
-    return client, name
+from model_loader import load_model
 
 def create_batch(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None):
     max_token_key = "max_tokens" if "gpt" in MODEL else "max_completion_tokens"

@@ -2,6 +2,19 @@
 
 A comprehensive benchmark for evaluating Large Language Models' (LLMs) **deductive reasoning** abilities across multiple cognitive dimensions using interactive detective novel games from the **Ace Attorney** and **Danganronpa** series.
 
+## Recent Updates
+
+**Model Support Simplification (Latest):**
+- **Streamlined model support**: Now supports only OpenAI and Nebius models for improved reliability
+- **Unified model loading**: All model loading is handled through `model_loader.py`
+- **Enhanced error handling**: Clear error messages for unsupported models
+- **Code modularization**: Extracted shared `load_model()` function to reduce duplication
+
+**Supported Models:**
+- **OpenAI**: `gpt-*`, `o3-*`, `o4-*` variants
+- **Nebius**: `nebius-*` variants
+- **Unsupported**: DeepSeek and local HuggingFace models (removed for stability)
+
 ## Overview
 
 This project transforms detective game scenarios into sophisticated multiple-choice reasoning tasks where models must:
@@ -79,7 +92,7 @@ python evaluate_spatial.py --all --data aceattorney
 python run_models_spatial.py [OPTIONS]
 
 Options:
-  -m, --model TEXT          Model name (nebius-llama3.3-70b, llama-3.1-70b, deepseek-R1-70b, etc.)
+  -m, --model TEXT          Model name (OpenAI: gpt-*, o3-*, o4-*; Nebius: nebius-*)
   -p, --prompt TEXT         Prompt type (base, rulesv4_explicit, prop_generated_explicit, cot_one_shot, etc.)
   --context TEXT            Context strategy (full, sum, or none)
   --label TEXT              Reasoning type filter (spatial, temporal, behavioral, physical, numerical, causal)
@@ -155,7 +168,29 @@ python run_models_parallel.py -m nebius-llama3.3-70b -p prop_generated_explicit 
 - **Comparative analysis**: Multi-model performance comparison
 - **Error categorization**: Detailed failure mode analysis across reasoning types
 
-### 4. **Proposition Generator** (`source/prop_generator.py`)
+### 4. **Model Loader** (`source/model_loader.py`)
+
+**Shared Model Loading System:**
+- **Unified interface**: Single function to load any supported model type
+- **Provider abstraction**: Handles OpenAI and Nebius models with consistent API
+- **Automatic detection**: Identifies model type from name patterns
+- **Error handling**: Clear validation and error messages for unsupported models
+- **Environment management**: Secure API key loading from `.env` file
+
+**Supported Models:**
+- **OpenAI Models**: `gpt-*`, `o3-*`, `o4-*` (GPT-4, GPT-3.5, O3, O4 variants)
+- **Nebius Models**: `nebius-*` (Nebius Llama, Qwen, and other variants)
+
+**Usage:**
+```python
+from model_loader import load_model
+
+# Load any supported model
+client, name = load_model("gpt-4")                    # OpenAI API
+client, name = load_model("nebius-llama3.3-70b")     # Nebius API
+```
+
+### 5. **Proposition Generator** (`source/prop_generator.py`)
 
 **Revolutionary Feature:**
 - **Dynamic proposition generation**: Automatically generates turn-specific spatial propositions for each case
@@ -365,6 +400,7 @@ source/
 ├── run_models_spatial.py          # Enhanced model evaluation (all reasoning types)
 ├── run_models_parallel.py         # Global parallel model evaluation (all reasoning types)
 ├── evaluate_spatial.py            # Advanced result analysis (all reasoning types)
+├── model_loader.py                # Shared model loading system (OpenAI & Nebius)
 ├── prop_generator.py              # Dynamic proposition generation system
 ├── rag.py                         # RAG system for dynamic rule retrieval
 ├── prompts/                       # Prompt engineering
@@ -378,6 +414,7 @@ source/
 │   └── ...
 ├── README.md                      # This documentation
 └── README_legacy.md               # Original documentation
+```
 
 data/
 ├── aceattorney_data/             # Ace Attorney cases
@@ -527,12 +564,18 @@ python run_models_spatial.py -m nebius-llama3.3-70b -p prop_generated_explicit -
 ## Advanced Configuration
 
 ### Model Configuration
-The system supports various LLM providers through flexible configuration:
-- **Nebius models**: nebius-llama3.3-70b, nebius-qwen-32b, nebius-qwen3-32b, etc.
-- **OpenAI models**: GPT-4.1, O3/O4-mini, etc.
-- **DeepSeek models**: DeepSeek-R1 variants, DeepSeek-Chat, etc.  
-- **Open source models**: Llama-3.1, Qwen-2.5, etc.
-- **Custom endpoints**: Any OpenAI-compatible API
+The system supports OpenAI and Nebius models through the unified `model_loader.py`:
+- **OpenAI models**: `gpt-*`, `o3-*`, `o4-*` (GPT-4, GPT-3.5, O3, O4 variants)
+- **Nebius models**: `nebius-*` (Nebius Llama, Qwen, and other variants)
+
+**Environment Setup:**
+Create a `.env` file in the project root with your API keys:
+```
+OPENAI_API_KEY=your_openai_api_key_here
+NEBIUS_API_KEY=your_nebius_api_key_here
+```
+
+**Note:** DeepSeek and local HuggingFace models are no longer supported in the current version.
 
 ### Prompt Customization
 Create custom prompts by following the established JSON format:
