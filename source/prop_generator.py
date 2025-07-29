@@ -8,7 +8,7 @@ class PropGenerator:
             self.rules = [line.strip() for line in f if line.strip()]
         
         # Load prop generation prompt template
-        with open(prompt_file, 'r') as f:
+        with open(prompt_file, 'r', encoding='utf-8') as f:
             self.prompt_template = json.load(f)
         
         self.props_log = []  # Store generated props for logging

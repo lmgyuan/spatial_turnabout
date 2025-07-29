@@ -1,6 +1,6 @@
 """
 =============================================================================
-run_models_parallel_v2.py - Global Parallel Version
+run_models_parallel.py - Global Parallel Version
 =============================================================================
 
 This version parallelizes across ALL cases and ALL turns globally, rather than
@@ -36,6 +36,7 @@ from datetime import datetime
 import concurrent.futures
 from threading import Lock
 from collections import defaultdict
+from debug_logger import debug_logger
 
 # Global variable for prop generator
 current_prop_generator = None
@@ -53,6 +54,7 @@ def parse_arguments():
     parser.add_argument('--reasoning', type=str, default='none', choices=['none', 'full', 'facts', 'props'], 
                         help='Include reasoning in prompts: none (default), full (all reasoning), facts (only facts), props (only propositions)')
     parser.add_argument('--max_workers', type=int, default=20, help='Number of parallel API calls (default: 20, recommended for global parallelization)')
+    parser.add_argument('--debug_log_off', action='store_true', help='Disable detailed debug logging of all LLM interactions (enabled by default)')
 
     # Evaluation args
     parser.add_argument('-a', '--all', action='store_true', help='Evaluate all existing models')
@@ -215,7 +217,9 @@ def build_prompt(
         if current_prop_generator is None:
             try:
                 from prop_generator import PropGenerator
-                current_prop_generator = PropGenerator()
+                # Determine prop template based on main prompt
+                prop_template = "prop_generation_improved.json" if "improved" in PROMPT_ARG else "prop_generation.json"
+                current_prop_generator = PropGenerator(prompt_file=f"prompts/{prop_template}")
                 print(f"[INFO] Prop generation mode activated for prompt: {PROMPT_ARG}")
                 
                 # Initialize cache if we have output_dir
@@ -568,6 +572,11 @@ def run_single_prompt(prompt, client, client_name, global_idx, case_name, turn_i
 
         if cot == "":  # Only when model does not return its COT field
             cot = parsed_cot
+        
+        # Log LLM interaction for debugging (if enabled)
+        debug_logger.log_llm_interaction(
+            case_name, turn_idx, prompt, full_answer, answer_json, "main_contradiction_detection"
+        )
             
         return {
             'global_idx': global_idx,
@@ -739,7 +748,9 @@ def collect_tasks_with_parallel_props(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIP
     if current_prop_generator is None:
         try:
             from prop_generator import PropGenerator
-            current_prop_generator = PropGenerator()
+            # Determine prop template based on main prompt
+            prop_template = "prop_generation_improved.json" if "improved" in PROMPT else "prop_generation.json"
+            current_prop_generator = PropGenerator(prompt_file=f"prompts/{prop_template}")
             print(f"[INFO] Prop generation mode activated for prompt: {PROMPT}")
             
             # Initialize cache if we have output_dir
@@ -1117,6 +1128,14 @@ if __name__ == "__main__":
     # Collect cases
     fnames = get_fnames(data_dir, output_dir, CASE)
 
+    # Configure debug logger with the correct parameters
+    if not args.debug_log_off:
+        debug_logger.enable()
+
     # Run cases using global parallel processing
     print(f"Using global parallel processing with max_workers={MAX_WORKERS}")
-    run_job_global_parallel(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, LABEL, REASONING, MAX_WORKERS) 
+    run_job_global_parallel(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, LABEL, REASONING, MAX_WORKERS)
+    
+    # Save debug log if enabled
+    if not args.debug_log_off:
+        debug_logger.save_debug_log(output_dir, MODEL.split("/")[-1], PROMPT) 

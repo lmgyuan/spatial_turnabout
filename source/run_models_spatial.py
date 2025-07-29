@@ -34,6 +34,7 @@ import re
 import argparse
 import traceback
 from datetime import datetime
+from debug_logger import debug_logger
 
 # Global variable for prop generator
 current_prop_generator = None
@@ -50,6 +51,7 @@ def parse_arguments():
     parser.add_argument('--label', type=str, default=None, help='filter cases by label (e.g., spatial, temporal, etc.)')
     parser.add_argument('--reasoning', type=str, default='none', choices=['none', 'full', 'facts', 'props'], 
                         help='Include reasoning in prompts: none (default), full (all reasoning), facts (only facts), props (only propositions)')
+    parser.add_argument('--debug_log_off', action='store_true', help='Disable detailed debug logging of all LLM interactions (enabled by default)')
 
     # Evaluation args
     parser.add_argument('-a', '--all', action='store_true', help='Evaluate all existing models')
@@ -211,7 +213,9 @@ def build_prompt(
         if current_prop_generator is None:
             try:
                 from prop_generator import PropGenerator
-                current_prop_generator = PropGenerator()
+                # Determine prop template based on main prompt
+                prop_template = "prop_generation_improved.json" if "improved" in PROMPT_ARG else "prop_generation.json"
+                current_prop_generator = PropGenerator(prompt_file=f"prompts/{prop_template}")
                 print(f"[INFO] Prop generation mode activated for prompt: {PROMPT_ARG}")
                 
                 # Initialize cache if we have output_dir
@@ -425,6 +429,11 @@ def run_model(prompts, client, client_name):
 
             if cot == "":  # Only when model does not return its COT field
                 cot = parsed_cot
+            
+            # Log LLM interaction for debugging (if enabled)
+            debug_logger.log_llm_interaction(
+                "batch_processing", len(answer_jsons), prompt, full_answer, answer_json, "main_contradiction_detection"
+            )
                 
         except Exception as e:  # Handle errors, such as rate limit, context window, etc.
             print(f"<run_model> {traceback.format_exc()}")
@@ -649,8 +658,16 @@ if __name__ == "__main__":
     # Collect cases
     fnames = get_fnames(data_dir, output_dir, CASE)
 
+    # Configure debug logger with the correct parameters
+    if not args.debug_log_off:
+        debug_logger.enable()
+
     # Run cases
     if any(name in MODEL for name in ["o3", "o4", "gpt"]):
         run_batch_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, output_dir, data_dir, LABEL, REASONING)
     else:
         run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, LABEL, REASONING)
+    
+    # Save debug log if enabled
+    if not args.debug_log_off:
+        debug_logger.save_debug_log(output_dir, MODEL.split("/")[-1], PROMPT)
