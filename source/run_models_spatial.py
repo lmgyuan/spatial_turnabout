@@ -39,6 +39,9 @@ from debug_logger import debug_logger
 # Global variable for prop generator
 current_prop_generator = None
 
+# Global variable for RAG prop generator
+current_rag_prop_generator = None
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
     # General args
@@ -336,6 +339,66 @@ def build_prompt(
                 enhanced_prefix = PROMPT_PREFIX.replace("{generated_props}", 
                                                        "No specific propositions generated.")
         
+        # Handle RAG + prop generation for combined prompts
+        elif PROMPT_ARG and "rag" in PROMPT_ARG and "prop" in PROMPT_ARG and "{rag_generated_props}" in PROMPT_PREFIX:
+            try:
+                # For run_models_spatial.py, we'll do inline RAG + prop generation
+                # since it doesn't have parallel processing infrastructure
+                print(f"[INFO] RAG + prop generation mode detected for {case_name} turn {turn_idx}")
+                
+                # Step 1: Get RAG rules
+                from rag import SimpleRAG
+                rag = SimpleRAG()
+                
+                # Parse top_k from prompt name (e.g., rulesv3_rag_prop_t10_p5 -> top_k=10)
+                top_k = 5  # Default value
+                match = re.search(r'_t(\d+)', PROMPT_ARG)
+                if match:
+                    top_k = int(match.group(1))
+                
+                # Parse prop count from prompt name (e.g., rulesv3_rag_prop_t10_p5 -> prop_count=5)
+                prop_count = 15  # Default value
+                prop_match = re.search(r'_p(\d+)', PROMPT_ARG)
+                if prop_match:
+                    prop_count = int(prop_match.group(1))
+                
+                # Select appropriate template based on prop count
+                prop_template = f"prompts/rag_prop_generation_p{prop_count}_improved.json"
+                if not os.path.exists(prop_template):
+                    print(f"[WARNING] Template {prop_template} not found, using default")
+                    prop_template = "prompts/rag_prop_generation_improved.json"
+                
+                case_context = rag.extract_case_context(turn)
+                rag.top_k = top_k  # Set the top_k for this retrieval
+                relevant_rules = rag.retrieve_relevant_rules(case_context)
+                
+                # Step 2: Generate props using RAG rules
+                global current_rag_prop_generator
+                if current_rag_prop_generator is None:
+                    from rag_prop_generator import RagPropGenerator
+                    current_rag_prop_generator = RagPropGenerator(prompt_file=prop_template)
+                    if output_dir:
+                        model_name = MODEL.split("/")[-1]
+                        current_rag_prop_generator.set_cache_file(output_dir, model_name, PROMPT_ARG)
+                
+                # Load model for prop generation (same as main model)
+                client, client_name = load_model(MODEL)
+                
+                generated_props = current_rag_prop_generator.generate_turn_props_from_rag_rules(
+                    turn, relevant_rules, client, client_name, case_name, turn_idx
+                )
+                props_text = "\n".join([f"Prop {i+1}: {prop}" 
+                                      for i, prop in enumerate(generated_props)])
+                enhanced_prefix = PROMPT_PREFIX.replace("{rag_generated_props}", props_text)
+                
+                print(f"[INFO] Generated {len(generated_props)} RAG props for {case_name} turn {turn_idx} using {len(relevant_rules)} rules (template: {prop_template})")
+                print(f"[DEBUG] RAG props for turn {turn_idx}: {generated_props[0][:50] if generated_props else 'No props generated'}...")
+                
+            except Exception as e:
+                print(f"[WARNING] RAG prop generation failed for turn {turn_idx}: {e}")
+                enhanced_prefix = PROMPT_PREFIX.replace("{rag_generated_props}", 
+                                                       "No specific propositions generated.")
+        
         # Enhance prompt with RAG if using RAG prompt
         elif PROMPT_ARG and "rag" in PROMPT_ARG and "{dynamic_rules}" in PROMPT_PREFIX:
             try:
@@ -616,6 +679,16 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
             print(f"[WARNING] Prop generation was expected but no props were logged")
     except Exception as e:
         print(f"[WARNING] Failed to save props log: {e}")
+    
+    # Save RAG props log if RAG prop generation was used
+    try:
+        if 'current_rag_prop_generator' in globals() and current_rag_prop_generator is not None:
+            print(f"[INFO] Saving RAG props log with {len(current_rag_prop_generator.props_log)} turns from this run")
+            current_rag_prop_generator.save_props_log(output_dir, MODEL.split("/")[-1], PROMPT)
+        elif PROMPT and "rag" in PROMPT and "prop" in PROMPT:
+            print(f"[WARNING] RAG prop generation was expected but no props were logged")
+    except Exception as e:
+        print(f"[WARNING] Failed to save RAG props log: {e}")
 
 if __name__ == "__main__":
     parser = parse_arguments()

@@ -41,6 +41,9 @@ from debug_logger import debug_logger
 # Global variable for prop generator
 current_prop_generator = None
 
+# Global variable for RAG prop generator
+current_rag_prop_generator = None
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
     # General args
@@ -833,8 +836,16 @@ def collect_tasks_with_parallel_rag(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTI
     shared_rag = None
     try:
         from rag import SimpleRAG
-        shared_rag = SimpleRAG()
-        print(f"[INFO] RAG mode activated - shared instance created for prompt: {PROMPT}")
+        
+        # Parse top_k from prompt name (e.g., rulesv3_rag_prop_t15_p5 -> top_k=15)
+        top_k = 5  # Default value
+        match = re.search(r'_t(\d+)', PROMPT)
+        if match:
+            top_k = int(match.group(1))
+            print(f"[INFO] RAG top_k parsed from prompt: {top_k}")
+        
+        shared_rag = SimpleRAG(top_k=top_k)
+        print(f"[INFO] RAG mode activated - shared instance created for prompt: {PROMPT} with top_k={top_k}")
     except ImportError:
         print(f"[WARNING] RAG module not available, falling back to standard processing")
         return collect_all_tasks(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
@@ -908,11 +919,397 @@ def collect_tasks_with_parallel_rag(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTI
     print(f"<collect_tasks_with_parallel_rag> Generated {len(tasks)} total tasks, skipped {skip_count} cases")
     return tasks
 
+def collect_tasks_with_parallel_rag_props(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
+    """Collect tasks with parallel RAG + prop generation for combined rag_prop prompts"""
+    print(f"<collect_tasks_with_parallel_rag_props> Processing {len(fnames)} cases with parallel RAG + prop generation")
+    
+    # Step 1: Create shared RAG instance ONCE (load model + rules once)
+    shared_rag = None
+    try:
+        from rag import SimpleRAG
+        
+        # Parse top_k from prompt name (e.g., rulesv3_rag_prop_t15_p5 -> top_k=15)
+        top_k = 5  # Default value
+        match = re.search(r'_t(\d+)', PROMPT)
+        if match:
+            top_k = int(match.group(1))
+            print(f"[INFO] RAG top_k parsed from prompt: {top_k}")
+        
+        shared_rag = SimpleRAG(top_k=top_k)
+        print(f"[INFO] RAG mode activated - shared instance created for prompt: {PROMPT} with top_k={top_k}")
+    except ImportError:
+        print(f"[WARNING] RAG module not available, falling back to standard processing")
+        # Fallback to standard collection without RAG/prop features
+        return collect_all_tasks_standard(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
+    except Exception as e:
+        print(f"[WARNING] RAG initialization failed: {e}, falling back to standard processing")
+        return collect_all_tasks_standard(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
+    
+    # Step 2: Initialize RAG prop generator
+    global current_rag_prop_generator
+    current_rag_prop_generator = None
+    try:
+        # Parse prop count from prompt name (e.g., rulesv3_rag_prop_t10_p5 -> prop_count=5)
+        prop_count = 15  # Default value
+        prop_match = re.search(r'_p(\d+)', PROMPT)
+        if prop_match:
+            prop_count = int(prop_match.group(1))
+        
+        # Select appropriate template based on prop count
+        prop_template = f"prompts/rag_prop_generation_p{prop_count}_improved.json"
+        if not os.path.exists(prop_template):
+            print(f"[WARNING] Template {prop_template} not found, using default")
+            prop_template = "prompts/rag_prop_generation_improved.json"
+        
+        from rag_prop_generator import RagPropGenerator
+        current_rag_prop_generator = RagPropGenerator(prompt_file=prop_template)
+        print(f"[INFO] RAG prop generation mode activated for prompt: {PROMPT} (template: {prop_template})")
+        
+        # Initialize cache if we have output_dir
+        if output_dir:
+            model_name = MODEL.split("/")[-1]
+            current_rag_prop_generator.set_cache_file(output_dir, model_name, PROMPT)
+    except ImportError:
+        print(f"[WARNING] RagPropGenerator not available, falling back to standard processing")
+        return collect_all_tasks_standard(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
+    
+    # Step 3: Collect all RAG enhancement tasks
+    rag_tasks = []
+    case_turn_data = {}  # Store turn data for later processing
+    skip_count = 0
+    PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
+    
+    for fname in fnames:
+        case_name = fname.split('.')[0]
+        try:
+            turns, context = parse_json(os.path.join(data_dir, fname), label_filter)
+            if turns == []:  # Skip cases with no turns
+                skip_count += 1
+                continue
+            
+            case_turn_data[case_name] = {'turns': turns, 'context': context}
+            
+            # Create RAG enhancement tasks for each turn
+            for turn_idx, turn in enumerate(turns):
+                rag_tasks.append({
+                    'case_name': case_name,
+                    'turn_idx': turn_idx,
+                    'turn_data': turn,
+                    'prompt_prefix': PROMPT_PREFIX
+                })
+                
+        except Exception as e:
+            print(f"<collect_tasks_with_parallel_rag_props> Error processing {fname}: {e}")
+            skip_count += 1
+            continue
+    
+    print(f"<collect_tasks_with_parallel_rag_props> Found {len(rag_tasks)} RAG enhancement tasks")
+    
+    # Step 4: Enhance all prompts with RAG in parallel using shared instance
+    rag_results = {}
+    if rag_tasks:
+        # Use same max_workers for RAG processing
+        rag_results = enhance_all_rags_parallel(rag_tasks, shared_rag, PROMPT, max_workers)
+    
+    # Step 5: Collect all RAG prop generation tasks using RAG results
+    rag_prop_tasks = []
+    for case_name, data in case_turn_data.items():
+        for turn_idx, turn in enumerate(data['turns']):
+            # Get RAG results for this case/turn
+            rag_rules = []
+            if case_name in rag_results and turn_idx in rag_results[case_name]:
+                rag_result = rag_results[case_name][turn_idx]
+                if rag_result['success']:
+                    rag_rules = rag_result['rules_metadata']
+            
+            rag_prop_tasks.append({
+                'case_name': case_name,
+                'turn_idx': turn_idx,
+                'turn_data': turn,
+                'rag_rules': rag_rules
+            })
+    
+    print(f"<collect_tasks_with_parallel_rag_props> Found {len(rag_prop_tasks)} RAG prop generation tasks")
+    
+    # Step 6: Generate all RAG props in parallel
+    if rag_prop_tasks:
+        # Use same max_workers for RAG prop generation
+        generate_all_rag_props_parallel(rag_prop_tasks, *load_model(MODEL), max_workers)
+    
+    # Step 7: Build final prompts with generated RAG propositions
+    tasks = []
+    
+    for case_name, data in case_turn_data.items():
+        try:
+            prompts = build_prompt_with_rag_props(
+                data['turns'], data['context'], PROMPT_PREFIX, PROMPT_SUFFIX, 
+                CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT,
+                case_name=case_name, label_filter=label_filter, 
+                data=data_dir.split('/')[-2], output_dir=output_dir
+            )
+            
+            # Add each prompt as a task
+            for turn_idx, prompt in enumerate(prompts):
+                tasks.append({
+                    'case_name': case_name,
+                    'turn_idx': turn_idx,
+                    'prompt': prompt
+                })
+                
+        except Exception as e:
+            print(f"<collect_tasks_with_parallel_rag_props> Error building prompts for {case_name}: {e}")
+            continue
+    
+    print(f"<collect_tasks_with_parallel_rag_props> Generated {len(tasks)} total tasks, skipped {skip_count} cases")
+    return tasks
+
+def generate_all_rag_props_parallel(rag_prop_tasks, client, client_name, max_workers=20):
+    """Generate RAG props for all tasks in parallel"""
+    print(f"<generate_all_rag_props_parallel> Generating RAG props for {len(rag_prop_tasks)} tasks with max_workers={max_workers}")
+    
+    def generate_single_rag_prop_task(task):
+        """Generate RAG props for a single task"""
+        try:
+            case_name = task['case_name']
+            turn_idx = task['turn_idx']
+            turn_data = task['turn_data']
+            rag_rules = task['rag_rules']
+            
+            # Use the global RAG prop generator
+            global current_rag_prop_generator
+            if current_rag_prop_generator is not None:
+                props = current_rag_prop_generator.generate_turn_props_from_rag_rules(
+                    turn_data, rag_rules, client, client_name, case_name, turn_idx
+                )
+                return {
+                    'case_name': case_name,
+                    'turn_idx': turn_idx,
+                    'props': props,
+                    'success': True
+                }
+            else:
+                return {
+                    'case_name': case_name,
+                    'turn_idx': turn_idx,
+                    'props': [],
+                    'success': False
+                }
+        except Exception as e:
+            print(f"<generate_single_rag_prop_task> Error generating RAG props for {task['case_name']} turn {task['turn_idx']}: {e}")
+            return {
+                'case_name': case_name,
+                'turn_idx': turn_idx,
+                'props': [],
+                'success': False
+            }
+    
+    results = []
+    completed_count = 0
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all RAG prop generation tasks
+        future_to_task = {
+            executor.submit(generate_single_rag_prop_task, task): task
+            for task in rag_prop_tasks
+        }
+        
+        # Collect results as they complete
+        for future in concurrent.futures.as_completed(future_to_task):
+            result = future.result()
+            results.append(result)
+            completed_count += 1
+            
+            if completed_count % 5 == 0 or completed_count == len(rag_prop_tasks):
+                print(f"<generate_all_rag_props_parallel> Completed {completed_count}/{len(rag_prop_tasks)} RAG prop generations")
+    
+    return results
+
+def build_prompt_with_rag_props(
+    turns, 
+    prev_context, 
+    PROMPT_PREFIX, 
+    PROMPT_SUFFIX, 
+    CONTEXT, 
+    NO_DESCRIPTION, 
+    MODEL,
+    REASONING,
+    PROMPT_ARG=None,
+    case_name=None,
+    label_filter=None,
+    data='aceattorney',
+    output_dir=None
+):
+    """Build prompts using pre-generated RAG props"""
+    prompts = []
+    context_sofar = ""
+    
+    for turn_idx, turn in enumerate(turns):
+        context_is_added = False
+        new_context = turn['newContext']  
+        new_context = re.sub(r'\n+', ' ', new_context)  # Remove newlines
+        context_sofar += new_context
+        if CONTEXT is None:
+            prompt = ""
+        else:
+            prompt = "Story:\n"
+            full_context = "" 
+            if CONTEXT == "full":
+                full_context += prev_context + "\n" + context_sofar + "\n"
+            elif CONTEXT == "sum":
+                full_context += turn['summarizedContext'] + "\n"
+
+            full_context = truncate_context(full_context, MODEL)
+
+            prompt += full_context
+
+        character_counter = 0
+        prompt += "Characters:\n"
+        for character in turn['characters']:
+            prompt += f"Character {character_counter}\n"
+            prompt += f"Name: {character['name']}\n"
+            if not NO_DESCRIPTION:
+                prompt += f"Description: {character['description1']}\n"
+            character_counter += 1
+
+        # Format evidences
+        evidence_counter = 0
+        evidences = []
+        for evidence in turn['evidences']:
+            evidence_string = f"Evidence {evidence_counter}\n"
+            evidence_string += f"Name: {evidence['name']}\n"
+            if not NO_DESCRIPTION:
+                evidence_string += f"Description: "
+                descriptions = []
+                for key in evidence.keys():
+                    if 'description' in key:
+                        descriptions.append(evidence[key])
+                evidence_string += " ".join(descriptions) + "\n"
+            evidences.append(evidence_string)
+            evidence_counter += 1
+        
+        # Format testimonies
+        testimony_counter = 0
+        testimonies = []
+        for testimony in turn['testimonies']:
+            testimony_string = f"Testimony {testimony_counter}\n"
+            testimony_string += f"Testimony: {testimony['testimony']}\n"
+            testimony_string += f"Person: {testimony['person']}\n"
+            # Provide context if needed
+            if "source" in testimony and \
+                testimony["source"].get("is_self_contained", "yes") == "no" and \
+                CONTEXT is None:
+                context_span = testimony["source"]["context_span"]
+                if not context_is_added and not NO_DESCRIPTION:
+                    for i, evidence_string in enumerate(evidences):
+                        evidence_spans = testimony["source"]["evidence_span"]
+                        if isinstance(evidence_spans, str):
+                            evidence_spans = [evidence_spans]
+                        for evidence_span in evidence_spans:
+                            if evidence_span in evidence_string: # Find evidence
+                                evidences[i] += f"{context_span}\n"  # Add context span
+                    context_is_added = True
+            testimony_counter += 1
+            testimonies.append(testimony_string)
+        
+        # Add reasoning if requested
+        reasoning_section = ""
+        if REASONING != 'none' and turn['reasoning']:
+            reasoning_section = "Reasoning:\n"
+            reasoning_items = []
+            
+            if REASONING == 'full':
+                reasoning_items = turn['reasoning']
+            elif REASONING == 'facts':
+                reasoning_items = [item for item in turn['reasoning'] if item.startswith('Fact')]
+            elif REASONING == 'props':
+                reasoning_items = [item for item in turn['reasoning'] if item.startswith('Prop')]
+            
+            for i, item in enumerate(reasoning_items, 1):
+                reasoning_section += f"{i}. {item}\n"
+            reasoning_section += "\n"
+        
+        # Build rest of the prompt
+        prompt += f"Evidences:\n{''.join(evidences)}\nTestimonies:\n{''.join(testimonies)}\n{reasoning_section}"
+        
+        # Use cached RAG props
+        enhanced_prefix = PROMPT_PREFIX
+        global current_rag_prop_generator
+        if current_rag_prop_generator is not None:
+            try:
+                # Get cached RAG props - we need the RAG rules for the cache key, but we'll use a simplified approach
+                # Since props are already generated in parallel phase, we can get them by case/turn
+                cached_props = None
+                for entry in current_rag_prop_generator.props_log:
+                    if entry['case_name'] == case_name and entry['turn_idx'] == turn_idx:
+                        cached_props = entry['parsed_props']
+                        break
+                
+                if cached_props is not None:
+                    props_text = "\n".join([f"Prop {i+1}: {prop}" 
+                                          for i, prop in enumerate(cached_props)])
+                    enhanced_prefix = PROMPT_PREFIX.replace("{rag_generated_props}", props_text)
+                    print(f"[INFO] Using {len(cached_props)} cached RAG props for {case_name} turn {turn_idx}")
+                else:
+                    print(f"[WARNING] No cached RAG props found for {case_name} turn {turn_idx}, using fallback")
+                    enhanced_prefix = PROMPT_PREFIX.replace("{rag_generated_props}", 
+                                                           "No specific propositions generated.")
+            except Exception as e:
+                print(f"[WARNING] Failed to load cached RAG props for {case_name} turn {turn_idx}: {e}")
+                enhanced_prefix = PROMPT_PREFIX.replace("{rag_generated_props}", 
+                                                       "No specific propositions generated.")
+        
+        prompts.append(enhanced_prefix + prompt + PROMPT_SUFFIX)
+    
+    return prompts
+
+def collect_all_tasks_standard(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
+    """Standard processing for prompts without special features"""
+    print(f"<collect_all_tasks_standard> Collecting tasks from {len(fnames)} cases...")
+    
+    global current_prop_generator
+    current_prop_generator = None
+    
+    tasks = []
+    skip_count = 0
+    PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
+    
+    for fname in fnames:
+        case_name = fname.split('.')[0]
+        try:
+            turns, context = parse_json(os.path.join(data_dir, fname), label_filter)
+            if turns == []:  # Skip cases with no turns
+                skip_count += 1
+                continue
+                
+            prompts = build_prompt(turns, context, PROMPT_PREFIX, PROMPT_SUFFIX, CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT,
+                                  case_name=case_name, label_filter=label_filter, data=data_dir.split('/')[-2], output_dir=output_dir)
+            
+            # Add each prompt as a task
+            for turn_idx, prompt in enumerate(prompts):
+                tasks.append({
+                    'case_name': case_name,
+                    'turn_idx': turn_idx,
+                    'prompt': prompt
+                })
+                
+        except Exception as e:
+            print(f"<collect_all_tasks_standard> Error processing {fname}: {e}")
+            skip_count += 1
+            continue
+    
+    print(f"<collect_all_tasks_standard> Collected {len(tasks)} total tasks, skipped {skip_count} cases")
+    return tasks
+
 def collect_all_tasks(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
     """Collect all tasks (case, turn, prompt) that need to be processed"""
     
+    # Route to parallel RAG + prop generation for combined prompts
+    if PROMPT and "rag" in PROMPT and "prop" in PROMPT:
+        print(f"<collect_all_tasks> Detected RAG + prop prompt, using parallel RAG + prop generation")
+        return collect_tasks_with_parallel_rag_props(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
+    
     # Route to parallel prop generation for prop_generated prompts
-    if PROMPT and "prop_generated" in PROMPT:
+    elif PROMPT and "prop_generated" in PROMPT:
         print(f"<collect_all_tasks> Detected prop_generated prompt, using parallel prop generation")
         return collect_tasks_with_parallel_props(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
     
@@ -1032,10 +1429,13 @@ def save_case_results(case_name, case_results, output_dir):
 def run_job_global_parallel(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name, output_dir, data_dir, label_filter=None, reasoning=None, max_workers=20):
     """Main function that runs everything in global parallel mode"""
     global current_prop_generator
+    global current_rag_prop_generator
     
-    # Reset prop generator for new run
+    # Reset prop generators for new run
     if PROMPT and "prop_generated" in PROMPT:
         current_prop_generator = None
+    if PROMPT and "rag" in PROMPT and "prop" in PROMPT:
+        current_rag_prop_generator = None
     
     print(f"<run_job_global_parallel> Starting global parallel processing")
     
@@ -1082,6 +1482,16 @@ def run_job_global_parallel(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, clie
             print(f"[WARNING] Prop generation was expected but no props were logged")
     except Exception as e:
         print(f"[WARNING] Failed to save props log: {e}")
+    
+    # Save RAG props log if RAG prop generation was used
+    try:
+        if 'current_rag_prop_generator' in globals() and current_rag_prop_generator is not None:
+            print(f"[INFO] Saving RAG props log with {len(current_rag_prop_generator.props_log)} turns from this run")
+            current_rag_prop_generator.save_props_log(output_dir, MODEL.split("/")[-1], PROMPT)
+        elif PROMPT and "rag" in PROMPT and "prop" in PROMPT:
+            print(f"[WARNING] RAG prop generation was expected but no props were logged")
+    except Exception as e:
+        print(f"[WARNING] Failed to save RAG props log: {e}")
 
 if __name__ == "__main__":
     parser = parse_arguments()
