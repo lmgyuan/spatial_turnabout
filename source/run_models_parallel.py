@@ -220,10 +220,24 @@ def build_prompt(
         if current_prop_generator is None:
             try:
                 from prop_generator import PropGenerator
-                # Determine prop template based on main prompt
-                prop_template = "prop_generation_improved.json" if "improved" in PROMPT_ARG else "prop_generation.json"
+                # Parse prop count from prompt name (e.g., prop_generated_p10_improved -> prop_count=10)
+                prop_count = 15  # Default value
+                prop_match = re.search(r'_p(\d+)', PROMPT_ARG)
+                if prop_match:
+                    prop_count = int(prop_match.group(1))
+                
+                # Check for v2 version and select appropriate template
+                if "_v2" in PROMPT_ARG:
+                    prop_template = f"prop_generation_p{prop_count}_improved_v2.json"
+                else:
+                    prop_template = f"prop_generation_p{prop_count}_improved.json"
+                
+                if not os.path.exists(f"prompts/{prop_template}"):
+                    print(f"[WARNING] Template {prop_template} not found, using default")
+                    prop_template = "prop_generation_improved.json"
+                
                 current_prop_generator = PropGenerator(prompt_file=f"prompts/{prop_template}")
-                print(f"[INFO] Prop generation mode activated for prompt: {PROMPT_ARG}")
+                print(f"[INFO] Prop generation mode activated for prompt: {PROMPT_ARG} (template: {prop_template})")
                 
                 # Initialize cache if we have output_dir
                 if output_dir:
@@ -751,10 +765,24 @@ def collect_tasks_with_parallel_props(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIP
     if current_prop_generator is None:
         try:
             from prop_generator import PropGenerator
-            # Determine prop template based on main prompt
-            prop_template = "prop_generation_improved.json" if "improved" in PROMPT else "prop_generation.json"
+            # Parse prop count from prompt name (e.g., prop_generated_p10_improved -> prop_count=10)
+            prop_count = 15  # Default value
+            prop_match = re.search(r'_p(\d+)', PROMPT)
+            if prop_match:
+                prop_count = int(prop_match.group(1))
+            
+            # Check for v2 version and select appropriate template
+            if "_v2" in PROMPT:
+                prop_template = f"prop_generation_p{prop_count}_improved_v2.json"
+            else:
+                prop_template = f"prop_generation_p{prop_count}_improved.json"
+            
+            if not os.path.exists(f"prompts/{prop_template}"):
+                print(f"[WARNING] Template {prop_template} not found, using default")
+                prop_template = "prop_generation_improved.json"
+            
             current_prop_generator = PropGenerator(prompt_file=f"prompts/{prop_template}")
-            print(f"[INFO] Prop generation mode activated for prompt: {PROMPT}")
+            print(f"[INFO] Prop generation mode activated for prompt: {PROMPT} (template: {prop_template})")
             
             # Initialize cache if we have output_dir
             if output_dir:
@@ -955,8 +983,11 @@ def collect_tasks_with_parallel_rag_props(fnames, MODEL, PROMPT, CONTEXT, NO_DES
         if prop_match:
             prop_count = int(prop_match.group(1))
         
-        # Select appropriate template based on prop count
-        prop_template = f"prompts/rag_prop_generation_p{prop_count}_improved.json"
+        # Select appropriate template based on prop count and v2 variant
+        if "_v2" in PROMPT:
+            prop_template = f"prompts/rag_prop_generation_p{prop_count}_improved_v2.json"
+        else:
+            prop_template = f"prompts/rag_prop_generation_p{prop_count}_improved.json"
         if not os.path.exists(prop_template):
             print(f"[WARNING] Template {prop_template} not found, using default")
             prop_template = "prompts/rag_prop_generation_improved.json"
