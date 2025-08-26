@@ -6,9 +6,9 @@ Scripts for evaluating LLM deductive reasoning on detective game contradictions.
 
 **Supported Models:** OpenAI (`gpt-*`, `o3-*`, `o4-*`) and Nebius (`nebius-*`)
 
-## Four Processing Pipelines
+## Five Processing Pipelines
 
-The system supports four distinct processing pipelines for different reasoning approaches:
+The system supports five distinct processing pipelines for different reasoning approaches:
 
 ### 1. **Base Pipeline** 
 - **Purpose:** Direct contradiction detection with static rules
@@ -37,6 +37,14 @@ The system supports four distinct processing pipelines for different reasoning a
   - Generates N propositions based on retrieved rules
   - V2 variant: Contextually specific propositions
 - **Example:** `rulesv3_rag_prop_t15_p5_improved_v2`
+
+### 5. **Rules Generation Pipeline**
+- **Purpose:** Generate a per-turn set of spatial reasoning rules (no RAG)
+- **Usage:** `-p rules_generated_r{N}_improved_v2` (where N = 5, 10, or 15)
+- **Features:**
+  - Produces N general-but-case-relevant rules per turn (deterministic: temperature=0, seed=42)
+  - Injects rules into consumer templates via `{generated_rules}`
+- **Example:** `rules_generated_r10_improved_v2`
 
 ## Basic Usage
 
@@ -73,6 +81,11 @@ python run_models_parallel.py -m nebius-llama3.3-70b -p rulesv3_rag_t15_improved
 python run_models_parallel.py -m nebius-llama3.3-70b -p rulesv3_rag_prop_t10_p5_improved_v2 --context sum --label spatial
 ```
 
+**Rules Generated (V2 - per-turn rules, no RAG):**
+```bash
+python run_models_parallel.py -m nebius-llama3.3-70b -p rules_generated_r10_improved_v2 --context sum --label spatial
+```
+
 ## Command Options
 
 | Option | Description | Values |
@@ -102,11 +115,13 @@ NEBIUS_API_KEY=your_key_here
 | **RAG** | `rulesv3_rag_t10_improved.json` | 10 most relevant rules |
 | **Combined** | `rulesv3_rag_prop_t15_p5_improved.json` | 15 rules + 5 generic props |
 | **Combined** | `rulesv3_rag_prop_t10_p5_improved_v2.json` | 10 rules + 5 contextual props |
+| **Rules Generated** | `rules_generated_r10_improved_v2.json` | Use per-turn generated rules |
 
 ## Technical Details
 
 **RAG Control:** `_t{N}` controls rule count (e.g., `_t10` = 10 rules)  
 **Proposition Control:** `_p{M}` controls generated propositions (e.g., `_p5` = 5 propositions)  
+**Rules Generation Control:** `_r{N}` controls generated rules (e.g., `_r10` = 10 rules; V2 consumer with `{generated_rules}`)
 **V2 Variants:** `_v2` suffix enables contextually specific propositions instead of generic universal principles  
 **Parallel vs Sequential:** Use `run_models_parallel.py` for speed, `run_models_spatial.py` for debugging
 
@@ -118,11 +133,12 @@ python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --lab
 python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label temporal --max_workers 20
 python run_models_parallel.py -m nebius-llama3.3-70b -p base --context sum --label behavioral --max_workers 20
 
-# Compare all four pipelines
+# Compare all five pipelines
 python run_models_parallel.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial
 python run_models_parallel.py -m nebius-llama3.3-70b -p prop_generated_p10_improved_v2 --context sum --label spatial  
 python run_models_parallel.py -m nebius-llama3.3-70b -p rulesv3_rag_t10_improved --context sum --label spatial
 python run_models_parallel.py -m nebius-llama3.3-70b -p rulesv3_rag_prop_t15_p5_improved_v2 --context sum --label spatial
+python run_models_parallel.py -m nebius-llama3.3-70b -p rules_generated_r10_improved_v2 --context sum --label spatial
 
 # Evaluate results
 python evaluate_spatial.py -m nebius-llama3.3-70b -p rulesv4_explicit --context sum --label spatial

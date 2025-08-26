@@ -42,6 +42,9 @@ current_prop_generator = None
 # Global variable for RAG prop generator
 current_rag_prop_generator = None
 
+# Global variable for Rules generator (new pipeline)
+current_rule_generator = None
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
     # General args
@@ -353,6 +356,50 @@ def build_prompt(
                 enhanced_prefix = PROMPT_PREFIX.replace("{generated_props}", 
                                                        "No specific propositions generated.")
         
+        # Handle Rules-generated pipeline (no RAG). Inject {generated_rules}
+        elif PROMPT_ARG and "rules_generated" in PROMPT_ARG:
+            # Guard against accidental RAG mixing
+            if "rag" in PROMPT_ARG:
+                raise ValueError("[rules_generated] Prompt must not contain 'rag'")
+            if "{generated_rules}" not in PROMPT_PREFIX:
+                raise ValueError("[rules_generated] Template missing {generated_rules} placeholder")
+
+            try:
+                # Parse rule count r5/r10/r15
+                match = re.search(r'_r(\d+)', PROMPT_ARG)
+                if not match:
+                    raise ValueError("[rules_generated] Missing rN in prompt name (r5/r10/r15)")
+                rule_count = int(match.group(1))
+                if rule_count not in [5, 10, 15]:
+                    raise ValueError(f"[rules_generated] Unsupported rule count: {rule_count}")
+
+                # Initialize RuleGenerator once
+                global current_rule_generator
+                if current_rule_generator is None:
+                    from rule_generator import RuleGenerator
+                    # Always use improved_v2 generator template
+                    rule_template = f"prompts/rule_generation_r{rule_count}_improved_v2.json"
+                    if not os.path.exists(rule_template):
+                        raise ValueError(f"[rules_generated] Template not found: {rule_template}")
+                    current_rule_generator = RuleGenerator(prompt_file=rule_template, rule_count=rule_count, seed=42)
+                    if output_dir:
+                        model_name = MODEL.split("/")[-1]
+                        current_rule_generator.set_cache_file(output_dir, model_name, PROMPT_ARG)
+
+                # Load model for rule generation (same as main model)
+                client, client_name = load_model(MODEL)
+
+                generated_rules = current_rule_generator.generate_turn_rules(
+                    turn, client, client_name, case_name, turn_idx, rule_count=rule_count
+                )
+                rules_text = "\n".join([f"Rule {i+1}: {rule}" for i, rule in enumerate(generated_rules)])
+                enhanced_prefix = PROMPT_PREFIX.replace("{generated_rules}", rules_text)
+                print(f"[INFO] Generated {len(generated_rules)} rules for {case_name} turn {turn_idx}")
+
+            except Exception as e:
+                print(f"[WARNING] Rule generation failed for turn {turn_idx}: {e}")
+                enhanced_prefix = PROMPT_PREFIX.replace("{generated_rules}", "No rules generated.")
+
         # Handle RAG + prop generation for combined prompts
         elif PROMPT_ARG and "rag" in PROMPT_ARG and "prop" in PROMPT_ARG and "{rag_generated_props}" in PROMPT_PREFIX:
             try:
@@ -707,6 +754,16 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
             print(f"[WARNING] RAG prop generation was expected but no props were logged")
     except Exception as e:
         print(f"[WARNING] Failed to save RAG props log: {e}")
+
+    # Save Rules log if rules generation was used
+    try:
+        if 'current_rule_generator' in globals() and current_rule_generator is not None:
+            print(f"[INFO] Saving rules log with {len(current_rule_generator.rules_log)} turns from this run")
+            current_rule_generator.save_rules_log(output_dir, MODEL.split("/")[-1], PROMPT)
+        elif PROMPT and "rules_generated" in PROMPT:
+            print(f"[WARNING] Rules generation was expected but no rules were logged")
+    except Exception as e:
+        print(f"[WARNING] Failed to save rules log: {e}")
 
 if __name__ == "__main__":
     parser = parse_arguments()

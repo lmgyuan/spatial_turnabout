@@ -44,6 +44,9 @@ current_prop_generator = None
 # Global variable for RAG prop generator
 current_rag_prop_generator = None
 
+# Global variable for Rules generator (new pipeline)
+current_rule_generator = None
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
     # General args
@@ -208,7 +211,8 @@ def build_prompt(
     label_filter=None,
     data='aceattorney',
     output_dir=None,
-    skip_prop_generation=False
+    skip_prop_generation=False,
+    skip_rule_generation=False
 ):
     prompts = []
     context_sofar = ""
@@ -373,6 +377,53 @@ def build_prompt(
                 print(f"[WARNING] Failed to load cached props for {case_name} turn {turn_idx}: {e}")
                 enhanced_prefix = PROMPT_PREFIX.replace("{generated_props}", 
                                                        "No specific propositions generated.")
+
+        # Handle Rules-generated pipeline (no RAG). Inject {generated_rules}
+        elif PROMPT_ARG and "rules_generated" in PROMPT_ARG:
+            # Guard against accidental RAG mixing
+            if "rag" in PROMPT_ARG:
+                raise ValueError("[rules_generated] Prompt must not contain 'rag'")
+            if "{generated_rules}" not in PROMPT_PREFIX:
+                raise ValueError("[rules_generated] Template missing {generated_rules} placeholder")
+
+            try:
+                # Parse rule count r5/r10/r15
+                match = re.search(r'_r(\d+)', PROMPT_ARG)
+                if not match:
+                    raise ValueError("[rules_generated] Missing rN in prompt name (r5/r10/r15)")
+                rule_count = int(match.group(1))
+                if rule_count not in [5, 10, 15]:
+                    raise ValueError(f"[rules_generated] Unsupported rule count: {rule_count}")
+
+                # Initialize RuleGenerator once
+                global current_rule_generator
+                if current_rule_generator is None:
+                    from rule_generator import RuleGenerator
+                    rule_template = f"prompts/rule_generation_r{rule_count}_improved_v2.json"
+                    if not os.path.exists(rule_template):
+                        raise ValueError(f"[rules_generated] Template not found: {rule_template}")
+                    current_rule_generator = RuleGenerator(prompt_file=rule_template, rule_count=rule_count, seed=42)
+                    if output_dir:
+                        model_name = MODEL.split("/")[-1]
+                        current_rule_generator.set_cache_file(output_dir, model_name, PROMPT_ARG)
+
+                rules_to_use = None
+                if skip_rule_generation:
+                    # Use cached rules only
+                    rules_to_use = current_rule_generator.get_cached_rules(case_name, turn_idx, rule_count)
+                if rules_to_use is None:
+                    # Load model for rule generation (same as main model)
+                    client, client_name = load_model(MODEL)
+                    rules_to_use = current_rule_generator.generate_turn_rules(
+                        turn, client, client_name, case_name, turn_idx, rule_count=rule_count
+                    )
+                rules_text = "\n".join([f"Rule {i+1}: {rule}" for i, rule in enumerate(rules_to_use)])
+                enhanced_prefix = PROMPT_PREFIX.replace("{generated_rules}", rules_text)
+                print(f"[INFO] Prepared {len(rules_to_use)} rules for {case_name} turn {turn_idx}")
+
+            except Exception as e:
+                print(f"[WARNING] Rule handling failed for turn {turn_idx}: {e}")
+                enhanced_prefix = PROMPT_PREFIX.replace("{generated_rules}", "No rules generated.")
         
         # Enhance prompt with RAG if using RAG prompt
         elif PROMPT_ARG and "rag" in PROMPT_ARG and "{dynamic_rules}" in PROMPT_PREFIX:
@@ -855,6 +906,93 @@ def collect_tasks_with_parallel_props(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIP
     
     print(f"<collect_tasks_with_parallel_props> Generated {len(tasks)} total tasks, skipped {skip_count} cases")
     return tasks
+def collect_tasks_with_parallel_rules(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
+    """Collect tasks with parallel rule generation for rules_generated prompts"""
+    print(f"<collect_tasks_with_parallel_rules> Processing {len(fnames)} cases with parallel rules generation")
+
+    global current_rule_generator
+
+    # Parse rule count from prompt
+    match = re.search(r'_r(\d+)', PROMPT)
+    if not match:
+        raise ValueError("[rules_generated] Missing rN in prompt name (r5/r10/r15)")
+    rule_count = int(match.group(1))
+    if rule_count not in [5, 10, 15]:
+        raise ValueError(f"[rules_generated] Unsupported rule count: {rule_count}")
+
+    # Initialize rule generator
+    if current_rule_generator is None:
+        from rule_generator import RuleGenerator
+        rule_template = f"prompts/rule_generation_r{rule_count}_improved_v2.json"
+        if not os.path.exists(rule_template):
+            raise ValueError(f"[rules_generated] Template not found: {rule_template}")
+        current_rule_generator = RuleGenerator(prompt_file=rule_template, rule_count=rule_count, seed=42)
+        if output_dir:
+            model_name = MODEL.split("/")[-1]
+            current_rule_generator.set_cache_file(output_dir, model_name, PROMPT)
+
+    # Step 1: Collect all rule generation tasks
+    rule_tasks = []
+    case_turn_data = {}
+    skip_count = 0
+
+    for fname in fnames:
+        case_name = fname.split('.')[0]
+        try:
+            turns, context = parse_json(os.path.join(data_dir, fname), label_filter)
+            if turns == []:
+                skip_count += 1
+                continue
+            case_turn_data[case_name] = {'turns': turns, 'context': context}
+            for turn_idx, turn in enumerate(turns):
+                rule_tasks.append({
+                    'case_name': case_name,
+                    'turn_idx': turn_idx,
+                    'turn_data': turn
+                })
+        except Exception as e:
+            print(f"<collect_tasks_with_parallel_rules> Error processing {fname}: {e}")
+            skip_count += 1
+            continue
+
+    print(f"<collect_tasks_with_parallel_rules> Found {len(rule_tasks)} rules generation tasks")
+
+    # Step 2: Generate all rules in parallel
+    def generate_single_rule_task(task):
+        try:
+            case_name = task['case_name']
+            turn_idx = task['turn_idx']
+            turn_data = task['turn_data']
+            client, client_name = load_model(MODEL)
+            rules = current_rule_generator.generate_turn_rules(turn_data, client, client_name, case_name, turn_idx, rule_count=rule_count)
+            return {'case_name': case_name, 'turn_idx': turn_idx, 'rules': rules, 'success': True}
+        except Exception as e:
+            print(f"<generate_single_rule_task> Error for {task['case_name']} turn {task['turn_idx']}: {e}")
+            return {'case_name': task['case_name'], 'turn_idx': task['turn_idx'], 'rules': [], 'success': False}
+
+    if rule_tasks:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            list(executor.map(generate_single_rule_task, rule_tasks))
+
+    # Step 3: Build prompts using cached rules only
+    tasks = []
+    PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
+    for case_name, data in case_turn_data.items():
+        try:
+            prompts = build_prompt(
+                data['turns'], data['context'], PROMPT_PREFIX, PROMPT_SUFFIX,
+                CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT,
+                case_name=case_name, label_filter=label_filter, data=data_dir.split('/')[-2], output_dir=output_dir,
+                skip_prop_generation=True, skip_rule_generation=True
+            )
+            for turn_idx, prompt in enumerate(prompts):
+                tasks.append({'case_name': case_name, 'turn_idx': turn_idx, 'prompt': prompt})
+        except Exception as e:
+            print(f"<collect_tasks_with_parallel_rules> Error building prompts for {case_name}: {e}")
+            continue
+
+    print(f"<collect_tasks_with_parallel_rules> Generated {len(tasks)} total tasks, skipped {skip_count} cases")
+    return tasks
 
 def collect_tasks_with_parallel_rag(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
     """Collect tasks with parallel RAG processing for rag prompts"""
@@ -1333,6 +1471,11 @@ def collect_all_tasks_standard(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, d
 
 def collect_all_tasks(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
     """Collect all tasks (case, turn, prompt) that need to be processed"""
+    
+    # Route to parallel rules generation for rules_generated prompts
+    if PROMPT and "rules_generated" in PROMPT:
+        print(f"<collect_all_tasks> Detected rules_generated prompt, using parallel rules generation")
+        return collect_tasks_with_parallel_rules(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
     
     # Route to parallel RAG + prop generation for combined prompts
     if PROMPT and "rag" in PROMPT and "prop" in PROMPT:

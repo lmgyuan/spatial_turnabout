@@ -107,7 +107,8 @@ class RagPropGenerator:
                 {"role": "system", "content": "You are a helpful assistant"},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0
+            temperature=0,
+            seed=42
         )
         
         full_answer = response.choices[0].message.content
