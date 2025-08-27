@@ -62,7 +62,10 @@ class RuleGenerator:
         if cache_key in self.rules_cache:
             cached_entry = self.rules_cache[cache_key]
             print(f"[RULES CACHE HIT] Using cached rules for {cache_key} (generated {cached_entry.get('generated_at', 'unknown')})")
-            return cached_entry.get('rules', [])
+            raw_rules = cached_entry.get('rules', [])
+            # Sanitize cached rules to avoid leaking any non-rule content
+            count = int(rule_count if rule_count is not None else self.rule_count)
+            return self._sanitize_rules_list(raw_rules, count)
         return None
 
     def cache_rules(self, case_name, turn_idx, rules, rule_count=None):
@@ -71,12 +74,15 @@ class RuleGenerator:
             print(f"[RULES CACHE] Skipping cache for {case_name}_turn_{turn_idx} - no rules to cache")
             return
         cache_key = self.get_cache_key(case_name, turn_idx, rule_count)
+        # Sanitize before storing
+        count = int(rule_count if rule_count is not None else self.rule_count)
+        sanitized = self._sanitize_rules_list(rules, count)
         self.rules_cache[cache_key] = {
-            'rules': rules,
+            'rules': sanitized,
             'generated_at': datetime.now().isoformat(),
             'case_name': case_name,
             'turn_idx': turn_idx,
-            'rule_count': int(rule_count if rule_count is not None else self.rule_count)
+            'rule_count': count
         }
         print(f"[RULES CACHE] Cached {len(rules)} rules for {cache_key}")
         self.save_cache()
@@ -107,7 +113,7 @@ class RuleGenerator:
         )
 
         full_answer = response.choices[0].message.content
-        rules = self._parse_rules(full_answer)
+        rules = self._parse_rules(full_answer, count)
 
         if case_name is not None and turn_idx is not None:
             self.cache_rules(case_name, turn_idx, rules, count)
@@ -161,20 +167,52 @@ class RuleGenerator:
         prompt = prefix + case_data + suffix
         return prompt
 
-    def _parse_rules(self, response):
-        lines = response.strip().split('\n')
-        rules = []
+    def _parse_rules(self, response, rule_count):
+        """Parse only rule-like lines and keep the last N that start with 'If'."""
+        lines = response.splitlines()
+        candidates = []
         for line in lines:
-            if not line.strip():
+            if not line:
                 continue
             clean = line.strip()
-            # Accept formats like "Rule X: ..." or numbered lists
+            if not clean:
+                continue
+            # Trim a leading "Rule X:" prefix if present
             if ':' in clean:
-                parts = clean.split(':', 1)
-                if parts[0].lower().startswith('rule'):
-                    clean = parts[1].strip()
-            rules.append(clean)
-        return rules
+                prefix = clean.split(':', 1)[0].strip().lower()
+                if prefix.startswith('rule'):
+                    clean = clean.split(':', 1)[1].strip()
+            # Keep only lines that look like actual rules
+            if clean.startswith('If'):
+                candidates.append(clean)
+        if not candidates:
+            return []
+        # Take the last rule_count entries
+        count = int(rule_count)
+        return candidates[-count:] if len(candidates) >= count else candidates
+
+    def _sanitize_rules_list(self, rules, rule_count):
+        """Sanitize a list of rules: keep only lines starting with 'If', return last N."""
+        if not isinstance(rules, list):
+            return []
+        candidates = []
+        for r in rules:
+            if not isinstance(r, str):
+                continue
+            clean = r.strip()
+            if not clean:
+                continue
+            # Trim a leading "Rule X:" prefix if present
+            if ':' in clean:
+                prefix = clean.split(':', 1)[0].strip().lower()
+                if prefix.startswith('rule'):
+                    clean = clean.split(':', 1)[1].strip()
+            if clean.startswith('If'):
+                candidates.append(clean)
+        if not candidates:
+            return []
+        count = int(rule_count)
+        return candidates[-count:] if len(candidates) >= count else candidates
 
     def _log_rules(self, rules, turn_data, case_name, turn_idx, prompt_sent, raw_response):
         log_entry = {

@@ -6,9 +6,9 @@ Scripts for evaluating LLM deductive reasoning on detective game contradictions.
 
 **Supported Models:** OpenAI (`gpt-*`, `o3-*`, `o4-*`) and Nebius (`nebius-*`)
 
-## Five Processing Pipelines
+## Six Processing Pipelines
 
-The system supports five distinct processing pipelines for different reasoning approaches:
+The system supports six distinct processing pipelines for different reasoning approaches:
 
 ### 1. **Base Pipeline** 
 - **Purpose:** Direct contradiction detection with static rules
@@ -45,6 +45,15 @@ The system supports five distinct processing pipelines for different reasoning a
   - Produces N general-but-case-relevant rules per turn (deterministic: temperature=0, seed=42)
   - Injects rules into consumer templates via `{generated_rules}`
 - **Example:** `rules_generated_r10_improved_v2`
+
+### 6. **ET-Suggested Pipeline (Evidence/Testimony Suggestions)**
+- **Purpose:** Per-turn selection of N evidences and N testimonies most likely to contain the contradictory pair (no RAG)
+- **Usage:** `-p et_suggested_et{N}_improved_v2` (where N = 2 or 3)
+- **Features:**
+  - First pass: deterministic selection of N evidence indices and N testimony indices (temperature=0, seed=42)
+  - Second pass: injects suggestions and instructs model to search suggestions first, then full pool only if necessary
+  - Placeholders: `{suggested_evidences}`, `{suggested_testimonies}`
+- **Examples:** `et_suggested_et2_improved_v2`, `et_suggested_et3_improved_v2`
 
 ## Basic Usage
 
@@ -86,6 +95,11 @@ python run_models_parallel.py -m nebius-llama3.3-70b -p rulesv3_rag_prop_t10_p5_
 python run_models_parallel.py -m nebius-llama3.3-70b -p rules_generated_r10_improved_v2 --context sum --label spatial
 ```
 
+**ET-Suggested (N=2 suggestions each):**
+```bash
+python run_models_parallel.py -m nebius-llama3.3-70b -p et_suggested_et2_improved_v2 --context sum --label spatial
+```
+
 ## Command Options
 
 | Option | Description | Values |
@@ -116,12 +130,14 @@ NEBIUS_API_KEY=your_key_here
 | **Combined** | `rulesv3_rag_prop_t15_p5_improved.json` | 15 rules + 5 generic props |
 | **Combined** | `rulesv3_rag_prop_t10_p5_improved_v2.json` | 10 rules + 5 contextual props |
 | **Rules Generated** | `rules_generated_r10_improved_v2.json` | Use per-turn generated rules |
+| **ET-Suggested** | `et_suggested_et2_improved_v2.json` | Suggest E/T indices; search suggestions first |
 
 ## Technical Details
 
 **RAG Control:** `_t{N}` controls rule count (e.g., `_t10` = 10 rules)  
 **Proposition Control:** `_p{M}` controls generated propositions (e.g., `_p5` = 5 propositions)  
 **Rules Generation Control:** `_r{N}` controls generated rules (e.g., `_r10` = 10 rules; V2 consumer with `{generated_rules}`)
+**ET Selection Control:** `_et{N}` controls number of suggested evidences and testimonies (2 or 3)
 **V2 Variants:** `_v2` suffix enables contextually specific propositions instead of generic universal principles  
 **Parallel vs Sequential:** Use `run_models_parallel.py` for speed, `run_models_spatial.py` for debugging
 
