@@ -45,9 +45,6 @@ current_rag_prop_generator = None
 # Global variable for Rules generator (new pipeline)
 current_rule_generator = None
 
-# Global variable for ET selector (new pipeline 6)
-current_et_selector = None
-
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
     # General args
@@ -403,50 +400,6 @@ def build_prompt(
                 print(f"[WARNING] Rule generation failed for turn {turn_idx}: {e}")
                 enhanced_prefix = PROMPT_PREFIX.replace("{generated_rules}", "No rules generated.")
 
-        # Handle ET-Suggested pipeline (no RAG). Inject {suggested_evidences} and {suggested_testimonies}
-        elif PROMPT_ARG and "et_suggested" in PROMPT_ARG:
-            # Guard against accidental RAG mixing
-            if "rag" in PROMPT_ARG:
-                raise ValueError("[et_suggested] Prompt must not contain 'rag'")
-            if "{suggested_evidences}" not in PROMPT_PREFIX or "{suggested_testimonies}" not in PROMPT_PREFIX:
-                raise ValueError("[et_suggested] Template missing {suggested_evidences} or {suggested_testimonies} placeholder")
-
-            try:
-                # Parse N from prompt name _etN
-                match = re.search(r'_et(\d+)', PROMPT_ARG)
-                if not match:
-                    raise ValueError("[et_suggested] Missing etN in prompt name (et2/et3)")
-                et_n = int(match.group(1))
-                if et_n not in [2, 3]:
-                    raise ValueError(f"[et_suggested] Unsupported selection count: {et_n}")
-
-                # Initialize ETSelector once
-                global current_et_selector
-                if current_et_selector is None:
-                    from et_selector import ETSelector
-                    sel_template = f"prompts/et_selection_et{et_n}_improved_v2.json"
-                    if not os.path.exists(sel_template):
-                        raise ValueError(f"[et_suggested] Template not found: {sel_template}")
-                    current_et_selector = ETSelector(prompt_file=sel_template, n=et_n, seed=42)
-                    if output_dir:
-                        model_name = MODEL.split("/")[-1]
-                        current_et_selector.set_cache_file(output_dir, model_name, PROMPT_ARG)
-
-                # Load model for selection (same as main model)
-                client, client_name = load_model(MODEL)
-
-                ev_idxs, ts_idxs = current_et_selector.select(
-                    turn, client, client_name, case_name, turn_idx
-                )
-                ev_str = ", ".join(str(i) for i in ev_idxs)
-                ts_str = ", ".join(str(i) for i in ts_idxs)
-                enhanced_prefix = PROMPT_PREFIX.replace("{suggested_evidences}", ev_str).replace("{suggested_testimonies}", ts_str)
-                print(f"[INFO] Selected evidences {ev_idxs} and testimonies {ts_idxs} for {case_name} turn {turn_idx}")
-
-            except Exception as e:
-                print(f"[WARNING] ET selection failed for turn {turn_idx}: {e}")
-                enhanced_prefix = PROMPT_PREFIX.replace("{suggested_evidences}", "").replace("{suggested_testimonies}", "")
-
         # Handle RAG + prop generation for combined prompts
         elif PROMPT_ARG and "rag" in PROMPT_ARG and "prop" in PROMPT_ARG and "{rag_generated_props}" in PROMPT_PREFIX:
             try:
@@ -554,9 +507,30 @@ def get_json_answer(multiline_string):
             json_answer = json.loads(target)
             cot = "\n".join(lines[:-2])
         except json.JSONDecodeError:
-            # print(f"Error parsing JSON: {multiline_string[:-1]}")
-            json_answer = {}
-            cot = ""
+            # 3rd fallback: search for last valid JSON object in entire response
+            try:
+                import re
+                # Find all potential JSON objects in the response
+                json_pattern = r'\{[^{}]*"evidence"\s*:\s*\d+[^{}]*"testimony"\s*:\s*\d+[^{}]*\}'
+                matches = re.findall(json_pattern, multiline_string)
+                if matches:
+                    # Take the last match and try to parse it
+                    last_match = matches[-1]
+                    json_answer = json.loads(last_match)
+                    # For COT, use everything except the line containing the JSON
+                    cot_lines = []
+                    for line in lines:
+                        if last_match not in line:
+                            cot_lines.append(line)
+                    cot = "\n".join(cot_lines)
+                else:
+                    # print(f"Error parsing JSON: {multiline_string[:-1]}")
+                    json_answer = {}
+                    cot = ""
+            except (json.JSONDecodeError, re.error):
+                # print(f"Error parsing JSON: {multiline_string[:-1]}")
+                json_answer = {}
+                cot = ""
     return json_answer, cot
 
 def run_model(prompts, client, client_name):
@@ -811,16 +785,6 @@ def run_job(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, client, client_name,
             print(f"[WARNING] Rules generation was expected but no rules were logged")
     except Exception as e:
         print(f"[WARNING] Failed to save rules log: {e}")
-
-    # Save ET selection log if used
-    try:
-        if 'current_et_selector' in globals() and current_et_selector is not None:
-            print(f"[INFO] Saving ET selection log with {len(current_et_selector.log)} turns from this run")
-            current_et_selector.save_log(output_dir, MODEL.split("/")[-1], PROMPT)
-        elif PROMPT and "et_suggested" in PROMPT:
-            print(f"[WARNING] ET selection was expected but no selections were logged")
-    except Exception as e:
-        print(f"[WARNING] Failed to save ET selection log: {e}")
 
 if __name__ == "__main__":
     parser = parse_arguments()

@@ -1,0 +1,34 @@
+{
+  "case_id": "550-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "left"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:21:43.707400",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 2,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the question and the story to determine if all big apples are inside all boxes.\n\nThe story states:\n*   \"A big orange apple and a small yellow watermelon are covered by a box named one.\" - This implies the big orange apple is *within* box one.\n*   \"This fruit is within box one.\" - This confirms the big yellow apple is within box one.\n\nWe need to determine if *all* big apples are inside *all* boxes. We have two big apples mentioned: one orange and one yellow. Both are within box one. Box one is inside box two. Therefore, both big apples are inside box two.\n\nNow let's consider the spatial reasoning propositions:\n\n*   Prop 1: If object A is inside object B and object B is inside object C, then object A is inside object C. - This is relevant.\n*   Prop 2: If object A is inside object B and object B is covered by object C, then object A is inside object C. - Not directly relevant.\n*   Prop 3: If object A is covered by object B and object B is to the left of object C and object D is covered by object C, then object A is to the left of object D. - Not relevant.\n*   Prop 4: If object A is inside object B and object B is above object C and object D is inside object C, then object A is above object D. - Not relevant.\n*   Prop 5: If object A is inside object B and object B is to the left of object C and object D is inside object C, then object A is to the left of object D. - Not relevant.\n*   Prop 6: If object A is inside object B and object B is below object C and object D is inside object C, then object A is below object D. - Not relevant.\n*   Prop 7: If object A is covered by object B and object B is in front of object C and object D is covered by object C, then object A is in front of object D. - Not relevant.\n*   Prop 8: If object A is inside object B and object B is inside object C, then object A is inside object C. - Relevant.\n*   Prop 9: If object A is inside object B and object B is in front of object C and object D is inside object C, then object A is in front of object D. - Not relevant.\n*   Prop 10: If object A is inside object B and object B is near object C and object D is inside object C, then object A is near object D. - Not relevant.\n\nUsing Prop 8: The big orange apple is inside box one, and box one is inside box two. Therefore, the big orange apple is inside box two. The big yellow apple is inside box one, and box one is inside box two. Therefore, the big yellow apple is inside box two.\n\nSince both big apples are inside box two, and box two is a single box, we can conclude that all big apples are inside all boxes.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "left",
+      "full_response": "Let's analyze the question and the story to determine the position of the big orange apple relative to box two.\n\nThe question asks \"Where is the big orange apple regarding box two?\".\n\nHere's a breakdown of relevant propositions:\n\n*   **Prop 10:** If an object is covered by a container and that container is to the left of another container, then the first object is to the left of the second container. This proposition is relevant because box one is inside box two.\n*   **Prop 7:** If an object is inside a container and that container is to the left of another container and a third object is inside the second container, then the first object is to the left of the third object. This is relevant because the big orange apple is inside box one, which is inside box two, and the small orange watermelon is inside box two.\n\nNow let's apply these propositions:\n\n1.  Box one is inside box two.\n2.  The big orange apple is inside box one.\n3.  Therefore, the big orange apple is inside box two.\n\nSince box two covers the small orange watermelon and the medium green melon, and box one is inside box two, the big orange apple is to the left of the small orange watermelon.\n\n{\"answer\": \"left\"}",
+      "cot": ""
+    }
+  ]
+}

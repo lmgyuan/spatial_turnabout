@@ -1,0 +1,94 @@
+{
+  "case_id": "4000-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    },
+    {
+      "q_id": 7,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:17:08.065629",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question. The question asks if *all* blocks are away from a medium grey hexagon.\n\nWe know:\n1. Block HHH contains a medium grey hexagon and a medium red hexagon. Therefore, block HHH is *not* away from a medium grey hexagon.\n2. Block LLL is south of, disconnected from, and away from block HHH. Block LLL contains a medium red hexagon. This doesn't directly tell us if LLL is away from a medium grey hexagon, but it does tell us it's away from HHH.\n3. There's a medium grey hexagon to the south of the medium red hexagon inside HHH.\n4. There's a medium grey hexagon to the south of the medium red hexagon inside HHH, which is covered by HHH.\n\nSince block HHH is not away from a medium grey hexagon (it contains one), the answer to the question \"Are all blocks away from a medium grey hexagon?\" is No.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the propositions to answer the question.\n\nThe question asks if any medium object is disconnected from any medium red hexagon.\n\nThe story states:\n1. Block HHH contains a medium grey hexagon and a medium red hexagon.\n2. Block HHH covers another medium grey hexagon south of the first medium grey hexagon.\n3. The first medium grey hexagon is south of the medium red hexagon within HHH.\n4. Block LLL is south of, disconnected from, and away from block HHH.\n5. Block LLL contains a medium red hexagon.\n\nWe are looking for a medium object disconnected from a medium red hexagon.\n\nFrom the story, we know that block LLL is disconnected from block HHH. Block LLL contains a medium red hexagon.  Since block LLL is disconnected from block HHH, and block HHH contains a medium red hexagon, it follows that the medium red hexagon inside LLL is disconnected from the medium red hexagon inside HHH.\n\nThe question asks if *any* medium object is disconnected from *any* medium red hexagon. The medium grey hexagon in block LLL is a medium object, and it is inside block LLL, which is disconnected from block HHH (which contains a medium red hexagon). Therefore, the medium grey hexagon in LLL is disconnected from the medium red hexagon in HHH.\n\nTherefore, the answer is Yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question.\n\nThe story states:\n1. \"Medium grey hexagon number one is south of the medium red hexagon.\"\n2. \"This block covers another medium grey hexagon which is to the south of medium grey hexagon number one.\"\n\nThe question asks: \"Is medium grey hexagon number one to the north of medium grey hexagon number two?\"\n\nFrom the story, we know that medium grey hexagon number one is south of another medium grey hexagon. Let's call this other hexagon \"medium grey hexagon number two\". Therefore, medium grey hexagon number one is *not* to the north of medium grey hexagon number two; it is to the south.\n\nNo propositions are directly applicable here.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question. The question asks if all medium red hexagons are north of a hexagon.\n\nThe story states:\n1. Block HHH contains a medium grey hexagon and a medium red hexagon.\n2. Block HHH covers another medium grey hexagon which is to the south of medium grey hexagon number one.\n3. Medium grey hexagon number one is south of the medium red hexagon.\n4. Block LLL is to the south of block HHH and contains a medium red hexagon.\n\nFrom (3), the medium red hexagon within block HHH is north of medium grey hexagon number one.\nFrom (4), the medium red hexagon within block LLL is south of block LLL, and block LLL is south of block HHH. Therefore, this medium red hexagon is south of block HHH and thus south of the medium red hexagon within block HHH.\n\nSince we have one medium red hexagon north of a hexagon (medium grey hexagon number one) and another south of a hexagon (the medium red hexagon in block LLL), it is not true that *all* medium red hexagons are north of a hexagon.\n\nTherefore, the answer is No.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Okay, let's break this down.\n\nThe question asks about the position of LLL relative to medium grey hexagon number one. The story states: \"To the south of, disconnected from and away from block HHH there is block LLL.\"  This directly tells us that LLL is south of medium grey hexagon number one (since HHH contains medium grey hexagon number one).\n\nTherefore, the correct answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Okay, let's break this down.\n\nThe question asks about the relative position of medium grey hexagon number two (south of the first grey hexagon) and the medium red hexagon inside block LLL.\n\nThe story states:\n*   Block LLL contains a medium red hexagon.\n*   Block HHH covers a medium grey hexagon (number two) which is south of another medium grey hexagon (number one).\n*   Medium grey hexagon number one is south of the medium red hexagon in HHH.\n*   Block LLL is south of and away from block HHH.\n\nSince block LLL is south of block HHH, and the medium red hexagon is *inside* block LLL, and the grey hexagon number two is south of the red hexagon in HHH, the grey hexagon number two is south of the red hexagon in LLL.\n\nTherefore, the answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "Okay, let's break down this spatial reasoning problem.\n\n**1. Understanding the Story:**\n\n*   We have a block (HHH) containing two hexagons: a medium grey and a medium red.\n*   The block HHH covers a \"medium grey hexagon number one\" which is south of another \"medium grey hexagon number one\". This is a bit confusingly worded, but it means there's a medium grey hexagon *within* HHH, and it's south of another medium grey hexagon. Let's call the first one \"grey1\" and the second one \"grey2\".\n*   grey1 is south of the medium red hexagon within HHH.\n*   Block LLL is south of and disconnected from HHH.\n*   LLL contains a medium red hexagon.\n\n**2. Identifying Relevant Propositions:**\n\nThe question asks about the relative position of \"medium grey hexagon number one\" (grey1) and \"medium grey hexagon number two\" (grey2). The story states that grey1 is *south* of grey2.  None of the provided propositions directly address \"south\" or \"north\". Therefore, we need to rely on our own reasoning.\n\n**3. Reasoning and Answer:**\n\nSince the story explicitly states that grey1 is south of grey2, the correct answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "above",
+      "full_response": "Okay, let's break this down.\n\nThe question asks about the spatial relationship between the medium red hexagon in block HHH and medium grey hexagon number one.\n\nThe story states: \"Medium grey hexagon number one is south of the medium red hexagon.\"\n\nThis directly tells us the relationship.  The medium red hexagon is *above* medium grey hexagon number one.\n\nTherefore, the answer is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    }
+  ]
+}

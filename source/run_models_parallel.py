@@ -47,9 +47,6 @@ current_rag_prop_generator = None
 # Global variable for Rules generator (new pipeline)
 current_rule_generator = None
 
-# Global variable for ET selector (new pipeline 6)
-current_et_selector = None
-
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
     # General args
@@ -427,54 +424,6 @@ def build_prompt(
             except Exception as e:
                 print(f"[WARNING] Rule handling failed for turn {turn_idx}: {e}")
                 enhanced_prefix = PROMPT_PREFIX.replace("{generated_rules}", "No rules generated.")
-
-        # Handle ET-Suggested pipeline (no RAG). Inject {suggested_evidences} and {suggested_testimonies}
-        elif PROMPT_ARG and "et_suggested" in PROMPT_ARG:
-            # Guard against accidental RAG mixing
-            if "rag" in PROMPT_ARG:
-                raise ValueError("[et_suggested] Prompt must not contain 'rag'")
-            if "{suggested_evidences}" not in PROMPT_PREFIX or "{suggested_testimonies}" not in PROMPT_PREFIX:
-                raise ValueError("[et_suggested] Template missing {suggested_evidences} or {suggested_testimonies} placeholder")
-
-            try:
-                # Parse N from prompt name _etN
-                match = re.search(r'_et(\d+)', PROMPT_ARG)
-                if not match:
-                    raise ValueError("[et_suggested] Missing etN in prompt name (et2/et3)")
-                et_n = int(match.group(1))
-                if et_n not in [2, 3]:
-                    raise ValueError(f"[et_suggested] Unsupported selection count: {et_n}")
-
-                # Initialize ETSelector once
-                global current_et_selector
-                if current_et_selector is None:
-                    from et_selector import ETSelector
-                    sel_template = f"prompts/et_selection_et{et_n}_improved_v2.json"
-                    if not os.path.exists(sel_template):
-                        raise ValueError(f"[et_suggested] Template not found: {sel_template}")
-                    current_et_selector = ETSelector(prompt_file=sel_template, n=et_n, seed=42)
-                    if output_dir:
-                        model_name = MODEL.split("/")[-1]
-                        current_et_selector.set_cache_file(output_dir, model_name, PROMPT_ARG)
-
-                ev_idxs = []
-                ts_idxs = []
-                if skip_rule_generation:  # reuse the flag meaning "skip generation; only use cached"
-                    cached = current_et_selector.get_cached(case_name, turn_idx)
-                    if cached is not None:
-                        ev_idxs, ts_idxs = cached
-                if not ev_idxs and not ts_idxs:
-                    client, client_name = load_model(MODEL)
-                    ev_idxs, ts_idxs = current_et_selector.select(turn, client, client_name, case_name, turn_idx)
-
-                ev_str = ", ".join(str(i) for i in ev_idxs)
-                ts_str = ", ".join(str(i) for i in ts_idxs)
-                enhanced_prefix = PROMPT_PREFIX.replace("{suggested_evidences}", ev_str).replace("{suggested_testimonies}", ts_str)
-                print(f"[INFO] Prepared suggestions E={ev_idxs} T={ts_idxs} for {case_name} turn {turn_idx}")
-
-            except Exception as e:
-                print(f"[WARNING] ET handling failed for turn {turn_idx}: {e}")
-                enhanced_prefix = PROMPT_PREFIX.replace("{suggested_evidences}", "").replace("{suggested_testimonies}", "")
         
         # Enhance prompt with RAG if using RAG prompt
         elif PROMPT_ARG and "rag" in PROMPT_ARG and "{dynamic_rules}" in PROMPT_PREFIX:
@@ -651,9 +600,30 @@ def get_json_answer(multiline_string):
             json_answer = json.loads(target)
             cot = "\n".join(lines[:-2])
         except json.JSONDecodeError:
-            # print(f"Error parsing JSON: {multiline_string[:-1]}")
-            json_answer = {}
-            cot = ""
+            # 3rd fallback: search for last valid JSON object in entire response
+            try:
+                import re
+                # Find all potential JSON objects in the response
+                json_pattern = r'\{[^{}]*"evidence"\s*:\s*\d+[^{}]*"testimony"\s*:\s*\d+[^{}]*\}'
+                matches = re.findall(json_pattern, multiline_string)
+                if matches:
+                    # Take the last match and try to parse it
+                    last_match = matches[-1]
+                    json_answer = json.loads(last_match)
+                    # For COT, use everything except the line containing the JSON
+                    cot_lines = []
+                    for line in lines:
+                        if last_match not in line:
+                            cot_lines.append(line)
+                    cot = "\n".join(cot_lines)
+                else:
+                    # print(f"Error parsing JSON: {multiline_string[:-1]}")
+                    json_answer = {}
+                    cot = ""
+            except (json.JSONDecodeError, re.error):
+                # print(f"Error parsing JSON: {multiline_string[:-1]}")
+                json_answer = {}
+                cot = ""
     return json_answer, cot
 
 def run_single_prompt(prompt, client, client_name, global_idx, case_name, turn_idx):
@@ -1043,90 +1013,6 @@ def collect_tasks_with_parallel_rules(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIP
             continue
 
     print(f"<collect_tasks_with_parallel_rules> Generated {len(tasks)} total tasks, skipped {skip_count} cases")
-    return tasks
-
-def collect_tasks_with_parallel_et(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
-    """Collect tasks with parallel ET selection for et_suggested prompts"""
-    print(f"<collect_tasks_with_parallel_et> Processing {len(fnames)} cases with parallel ET selection")
-
-    global current_et_selector
-
-    # Parse N from prompt
-    match = re.search(r'_et(\d+)', PROMPT)
-    if not match:
-        raise ValueError("[et_suggested] Missing etN in prompt name (et2/et3)")
-    et_n = int(match.group(1))
-    if et_n not in [2, 3]:
-        raise ValueError(f"[et_suggested] Unsupported selection count: {et_n}")
-
-    # Initialize selector
-    if current_et_selector is None:
-        from et_selector import ETSelector
-        sel_template = f"prompts/et_selection_et{et_n}_improved_v2.json"
-        if not os.path.exists(sel_template):
-            raise ValueError(f"[et_suggested] Template not found: {sel_template}")
-        current_et_selector = ETSelector(prompt_file=sel_template, n=et_n, seed=42)
-        if output_dir:
-            model_name = MODEL.split("/")[-1]
-            current_et_selector.set_cache_file(output_dir, model_name, PROMPT)
-
-    # Step 1: Collect all ET selection tasks
-    et_tasks = []
-    case_turn_data = {}
-    skip_count = 0
-
-    for fname in fnames:
-        case_name = fname.split('.')[0]
-        try:
-            turns, context = parse_json(os.path.join(data_dir, fname), label_filter)
-            if turns == []:
-                skip_count += 1
-                continue
-            case_turn_data[case_name] = {'turns': turns, 'context': context}
-            for turn_idx, turn in enumerate(turns):
-                et_tasks.append({'case_name': case_name, 'turn_idx': turn_idx, 'turn_data': turn})
-        except Exception as e:
-            print(f"<collect_tasks_with_parallel_et> Error processing {fname}: {e}")
-            skip_count += 1
-            continue
-
-    print(f"<collect_tasks_with_parallel_et> Found {len(et_tasks)} ET selection tasks")
-
-    # Step 2: Run ET selection in parallel
-    def run_single_et(task):
-        try:
-            case_name = task['case_name']
-            turn_idx = task['turn_idx']
-            turn_data = task['turn_data']
-            client, client_name = load_model(MODEL)
-            current_et_selector.select(turn_data, client, client_name, case_name, turn_idx)
-            return True
-        except Exception as e:
-            print(f"<run_single_et> Error for {task['case_name']} turn {task['turn_idx']}: {e}")
-            return False
-
-    if et_tasks:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            list(executor.map(run_single_et, et_tasks))
-
-    # Step 3: Build prompts using cached selections only
-    tasks = []
-    PROMPT_PREFIX, PROMPT_SUFFIX = build_prompt_prefix_suffix(PROMPT)
-    for case_name, data in case_turn_data.items():
-        try:
-            prompts = build_prompt(
-                data['turns'], data['context'], PROMPT_PREFIX, PROMPT_SUFFIX,
-                CONTEXT, NO_DESCRIPTION, MODEL, reasoning, PROMPT,
-                case_name=case_name, label_filter=label_filter, data=data_dir.split('/')[-2], output_dir=output_dir,
-                skip_prop_generation=True, skip_rule_generation=True
-            )
-            for turn_idx, prompt in enumerate(prompts):
-                tasks.append({'case_name': case_name, 'turn_idx': turn_idx, 'prompt': prompt})
-        except Exception as e:
-            print(f"<collect_tasks_with_parallel_et> Error building prompts for {case_name}: {e}")
-            continue
-
-    print(f"<collect_tasks_with_parallel_et> Generated {len(tasks)} total tasks, skipped {skip_count} cases")
     return tasks
 
 def collect_tasks_with_parallel_rag(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
@@ -1606,11 +1492,6 @@ def collect_all_tasks_standard(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, d
 
 def collect_all_tasks(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter=None, reasoning=None, output_dir=None, max_workers=20):
     """Collect all tasks (case, turn, prompt) that need to be processed"""
-    
-    # Route to parallel ET selection for et_suggested prompts
-    if PROMPT and "et_suggested" in PROMPT:
-        print(f"<collect_all_tasks> Detected et_suggested prompt, using parallel ET selection")
-        return collect_tasks_with_parallel_et(fnames, MODEL, PROMPT, CONTEXT, NO_DESCRIPTION, data_dir, label_filter, reasoning, output_dir, max_workers)
     
     # Route to parallel rules generation for rules_generated prompts
     if PROMPT and "rules_generated" in PROMPT:

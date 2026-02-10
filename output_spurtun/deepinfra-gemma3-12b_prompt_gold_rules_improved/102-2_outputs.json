@@ -1,0 +1,74 @@
+{
+  "case_id": "102-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "right"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:45:33.785231",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the rules to determine if all boxes cover all midsize orange ovals.\n\nWe know:\n1. A midsize orange oval is inside and touching box DDD.\n2. A midsize orange oval is inside and touching box EEE, and the large green rectangle is covered by box EEE.\n3. Box DDD contains box EEE.\n\nFrom rule 1, box DDD covers the midsize orange oval.\nFrom rule 2, box EEE covers the midsize orange oval.\nSince box DDD contains box EEE, box DDD also covers box EEE.\n\nThe question asks if *all* boxes cover *all* midsize orange ovals. We have two midsize orange ovals mentioned. Box DDD covers one, and box EEE covers the other. Therefore, both boxes cover all midsize orange ovals.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story to determine if any box covers all orange shapes.\n\n1. **Orange shapes:** We have a midsize orange oval and a tiny orange rectangle.\n2. **Box DDD:** Contains a midsize orange oval and a tiny orange rectangle. It also contains box EEE.\n3. **Box EEE:** Contains a midsize orange oval (over a large green rectangle) and the large green rectangle is covered by box EEE.\n4. **Spatial Relationships:**\n    - The midsize orange oval is inside and touching box DDD.\n    - The tiny orange rectangle is to the left of the midsize orange oval and inside box DDD.\n    - The midsize orange oval is inside and touching box EEE.\n    - The large green rectangle is covered by box EEE.\n\nNow, let's see if any box covers *all* orange shapes (the midsize orange oval and the tiny orange rectangle).\n\n- **Box DDD:** Contains both the midsize orange oval and the tiny orange rectangle. Therefore, box DDD covers all orange shapes.\n- **Box EEE:** Contains the midsize orange oval, but not the tiny orange rectangle.\n\nTherefore, box DDD covers all orange shapes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story to determine the spatial relationships between the midsize orange ovals and the tiny shape.\n\n1. \"To the left of the midsize orange oval is the tiny object.\" This establishes that at least one midsize orange oval is to the right of the tiny object.\n\n2. \"Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE. The large green rectangle is covered by box EEE.\" This tells us there's another midsize orange oval, and it's inside box EEE.\n\n3. \"Box DDD has a tiny orange rectangle. To the left of the midsize orange oval is the tiny object.\" This tells us that the tiny object is to the left of the midsize orange oval inside box DDD.\n\n4. \"Box DDD contains box EEE.\" This means box EEE is inside box DDD.\n\nSince the tiny object is to the left of the midsize orange oval inside box DDD, and the other midsize orange oval is inside box EEE (which is inside box DDD), we can't definitively say that *all* midsize orange ovals are to the right of the tiny shape. The midsize orange oval inside box DDD is to the right of the tiny object, but we don't know the position of the midsize orange oval inside box EEE relative to the tiny object.\n\nTherefore, the answer is No.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story to determine if all large green rectangles are below a midsize orange oval.\n\nThe story states: \"Over a large green rectangle is a midsize orange oval.\" This means the midsize orange oval is *above* the large green rectangle.  Applying the rule \"If XXX is above YYY then YYY is below XXX\", we can conclude that the large green rectangle is *below* the midsize orange oval.\n\nThe story also states: \"It is inside and touching box EEE. The large green rectangle is covered by box EEE.\" This implies that the large green rectangle is also below the midsize orange oval, as it is inside box EEE which contains the oval.\n\nSince the story only mentions one large green rectangle, and that rectangle is below a midsize orange oval, the statement \"Are all large green rectangles below a midsize orange oval?\" is true.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "right",
+      "full_response": "Okay, let's break down the story and answer the question using the provided rules.\n\nThe story states: \"To the left of the midsize orange oval is the tiny object.\"\n\nTherefore, the midsize orange oval is to the *right* of the tiny object.\n\n```json\n{\"answer\": \"right\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to answer the question.\n\n1. **Midsize orange oval and DDD:** A midsize orange oval is inside and touching box DDD.\n2. **Tiny orange rectangle and DDD:** Box DDD has a tiny orange rectangle. The tiny object is to the left of the midsize orange oval.\n3. **DDD and EEE:** Box DDD contains box EEE.\n4. **Midsize orange oval and EEE:** A midsize orange oval is over a large green rectangle. It is inside and touching box EEE.\n5. **Large green rectangle and EEE:** The large green rectangle is covered by box EEE.\n\nThe question asks \"Where is the large thing relative to the midsize orange oval in EEE?\". The \"large thing\" refers to the large green rectangle. The story states that the midsize orange oval is *over* the large green rectangle *inside* box EEE. Therefore, the large green rectangle is *below* the midsize orange oval.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

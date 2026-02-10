@@ -1,0 +1,94 @@
+{
+  "case_id": "3672-3",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    },
+    {
+      "q_id": 6,
+      "answer": "above"
+    },
+    {
+      "q_id": 7,
+      "answer": "near"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.283237",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if the medium green apple is to the north of all apples.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\n*   If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\n\n**Applying the Rules:**\n\n1.  **Green apple's position:** The story states \"The green fruit is to the north of medium orange apple number one.\" This directly tells us the green apple is north of one orange apple.\n\n2.  **Orange apple number one's position:** \"North of medium orange apple number one there is medium yellow apple.\" This means the yellow apple is north of orange apple number one.\n\n3.  **Orange apple number two's position:** \"North of medium orange apple number two there is medium orange apple number one.\" This means orange apple number one is north of orange apple number two.\n\nSince the green apple is north of orange apple number one, and orange apple number one is north of orange apple number two, it follows that the green apple is north of all three orange apples.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if all medium green apples touch all medium yellow apples.\n\n**Relevant Rules:**\n\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX contains YYY and YYY covers ZZZ then XXX contains ZZZ\n\n**Applying the Rules:**\n\n1.  **Green fruit and Yellow Apple 1:** The story states \"The green fruit is to the north of medium orange apple number one.\" and \"North of medium orange apple number one there is medium yellow apple.\" This implies the green fruit (a medium green apple) is *near* the medium yellow apple (a medium yellow apple). However, it doesn't explicitly state they *touch*.\n\n2.  **Green fruit and Yellow Apple 2:** The story states \"A medium yellow apple is inside box three.\" and \"Box three contains a medium orange apple.\" and \"The medium orange apple touches the medium yellow apple.\" This means the medium yellow apple inside box three *touches* the medium orange apple.\n\nSince we have one green apple potentially near a yellow apple, and another yellow apple touching an orange apple, we cannot definitively say that *all* medium green apples touch *all* medium yellow apples. Some green apples might be far away from yellow apples.\n\n**Answer:**\n\nNo\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a medium yellow apple is north of anything.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\n*   If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\n*   If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n*   If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\n\n**Applying the Rules:**\n\n1.  \"North of medium orange apple number one is the medium yellow apple.\" - This directly states that the medium yellow apple is north of the medium orange apple number one.\n2.  \"To the north of medium orange apple number two there is medium orange apple number one.\" - This doesn't provide information about the yellow apple's position relative to the orange apple number two.\n3.  \"The thing which touches medium orange apple number one touches the green fruit.\" - This tells us about the relationship between the apple and the green fruit, but not their north-south position.\n\nBased on the first rule, the medium yellow apple is explicitly stated to be north of the medium orange apple number one.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if all yellow fruits touch something.\n\n**Relevant Rules:**\n\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX contains YYY then XXX contains ZZZ (where ZZZ is a fruit)\n\n**Analysis:**\n\n1.  **Medium yellow apple (in box three):** The story states \"A medium yellow apple is inside box three\" and \"The medium orange apple touches the medium yellow apple.\" Therefore, the medium yellow apple touches the medium orange apple.\n\n2.  **Medium yellow apple (inside box two):** The story states \"A medium orange apple and a medium yellow apple are inside box two.\" and \"The medium orange apple touches the medium yellow apple.\" Therefore, the medium yellow apple touches the medium orange apple.\n\n**Conclusion:**\n\nBoth yellow apples (in box three and inside box two) touch another fruit.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\n**Relevant Rules:**\n\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n*   If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\n*   If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\n*   If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\n*   If XXX is covered by YYY and YYY is near to ZZZ then XXX is near to the ZZZ\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n\n**Applying the Rules:**\n\n1.  \"The green fruit is to the north of medium orange apple number one.\" - This directly states the green fruit is *above* medium orange apple number one.\n\n2.  \"North of medium orange apple number one there is medium yellow apple.\" - This confirms the medium yellow apple is *above* medium orange apple number one.\n\n3.  \"To the north of medium orange apple number two there is medium orange apple number one.\" - This tells us that medium orange apple number one is *above* medium orange apple number two.\n\nTherefore, the green fruit is *below* medium orange apple number two.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe question asks about the position of the green thing (green fruit) regarding the medium yellow apple in box two.\n\nRelevant rules:\n1.  \"If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - Not relevant.\n2.  \"If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\" - Not relevant.\n3.  \"If XXX is touches YYY then YYY is touches XXX\" - Relevant.\n4.  \"If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - Not relevant.\n5.  \"If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\" - Not relevant.\n6.  \"If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\" - Not relevant.\n7.  \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - Not relevant.\n8.  \"If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\" - Not relevant.\n9.  \"If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\" - Not relevant.\n10. \"If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\" - Not relevant.\n\nThe story states: \"The green fruit is to the north of medium orange apple number one. To the north of and touches medium orange apple number one is the medium yellow apple.\"\n\nThis directly tells us that the green fruit is north of medium orange apple number one, and the medium yellow apple touches medium orange apple number one.  Since the yellow apple touches the orange apple, and the green fruit is north of the orange apple, the green fruit is to the north of the yellow apple.\n\nTherefore, the answer is \"above\".\n\n{\"answer\": \"above\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between the medium yellow apple in box two and the medium orange apple number two.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n*   If XXX is touches YYY then YYY is touches XXX\n\n**Applying the Rules:**\n\n1.  \"Box two has a medium green apple and covers another medium orange apple.\" This tells us that the medium orange apple number two is covered by box two.\n2.  \"A medium orange apple and a medium yellow apple are inside box two.\" This means the medium yellow apple is *inside* box two.\n3.  \"The medium orange apple touches the green fruit.\" This means the medium orange apple number two touches the green fruit.\n4.  \"North of medium orange apple number one there is medium yellow apple.\" This means the medium yellow apple is north of the medium orange apple number one.\n\nSince the medium yellow apple is inside box two and the medium orange apple number two is covered by box two, and the medium yellow apple is north of the medium orange apple number one, the medium yellow apple is to the north of the medium orange apple number two.\n\n{\"answer\": \"above\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "near",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between the medium yellow apple in box three and the medium orange apple in box three.\n\n**Relevant Rules:**\n\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX contains YYY and YYY covers ZZZ then XXX contains ZZZ\n*   If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\n\n**Applying the Rules:**\n\n1.  The story states: \"The medium orange apple touches the medium yellow apple.\" This directly implies that the medium yellow apple is *near* the medium orange apple.\n2.  The story states: \"Box three contains a medium orange apple.\"\n3.  The story states: \"A medium yellow apple is inside box three.\"\n\nCombining these, we can conclude that the medium yellow apple is near the medium orange apple within box three.\n\n**Answer:**\n\nnear\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    }
+  ]
+}

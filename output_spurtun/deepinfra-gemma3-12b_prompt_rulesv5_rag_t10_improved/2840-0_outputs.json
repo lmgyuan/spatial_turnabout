@@ -1,0 +1,80 @@
+{
+  "case_id": "2840-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "above"
+    },
+    {
+      "q_id": 4,
+      "answer": [
+        "left",
+        "near"
+      ]
+    },
+    {
+      "q_id": 5,
+      "answer": "near"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:55:23.241474",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the rules to determine if a medium apple is disconnected from all medium things.\n\nThe question asks about *all* medium things. We need to consider all medium apples and boxes.\n\nHere's a breakdown of the spatial relationships:\n\n*   **Apple 1 (orange):** Inside and touching box one.\n*   **Box One:** Exists.\n*   **Box Two:** Exists, contains Apple 2 (yellow), covers Apple 2 (yellow), south of and disconnected from Box Three.\n*   **Apple 2 (yellow):** Inside Box Two.\n*   **Apple 3 (yellow):** West of and near Box Three, inside Box Three.\n*   **Apple 4 (orange):** West of and near Box Three, inside Box Three.\n*   **Box Three:** South of and disconnected from Box Two, covers Apple 5 (green).\n*   **Apple 5 (green):** Covered by Box Three.\n\nNow let's consider the question. Is a medium apple disconnected from *all* medium things?\n\n*   Apple 1 (orange) is touching Box One. So, it's not disconnected from Box One.\n*   Apple 2 (yellow) is inside Box Two and touches Apple 3 (yellow). So, it's not disconnected from Apple 3.\n*   Apple 3 (yellow) is inside Box Three and touches Apple 4 (orange). So, it's not disconnected from Apple 4.\n*   Apple 4 (orange) is inside Box Three.\n\nSince there are connections between medium apples and boxes, the statement \"a medium apple is disconnected from all medium things\" is false.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the rules to determine if all medium yellow apples are disconnected from any box.\n\nWe have three medium yellow apples:\n1. Inside box two.\n2. Inside box two (covered by box two).\n3. Inside box three.\n\nRule: \"If XXX is inside YYY and YYY is disconnected from ZZZ then XXX is disconnected from the ZZZ\"\n\n*   Apple 1 & 2 are inside box two. Box two is disconnected from box three. Therefore, Apple 1 & 2 are disconnected from box three.\n*   Apple 3 is inside box three. Box two is disconnected from box three. Therefore, Apple 3 is disconnected from box two.\n\nHowever, we need to determine if *all* medium yellow apples are disconnected from *any* box.\n\nApple 1 and 2 are inside box two. Therefore, they are *not* disconnected from box two.\nApple 3 is inside box three. Therefore, it is *not* disconnected from box three.\n\nSince at least one medium yellow apple is *not* disconnected from a box (box two for apples 1 & 2, and box three for apple 3), the statement \"all medium yellow apples are disconnected from any box\" is false.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this:\n\n1. **Identify Relevant Information:** The question asks if \"medium yellow apple number two\" touches any fruit. The story states \"Medium yellow apple number one touches medium yellow apple number two.\"\n\n2. **Apply Reasoning:** Since \"medium yellow apple number one\" touches \"medium yellow apple number two\", then \"medium yellow apple number two\" touches \"medium yellow apple number one\".\n\n3. **Determine the Answer:** Yes, medium yellow apple number two touches medium yellow apple number one.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "above",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Rules:**\n\nWe need to find the relationship between the green apple and the medium yellow apple number one. The story states:\n\n*   \"A medium green apple is covered by box three.\"\n*   \"Medium yellow apple number one touches medium yellow apple number two.\"\n*   \"Box two covers another medium yellow apple.\"\n*   \"Medium yellow apple number one touches medium yellow apple number two.\"\n*   \"Box two is south of and disconnected from this box.\" (box three)\n\nThe rule \"If XXX is covered by YYY and YYY is near to ZZZ then XXX is near to the ZZZ\" seems relevant, but we don't know if box three is near to medium yellow apple number one.\n\nThe rule \"If XXX is covered by YYY and YYY is disconnected from ZZZ and HHH is covered by ZZZ then XXX is disconnected from the HHH\" is also relevant, but doesn't directly help us find the relative position.\n\nLet's use reasoning. Box three covers the green apple. Box two is disconnected from box three. Medium yellow apple number one touches medium yellow apple number two, which is inside box two. Therefore, medium yellow apple number one is also related to box two. Since box two is disconnected from box three, and the green apple is covered by box three, the green apple is disconnected from medium yellow apple number one. However, this doesn't give us a spatial relationship.\n\nLet's re-examine the story. Box two is south of box three. The green apple is covered by box three. Medium yellow apple number one is inside box two. Therefore, the green apple is above the medium yellow apple number one.\n\n**2. Determine the Answer:**\n\nBased on the reasoning above, the green thing (the green apple) is above the medium yellow apple number one.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": [
+        "left",
+        "near"
+      ],
+      "full_response": "Here's how we can solve this problem:\n\n1. **Identify Relevant Information:**\n   - \"West of and near to box two is another box called three...\"\n   - \"Box two is south of and disconnected from this box.\"\n\n2. **Apply Spatial Reasoning:**\n   - The story states that box three is \"west of and near to box two.\"  The options include \"left\" and \"near\". \"West\" implies \"left\" in a standard spatial representation. \"Near\" is also explicitly mentioned.\n\n3. **Determine the Answer:**\n   - Since the question asks for the position of the apple *in* box three *regarding* box two, and the story states box three is \"west of and near to box two\", the most appropriate answers are \"left\" and \"near\".\n\n```json\n{\"answer\": [\"left\", \"near\"]}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "near",
+      "full_response": "Here's how we can solve this problem:\n\n1. **Identify Relevant Information:** The story states: \"Medium yellow apple number one touches medium yellow apple number two.\"\n\n2. **Apply Spatial Reasoning Rules:** The rule \"If XXX is touches YYY then YYY is touches XXX\" is directly applicable. This means that if medium yellow apple number one touches medium yellow apple number two, then medium yellow apple number two also touches medium yellow apple number one.  This doesn't give us a directional relationship (left, right, above, etc.), but the question asks for a relative position. \"Touches\" implies they are adjacent.\n\n3. **Consider Options:** The options include \"left\", \"right\", \"above\", \"below\", \"near\", etc. Since \"touches\" implies adjacency, and we don't have more specific directional information, we need to choose the most appropriate single option. \"Near\" is a reasonable choice, as touching implies nearness.\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    }
+  ]
+}

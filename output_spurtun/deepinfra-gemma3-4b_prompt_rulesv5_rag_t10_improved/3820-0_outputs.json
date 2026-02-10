@@ -1,0 +1,84 @@
+{
+  "case_id": "3820-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "near"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.192918",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 7,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n*   If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH\n*   If XXX is covered by YYY and YYY is below ZZZ then XXX is below the ZZZ\n\nThe story states: \"Below the midsize orange rectangle is the midsize green rectangle.\" This directly relates to the \"below\" spatial relationship.  It also states \"The midsize white rectangle is below and touches the midsize green rectangle.\"\n\n**Applying the Rules:**\n\n1.  The midsize white rectangle is below the midsize green rectangle.\n2.  The midsize orange rectangle is below the midsize green rectangle.\n3.  Therefore, the midsize white rectangle is below the midsize orange rectangle.\n\nThis means the midsize white rectangle is under all midsize orange rectangles.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a midsize green rectangle touches any shape.\n\n**Relevant Rules:**\n\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\n*   If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n*   If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\n*   If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH\n*   If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH\n*   If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n\n**Applying the Rules:**\n\nThe story states: \"The midsize orange rectangle touches the midsize green rectangle.\" This directly implies that a midsize green rectangle touches a midsize orange rectangle.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if EEE contains all green rectangles.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY then XXX is inside YYY\n*   If XXX is covered by YYY then XXX is inside YYY\n\n**Applying the Rules:**\n\n1.  We know that box EEE covers a midsize white rectangle.\n2.  We know that a midsize green rectangle is *inside* box EEE (because it's covered by EEE).\n3.  We know that the midsize white rectangle is *below* the midsize green rectangle.\n\nSince the midsize green rectangle is inside EEE, and EEE covers the midsize white rectangle, it implies that EEE contains the midsize green rectangle.  We don't have information about whether EEE contains *all* green rectangles, only that it contains at least one.\n\n**Conclusion:**\n\nThe question asks if EEE contains *all* green rectangles. We only know that one green rectangle is inside EEE. Therefore, EEE does not contain all green rectangles.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if all shapes cover an object.\n\nThe story states:\n- Box EEE covers a midsize white rectangle.\n- Box EEE contains a midsize orange rectangle and a midsize green rectangle.\n- The midsize orange rectangle touches the midsize green rectangle.\n- The midsize white rectangle is below and touches the midsize green rectangle.\n- Below the midsize orange rectangle is the midsize green rectangle.\n\nThis means:\n- EEE covers the white rectangle.\n- EEE covers the orange rectangle.\n- EEE covers the green rectangle.\n- The orange rectangle covers the green rectangle.\n- The white rectangle covers the green rectangle.\n\nSince EEE covers all three rectangles (orange, green, and white), and the orange rectangle covers the green rectangle, and the white rectangle covers the green rectangle, it can be concluded that all shapes cover an object (the box EEE).\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states: \"Inside and touching box EEE is box DDD with a midsize orange rectangle and a midsize white rectangle. Box EEE covers a midsize white rectangle. The midsize orange rectangle touches the midsize green rectangle. The midsize white rectangle is below and touches the midsize green rectangle.\"\n\nThe question asks: \"Where is the midsize white rectangle in EEE relative to the midsize orange rectangle in box EEE?\"\n\nThe key information is that the midsize white rectangle is \"below and touches the midsize green rectangle\". The midsize orange rectangle \"touches the midsize green rectangle\".  Since the white rectangle is below the green rectangle, and they are touching, the white rectangle is below the orange rectangle.\n\nRule 9: \"If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH\" - This rule applies directly.  XXX is the white rectangle, YYY is EEE, ZZZ is the green rectangle, and HHH is the orange rectangle.\n\nTherefore, the midsize white rectangle is below the midsize orange rectangle.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "near",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states: \"The midsize orange rectangle touches the midsize green rectangle.\" This directly describes the spatial relationship between the two rectangles within box EEE.\n\nRule 1: If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH. This rule is not directly applicable here.\nRule 2: If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH. This rule is not directly applicable here.\nRule 3: If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH. This rule is not directly applicable here.\nRule 4: If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH. This rule is not directly applicable here.\nRule 5: If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH. This rule is not directly applicable here.\nRule 6: If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH. This rule is not directly applicable here.\nRule 7: If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH. This rule is not directly applicable here.\nRule 8: If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH. This rule is not directly applicable here.\nRule 9: If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH. This rule is not directly applicable here.\nRule 10: If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ. This rule is not directly applicable here.\n\nThe story explicitly states that the midsize orange rectangle touches the midsize green rectangle. This means the green rectangle is adjacent to the orange rectangle. Since the question asks for the relative position, and the rectangles are touching, the most appropriate answer is \"near\".\n\n{\"answer\": \"near\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states: \"The midsize white rectangle is below and touches the midsize green rectangle.\" This directly describes the spatial relationship between the midsize white rectangle and the midsize green rectangle.\n\nRule 1: \"If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH\" - This rule is relevant. In our case, the midsize white rectangle (XXX) is inside the midsize green rectangle (YYY), and the midsize green rectangle is inside the midsize orange rectangle (ZZZ).\n\nTherefore, the midsize white rectangle is below the midsize green rectangle.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

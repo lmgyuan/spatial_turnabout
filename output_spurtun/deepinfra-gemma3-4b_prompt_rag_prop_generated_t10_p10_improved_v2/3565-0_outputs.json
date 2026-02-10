@@ -1,0 +1,74 @@
+{
+  "case_id": "3565-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "near"
+    },
+    {
+      "q_id": 5,
+      "answer": "dc"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:21:43.709994",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if all boxes have all fruits.\n\n**Fruits Present:**\n\n*   Medium orange apple (appears in box one twice)\n*   Medium green apple (appears in box one and box two)\n*   Medium yellow apple (appears in box two and box three)\n\n**Box Contents:**\n\n*   **Box one:** Medium orange apple, medium orange apple\n*   **Box two:** Medium green apple, medium yellow apple, medium yellow apple\n*   **Box three:** Medium orange apple, medium yellow apple\n\nNow let's consider the question: \"Do all boxes have all fruits?\"\n\nBox one has two orange apples. It does *not* have a green apple or a yellow apple.\nBox two has a green apple and two yellow apples. It does *not* have an orange apple.\nBox three has an orange apple and a yellow apple. It does *not* have a green apple.\n\nSince no box contains all three types of apples, the answer is \"No\".\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if medium orange apple number one is in a box.\n\nRelevant Propositions:\n* Prop 6: If an object is in a box, then the box covers the object.\n* Prop 10: If an object is covered by another object, then the first object is within the area of the second object.\n\nThe story states: \"Another medium orange apple is in box one.\" This directly indicates that medium orange apple number one is inside box one.  Since box one covers the apple, Prop 6 applies.\n\nTherefore, the answer is Yes.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the spatial reasoning propositions to determine if all medium orange apples are inside a box.\n\n**Relevant Propositions:**\n\n*   Prop 1: If an object is inside a box, then that object is also inside the box.\n*   Prop 10: If an object is inside a box, then the box contains the object.\n\n**Analysis:**\n\n1.  **Box one:** Contains a medium orange apple. (Prop 10 applies)\n2.  **Box one:** Contains another medium orange apple. (Prop 10 applies)\n3.  **Box two:** Contains a medium green apple and a medium yellow apple.\n4.  **Box two:** Contains another medium yellow apple, which is inside and touching box two. (This doesn't directly tell us if it's *inside* a box, but it's contained within the space of box two).\n5.  **Box three:** Contains a medium orange apple and covers a medium yellow apple. This means the medium orange apple is *inside* box three.\n\nTherefore, all three medium orange apples are located inside a box (box one, box one, and box three).\n\n**Answer:**\n\nYes\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the spatial reasoning propositions to determine if a medium yellow apple is covered by any box.\n\n**Relevant Propositions:**\n\n*   **Prop 10:** If object A is covered by object B, then object B covers object A.\n*   **Prop 7:** If object A is covered by object B and object B is above object C, then object A is above object C.\n*   **Prop 8:** If object A is covered by object B and object B is below object C, then object A is below object C.\n\n**Applying the Propositions:**\n\n1.  **Medium yellow apple number one:** This apple is inside box two. Box two covers box three. Therefore, the medium yellow apple number one is covered by box two.\n2.  **Medium yellow apple number two:** This apple is *over* medium yellow apple number one.  It is not covered by any box.\n\n**Conclusion:**\n\nA medium yellow apple is covered by box two.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "near",
+      "full_response": "Let's analyze the question and the story to determine the relationship between box one and medium orange apple number two.\n\nThe question asks \"Where is box one relative to medium orange apple number two?\".\n\nHere's how we can approach this using the provided propositions:\n\n*   **Prop 1:** If object A is covered by object B and object B overlaps object C and object D is covered by object C then object A overlaps object D. - This doesn't directly help us.\n*   **Prop 2:** If object A is covered by object B and object B is above object C and object D is covered by object C then object A is above object D. - This doesn't directly help us.\n*   **Prop 3:** If object A is covered by object B and object B is to the left of object C and object D is covered by object C then object A is to the left of object D. - This doesn't directly help us.\n*   **Prop 4:** If object A is inside object B and object B overlaps object C and object D is inside object C then object A overlaps object D. - This doesn't directly help us.\n*   **Prop 5:** If object A is covered by object B and object B is near object C and object D is covered by object C then object A is near object D. - This is potentially relevant.\n*   **Prop 6:** If object A is covered by object B and object B is below object C and object D is covered by object C then object A is below object D. - This doesn't directly help us.\n*   **Prop 7:** If object A is covered by object B and object B is in front of object C and object D is covered by object C then object A is in front of object D. - This doesn't directly help us.\n*   **Prop 8:** If object A is covered by object B and object B is above object C then object A is above object C. - This doesn't directly help us.\n*   **Prop 9:** If object A contains object B and object B covers object C then object A contains object C. - This doesn't directly help us.\n*   **Prop 10:** If object A contains object B and object B covers object C then object A contains object C. - This doesn't directly help us.\n\nLet's examine the story:\n\n*   Box one contains a medium orange apple and another medium orange apple.\n*   Box two contains a medium green apple and a medium yellow apple.\n*   The medium green apple is under the medium yellow apple.\n*   Box two covers box three.\n*   Box three has a medium orange apple and covers a medium yellow apple.\n\nFrom this, we can deduce that box one and medium orange apple number two are in different boxes. Box one contains two medium orange apples, and box two contains a medium green and a medium yellow apple.  Since box two covers box three, and box three has a medium orange apple, it's reasonable to assume that the medium orange apple in box three is covered by box two.  We don't have direct information about the *relative* positions of the boxes, but we know box one and box two are distinct.\n\nConsidering the options, \"near\" seems the most appropriate.  While we don't know the exact distance, the fact that they are in separate boxes suggests they are not far apart.\n\n{\"answer\": \"near\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "dc",
+      "full_response": "Let's analyze the question and the story to determine the relative position of medium orange apple number one to box one.\n\nThe question asks \"Where is medium orange apple number one relative to box one?\".\n\nRelevant Propositions:\n*   Prop 5: If an object is in a box and that box is in front of another box, then the object is in front of the other box.\n*   Prop 6: If an object is in a box and that box is above another box, then the object is above the other box.\n*   Prop 7: If an object is in a box and that box is to the left of another box, then the object is to the left of the other box.\n*   Prop 8: If an object is in a box and that box is below another box, then the object is below the other box.\n\nThe story states: \"A box named one has a medium orange apple. Another medium orange apple is in box one.\"  This means the medium orange apple number one is *inside* box one.  The story doesn't provide any information about the position of box one relative to any other box.  Therefore, we can't use Prop 5, 6, 7, or 8.\n\nSince the apple is *inside* box one, it's inherently \"near\" box one. However, we need to choose from the provided options.  \"Near\" isn't an option.  The most appropriate answer, given the information, is \"dc\" (default choice).\n\n{\"answer\": \"dc\"}",
+      "cot": ""
+    }
+  ]
+}

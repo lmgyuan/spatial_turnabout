@@ -1,0 +1,94 @@
+{
+  "case_id": "2082-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    },
+    {
+      "q_id": 6,
+      "answer": "ntppi"
+    },
+    {
+      "q_id": 7,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:29:40.213580",
+    "processing_mode": "per_question",
+    "pipeline": "prop_generated",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 6, Prop 7, Prop 8, Prop 9 and Prop 10, all stating that various apples (orange and yellow) are inside box two. Therefore, there is fruit within box two.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: Is any fruit within box two? Options Yes/No.\n\nWe have propositions: many about apples inside box two. Prop6: Medium orange apple number one is inside box two. Prop7: Medium orange apple number two is inside box two. Prop8: Medium yellow apple number one is inside box two. Prop9: Medium yellow apple number two is inside box two. Prop10: A medium yellow apple is inside box two. Also story mentions a medium green apple is covered by and a medium yellow apple is within box two. So there are fruits inside box two. So answer Yes.\n\nWe need to identify relevant propositions: 6-10. Then answer Yes.\n\nOutput JSON: {\"answer\": \"Yes\"} as last line."
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "{\"answer\":\"No\"}",
+      "cot": "We need to parse story and propositions. The question: \"Is a fruit over all yellow fruits?\" Means: Is there a fruit that is over all yellow fruits? We need to answer Yes or No.\n\nWe have yellow fruits: medium yellow apple(s). Let's list them.\n\nStory: Two boxes one and two. Box two has box one (i.e., box one inside box two). Box one contain a medium orange apple and a medium yellow apple. Another medium orange apple is within and another medium yellow apple is inside and touching this box. So box one has: orange apple #1, yellow apple #1, orange apple #2, yellow apple #2 (touching box). Then: \"Medium yellow apple number two is under medium yellow apple number one.\" So Y2 is below Y1. \"Medium orange apple number two touches and this thing is under medium orange apple number one.\" So O2 touches something? Probably touches box? But O2 is under O1. So O2 below O1.\n\n\"A medium green apple is covered by and a medium yellow apple is within box two.\" So box two covers a medium green apple (i.e., green apple is inside and touching box two). Also a medium yellow apple is within box two (maybe a third yellow apple? Let's call Y3). \"Medium green apple number one and the medium yellow apple are under another medium green apple.\" So there is another green apple (G2) above them. So G2 is above G1 and Y3. \"Box two contains medium green apple.\" So G2 is inside box two.\n\nThus we have yellow fruits: Y1 (in box one), Y2 (in box one, under Y1), Y3 (in box two, within). Possibly also other yellow? No.\n\nNow the question: \"Is a fruit over all yellow fruits?\" Means: Is there any fruit that is over every yellow fruit? We need to see if any fruit is positioned above all three yellow apples.\n\nWe have spatial relations from propositions: Prop 1 Y2 is below Y1 (same as story). Prop 2 Y1 is above Y2 (same). Prop 3 Y3 is below G2. Prop 4 G2 is above Y3. Prop 5 G1 is below G2. Prop 6 G2 is above G1. Prop 7 O2 is below O1. Prop 8 O1 is above O2. Prop 9 Box one is inside box two. Prop 10 Y1 is inside box two.\n\nThus we have relations: Y1 above Y2. G2 above Y3. Also G2 above G1. O1 above O2. No direct relation between G2 and Y1/Y2. Also O1/O2 not related to yellows.\n\nWe need to determine if any fruit is over all yellow fruits (Y1, Y2, Y3). Over means above.\n\nCheck each fruit:\n\n- G2: we know G2 is above Y3. No info about G2 relative to Y1 or Y2. Could be above, below, unknown. Not guaranteed.\n\n- O1: we know O1 above O2. No relation to yellows.\n\n- G1: below G2, no relation to yellows.\n\n- O2: below O1, no relation.\n\nThus none are definitively over all yellow fruits. However maybe Y1 is above Y2, but Y1 is not above Y3 (unknown). So not.\n\nThus answer: No.\n\nWe need to output JSON: {\"answer\":\"No\"}.\n\nBut we must first identify relevant propositions: Prop1,2,3,4,10 maybe. But final answer JSON only.\n\nLet's produce final."
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are:\n- Prop 1: “Box one contains medium orange apple number two.”\n- Prop 10: “If a box contains an object then the box has that object.”\n\nSince “contains” entails “has”, box one does have medium orange apple number two.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: Does box one have medium orange apple number two? Options Yes/No.\n\nWe have propositions: Prop1: Box one contains medium orange apple number two. That directly says box one contains that apple. Also Prop10: If a box contains an object then the box has that object. So \"contains\" implies \"has\". So answer Yes.\n\nWe need to identify relevant propositions: Prop1, Prop10. Also Prop2,3,4 etc but not needed.\n\nThus answer Yes.\n\nOutput JSON: {\"answer\": \"Yes\"}"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 1 and Prop 2, both stating that the two medium orange apples touch each other. Therefore, the answer to the question is **Yes**.\n\n{\"answer\":\"Yes\"}",
+      "cot": "We need to answer: Does medium orange apple number one touch medium orange apple number two? Options Yes/No.\n\nWe have spatial reasoning propositions: Prop 1: Medium orange apple number two touches medium orange apple number one. Prop 2: Medium orange apple number one touches medium orange apple number two. Both indicate they touch each other. So answer Yes.\n\nWe need to output JSON: {\"answer\":\"Yes\"} as last line.\n\nWe can include explanation before but final line must be JSON only.\n\nThus produce answer."
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp",
+      "full_response": "{\"answer\": \"ntpp\"}",
+      "cot": "We need to answer: Where is medium orange apple number one regarding box two? Options are spatial relations: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nWe have propositions:\n\nProp1: Box one is inside box two.\nProp2: Box two contains box one. (same)\nProp3: Medium orange apple number one is inside box one.\nProp4: Medium orange apple number one is inside box two.\nProp5: Box two contains medium orange apple number one.\nProp6: Medium orange apple number two is inside box one.\nProp7: Medium orange apple number two is under medium orange apple number one.\nProp8: Medium orange apple number two touches medium orange apple number one.\nProp9: Medium yellow apple number two is under medium yellow apple number one.\nProp10: Medium yellow apple number two is inside and touching box one.\n\nThus medium orange apple #1 is inside box two (Prop4). So relation of object to container: \"inside\". The options list includes \"po\", \"tpp\", \"ntpp\", etc. Need to map to spatial relations. Usually in these tasks, \"po\" stands for \"partially overlapping\"? Actually typical RCC8 relations: dc (disconnected), ec (externally connected), po (partial overlap), tpp (tangential proper part), ntpp (non-tangential proper part), tppi (tangential proper part inverse), ntppi (non-tangential proper part inverse). For containment, \"inside\" could be \"tpp\" (tangential proper part) if object touches container boundary, or \"ntpp\" if fully inside not touching. Here we have \"inside\" but not touching. Prop4 says \"inside box two\". Not \"inside and touching\". So it's a proper part not touching: that is \"ntpp\" (non-tangential proper part). However we also have Prop5: Box two contains medium orange apple number one. \"contains\" is the inverse of \"inside\". In RCC, \"contains\" corresponds to \"ntppi\" (inverse of ntpp) maybe? Actually \"contains\" means the container contains the object, which is the inverse relation: object is ntpp of container, container is ntppi of object. But the question asks \"Where is medium orange apple number one regarding box two?\" So we need relation from apple to box. Apple is inside box two, not touching. So answer: ntpp.\n\nCheck if any other relation like \"po\" could be considered? No.\n\nThus answer: \"ntpp\". Provide JSON.\n\n"
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "The relevant propositions are:\n\n- Prop 3: “Medium yellow apple number two is under medium yellow apple number one.”\n- Prop 4: “Medium yellow apple number one is above medium yellow apple number two.”\n- Prop 10: “Medium yellow apple number one is not under medium yellow apple number two.”\n\nThese state that apple 1 is positioned above apple 2. Therefore the correct spatial relation from apple 1 to apple 2 is **above**.\n\n{\"answer\":\"above\"}",
+      "cot": "We need to answer: Where is medium yellow apple number one relative to medium yellow apple number two? Options include spatial relations: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nWe have propositions: Prop 3: medium yellow apple number two is under medium yellow apple number one. Prop 4: medium yellow apple number one is above medium yellow apple number two. Prop 10: medium yellow apple number one is not under medium yellow apple number two. So we know apple1 is above apple2. So relative position of apple1 to apple2 is \"above\". Option \"above\" is present.\n\nThus answer: {\"answer\":\"above\"}.\n\nWe need to include explanation? The instruction: \"You may output an explanation, but your answer must end with a single JSON object\". So we can give explanation then final JSON line.\n\nThus final line: {\"answer\":\"above\"}"
+    },
+    {
+      "q_id": 6,
+      "answer": "ntppi",
+      "full_response": "{\"answer\": \"ntppi\"}",
+      "cot": "We need to answer: \"What is the position of box one regarding medium orange apple number two?\" So relation of box one relative to apple2.\n\nWe have propositions: Box one contains medium orange apple number one (Prop1). Box one contains medium orange apple number two (Prop2). Also Prop3: apple2 is inside box one. Prop5: Box one is inside box two. Prop4: Box two contains box one. Prop8: apple1 inside box one. Prop9: apple1 inside box two. Prop10: apple2 inside box two.\n\nThus apple2 is inside box one. So box one contains apple2. The question: position of box one regarding apple2. If apple2 is inside box one, then box one is around/contains apple2. The relation \"contains\" is not among options. Options: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nWe need to map spatial relations to these codes. In typical dataset, \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part, \"ntpp\" = non-tangential proper part, \"tppi\" = tangential proper part inverse, \"ntppi\" = non-tangential proper part inverse. But those are RCC relations between regions. \"contains\" corresponds to \"tppi\" (the inverse of tpp) or \"ntppi\" (inverse of ntpp) depending on whether touching. Since apple2 is inside box one, but does it touch? Not mentioned. So apple2 is inside box one, not touching. That is a proper part (non-tangential) relation: apple2 is a non-tangential proper part of box one (ntpp). The inverse relation (box one regarding apple2) is ntppi (non-tangential proper part inverse), i.e., box one is a non-tangential proper part inverse of apple2, meaning box one contains apple2 without touching. So answer likely \"ntppi\".\n\nCheck if any other relation like \"above\" etc. Not relevant.\n\nThus answer: {\"answer\": \"ntppi\"}"
+    },
+    {
+      "q_id": 7,
+      "answer": "above",
+      "full_response": "{\"answer\": \"above\"}",
+      "cot": "We need to answer: position of medium orange apple number one relative to medium orange apple number two. From propositions: Prop 4: medium orange apple number two is below medium orange apple number one. So apple1 is above apple2. Also Prop5 says apple1 is above apple2 (same). Also they touch each other (Prop3,6). So relative position includes \"above\" and \"touching\"? The options list includes left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. \"touching\" is not in list. \"near\" maybe but touching is more specific. The question: \"What is the position of medium orange apple number one relative to medium orange apple number two?\" The answer likely \"above\". Could also include \"near\" but not needed. Use \"above\". So output JSON.\n\n"
+    }
+  ]
+}

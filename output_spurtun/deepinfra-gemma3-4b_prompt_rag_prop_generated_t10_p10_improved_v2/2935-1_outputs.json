@@ -1,0 +1,94 @@
+{
+  "case_id": "2935-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "above"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    },
+    {
+      "q_id": 6,
+      "answer": "above"
+    },
+    {
+      "q_id": 7,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:21:43.647811",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial relationships.\n\nThe story states:\n*   \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" This establishes a north-south relationship between the apple number one, the green fruit, and apple number two.\n*   \"The green thing is to the north of medium yellow apple number two.\" This adds another north-south relationship.\n\nThe question asks: \"Is a thing south of medium yellow apple number one?\"\n\nProp 3: If A is covered by B and B is north of C, then A is north of C. This proposition isn't directly relevant.\nProp 4: If A is covered by B and B is south of C and D is covered by C, then A is south of D. This proposition is relevant because it describes a south-north relationship.\nProp 5: If A is covered by B and B is west of C and D is covered by C, then A is west of D. This proposition is not relevant.\nProp 6: If A is covered by B and B is east of C and D is covered by C, then A is east of D. This proposition is not relevant.\nProp 7: If A is covered by B and B is above C and D is covered by C, then A is above D. This proposition is not relevant.\nProp 8: If A is covered by B and B is below C and D is covered by C, then A is below D. This proposition is not relevant.\nProp 9: If A is covered by B and B is to the left of C and D is covered by C, then A is to the left of D. This proposition is not relevant.\nProp 10: If A is covered by B and B is to the right of C and D is covered by C, then A is to the right of D. This proposition is not relevant.\n\nFrom the story, we know that apple number one is north of the green fruit and apple number two. Therefore, the green fruit is south of apple number one.  Since the question asks if *a thing* is south of apple number one, and we know the green fruit is south of apple number one, the answer is yes.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if any medium green thing is disconnected from all boxes.\n\nThe story states:\n*   \"A box called one have a medium green thing and a medium yellow apple.\"\n*   \"This box covers another medium yellow apple.\"\n*   \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\"\n*   \"The green thing is to the north of medium yellow apple number two.\"\n*   \"Another box named two has box one.\"\n*   \"This box covers a medium yellow apple.\"\n\nWe need to determine if the medium green thing is disconnected from *all* boxes (one and two).\n\nLet's consider the propositions:\n\n*   **Prop 1:** If object A is covered by object B and object B is disconnected from object C and object D is covered by object C, then object A is disconnected from object D. This doesn't directly apply here.\n*   **Prop 2:** If object A is covered by object B and object B is disconnected from object C and object D is covered by object C, then object A is disconnected from object C. This doesn't directly apply here.\n*   **Prop 3:** If object A is covered by object B and object B is disconnected from object C, then object A is disconnected from object C.  Box one covers the green thing. Box one is disconnected from box two. Therefore, the green thing is disconnected from box two.\n*   **Prop 4:** If object A is inside object B and object B is disconnected from object C and object D is inside object C, then object A is disconnected from object D. This doesn't apply.\n*   **Prop 5:** If object A is inside object B and object B is disconnected from object C and object D is inside object C, then object A is disconnected from object C. This doesn't apply.\n*   **Prop 6:** If object A is inside object B and object B is disconnected from object C, then object A is disconnected from object C. This doesn't apply.\n*   **Prop 7:** If object A is disconnected from object B, then object B is disconnected from object A. This doesn't apply.\n*   **Prop 8:** If object A is covered by object B and object B overlaps object C and object D is covered by object C, then object A overlaps object D. This doesn't apply.\n*   **Prop 9:** If object A is covered by object B and object B overlaps object C and object D is covered by object C, then object A overlaps object C. This doesn't apply.\n*   **Prop 10:** If object A is disconnected from object B, then object B is disconnected from object A. This doesn't apply.\n\nFrom Prop 3, we know the green thing is disconnected from box two. However, we don't know if it's disconnected from box one.  The story states box one *has* the green thing, and box one *covers* another yellow apple.  Since box one covers the green thing, and box one is disconnected from box two, the green thing is disconnected from box two.  We don't have enough information to determine if it's disconnected from box one.\n\nHowever, the question asks if it's disconnected from *all* boxes. Since we only have evidence of disconnection from box two, the answer must be \"No\".\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\nThe question asks if a medium yellow apple is to the south of any medium fruit.\n\nRelevant Propositions:\n*   Prop 7: If object A covers object B and object B is above object C, then object A is above object C.\n*   Prop 8: If object A covers object B and object B is below object C, then object A is below object C.\n\nThe story states:\n1.  \"This box covers another medium yellow apple.\" (Box one covers apple one)\n2.  \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" This tells us apple one is north of the green fruit and apple two.\n3.  \"The green thing is to the north of medium yellow apple number two.\" This tells us the green fruit is north of apple two.\n4.  \"Another box named two has box one. This box covers a medium yellow apple.\" (Box two covers apple two)\n\nFrom this, we can deduce the following spatial relationships:\n\n*   Apple one is north of the green fruit.\n*   Apple two is south of the green fruit.\n*   Apple two is south of apple one.\n*   Box one covers apple one.\n*   Box two covers apple two.\n\nTherefore, apple two is south of apple one, and apple two is south of the green fruit.  Thus, a medium yellow apple is to the south of any medium fruit.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a medium yellow apple is covered by all boxes.\n\nThe story states:\n*   Box one has a medium green thing and a medium yellow apple.\n*   Box one covers another medium yellow apple.\n*   Medium yellow apple number one is north of the green fruit and medium yellow apple number two.\n*   The green thing is to the north of medium yellow apple number two.\n*   Box two has box one.\n*   Box two covers a medium yellow apple.\n\nWe need to determine if *every* medium yellow apple is covered by *at least one* box.\n\n*   **Apple 1:** Box one covers it. Box two covers it. So, Apple 1 is covered.\n*   **Apple 2:** Box one covers it. Box two covers it. So, Apple 2 is covered.\n*   **Apple 3:** Box one covers it. Box two covers it. So, Apple 3 is covered.\n\nSince all three medium yellow apples are covered by at least one box, the answer is \"Yes\".\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning propositions and the answer.\n\nThe story states: \"The green thing is to the north of medium yellow apple number two.\"  The question asks \"Where is the green thing relative to medium yellow apple number one?\".\n\nProp 5: If A is covered by B and B is north of C then A is to the north of C. This isn't directly relevant.\nProp 2: If A is covered by B and B is north of C then A is north of C. This isn't directly relevant.\nProp 3: If A is covered by B and B is north of C then A is above C. This isn't directly relevant.\nProp 4: If A is covered by B and B is north of C then A is located above C. This isn't directly relevant.\nProp 8: If A is covered by B and B is above C then A is above C. This isn't directly relevant.\nProp 9: If A is covered by B and B is north of C then A is located north of C. This isn't directly relevant.\nProp 10: If A is covered by B and B is north of C then A is positioned north of C. This isn't directly relevant.\n\nHowever, we know the green thing is *north* of medium yellow apple number two.  Since medium yellow apple number one is *south* of medium yellow apple number two, the green thing must be *above* medium yellow apple number one.\n\nTherefore, the answer is \"above\".\n\n{\"answer\": \"above\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning propositions and the answer.\n\nThe story states:\n*   Box one covers medium yellow apple number one.\n*   Medium yellow apple number one is north of the green fruit and medium yellow apple number two.\n*   The green thing is north of medium yellow apple number two.\n*   Box two has box one.\n*   Box two covers a medium yellow apple.\n\nWe need to find the relative position of the green thing to box two.\n\nLet's examine the propositions:\n\n*   **Prop 1:** If box A covers object B and object B is to the north of object C, then box A is to the north of object C. - Not directly relevant.\n*   **Prop 2:** If box A covers object B and object B is north of object C, then box A is north of object C. - Relevant.\n*   **Prop 3:** If box A covers object B and object B is near object C, then box A is near object C. - Not directly relevant.\n*   **Prop 4:** If box A covers object B and object B overlaps object C, then box A overlaps object C. - Not relevant.\n*   **Prop 5:** If box A covers object B and object B is in front of object C, then box A is in front of object C. - Not relevant.\n*   **Prop 6:** If box A covers object B and object B is above object C, then box A is above object C. - Not relevant.\n*   **Prop 7:** If box A covers object B and object B is to the right of object C, then box A is to the right of object C. - Not relevant.\n*   **Prop 8:** If box A covers object B and object B is below object C, then box A is below object C. - Relevant.\n*   **Prop 9:** If box A covers object B and object B is to the left of object C, then box A is to the left of object C. - Not relevant.\n*   **Prop 10:** If box A covers object B and object B is near object C, then object B is near object A. - Not relevant.\n\nFrom the story, we know:\n1.  Box one covers medium yellow apple number one.\n2.  Medium yellow apple number one is north of the green fruit.\n3.  The green thing is north of medium yellow apple number two.\n4.  Box two has box one.\n5.  Box two covers a medium yellow apple.\n\nSince box one covers medium yellow apple number one, and medium yellow apple number one is north of the green fruit, and box two has box one, then box two has the green fruit north of it.  Also, box two covers a medium yellow apple.\n\nTherefore, the green thing is above box two.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between medium yellow apple number two and the green thing.\n\nThe story states: \"The green thing is to the north of medium yellow apple number two.\"\n\nProp 2: If A is covered by B and B is north of C then A is north of C. (This isn't directly applicable here, as we're not dealing with covering.)\nProp 7: If A is covered by B and B is north of C then A is north of C. (Again, not directly applicable.)\nProp 9: If A is covered by B and B is above C then A is above C. (Not directly applicable.)\n\nThe key information is \"The green thing is to the north of medium yellow apple number two.\" This directly tells us the relative position.\n\nTherefore, the answer is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relationship between medium yellow apple number two and box one.\n\n**Spatial Relationships in the Story:**\n\n*   Box one covers medium yellow apple number one.\n*   Box one covers medium yellow apple number two.\n*   Medium yellow apple number one is north of the green fruit and medium yellow apple number two.\n*   The green thing is north of medium yellow apple number two.\n*   Box two has box one.\n\n**Question:** Where is medium yellow apple number two relative to box one?\n\n**Relevant Propositions:**\n\n*   Prop 1: If A is covered by B and B is to the left of C and D is covered by C then A is to the left of D. (Not relevant)\n*   Prop 2: If A is covered by B and B overlaps C and D is covered by C then A overlaps D. (Not relevant - we're looking for relative position, not overlap)\n*   Prop 3: If A is covered by B and B is near C and D is covered by C then A is near D. (Potentially relevant, but \"near\" is a vague term)\n*   Prop 4: If A is covered by B and B is to the left of C then A is to the left of C. (Not relevant - we're looking for relative position, not left/right of C)\n*   Prop 5: If A is covered by B and B is in front of C and D is covered by C then A is in front of D. (Not relevant - we're looking for relative position, not front/back)\n*   Prop 6: If A is covered by B and B is above C and D is covered by C then A is above D. (Not relevant - we're looking for relative position, not up/down)\n*   Prop 7: If A is covered by B and B is below C and D is covered by C then A is below D. (Not relevant - we're looking for relative position, not down/up)\n*   Prop 8: If A is covered by B and B is to the right of C and D is covered by C then A is to the right of D. (Not relevant - we're looking for relative position, not left/right of D)\n*   Prop 9: If A contains B and B covers C then A contains C. (Not relevant)\n*   Prop 10: If A contains B and B covers C then A contains C. (Not relevant)\n\nSince box one covers medium yellow apple number two, it is *below* it.\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    }
+  ]
+}

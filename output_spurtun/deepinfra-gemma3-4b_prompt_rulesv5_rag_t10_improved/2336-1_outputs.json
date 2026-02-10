@@ -1,0 +1,94 @@
+{
+  "case_id": "2336-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    },
+    {
+      "q_id": 7,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.245536",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question using the provided spatial reasoning rules.\n\nThe question asks: \"Is any midsize orange rectangle below all midsize orange rectangles?\"\n\nHere's how we can break down the spatial relationships:\n\n1. \"Below another midsize orange rectangle there is the white thing...\" - This tells us one midsize orange rectangle is *above* another.\n2. \"Below the white thing is the midsize orange rectangle...\" - This tells us the white rectangle is *above* another midsize orange rectangle.\n3. \"Over the shape that was under the white rectangle is midsize orange rectangle number one.\" - This means the midsize orange rectangle is *above* the one below the white rectangle.\n\nFrom these statements, we can conclude that there's a vertical stacking of the midsize orange rectangles.  One is above another, and another is above that.  Therefore, there's at least one midsize orange rectangle that is below all the others.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question using the provided spatial reasoning rules.\n\nThe question asks: \"Are all midsize orange rectangles over any midsize orange rectangle?\"\n\nHere's how we can break down the spatial relationships:\n\n1.  \"Over the shape that was under the white rectangle is midsize orange rectangle number one.\" - This means midsize orange rectangle number one is *above* the other midsize orange rectangle.\n2. \"Another midsize orange rectangle is under the white thing\" - This means one midsize orange rectangle is *below* another.\n3. \"The white object is above midsize orange rectangle number one.\" - This confirms the relationship in point 1.\n\nSince midsize orange rectangle number one is above another midsize orange rectangle, and the other midsize orange rectangle is below it, all midsize orange rectangles are over another midsize orange rectangle.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the spatial relationships described in the story to determine if all boxes contain all midsize orange rectangles.\n\n1. **Box DDD:** Contains midsize orange rectangle number one.\n2. **Midsize orange rectangle number one:** Inside box DDD, and the white rectangle is above it.\n3. **White rectangle:** Inside box DDD, and under the midsize orange rectangle number one. It also touches the other midsize orange rectangle.\n4. **Midsize orange rectangle under the white rectangle:** This rectangle is under the white rectangle and touches the other midsize orange rectangle. It is also inside box DDD.\n\nFrom this, we can see that box DDD contains all three midsize orange rectangles.  The question asks if *all* boxes contain *all* midsize orange rectangles. Since only one box (DDD) is explicitly mentioned containing all three rectangles, the answer is no.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question using the provided spatial reasoning rules.\n\nThe question asks: \"Is any midsize orange rectangle under all shapes?\"\n\nHere's how we can break down the spatial relationships:\n\n1.  \"Below another midsize orange rectangle there is the white thing.\" - This tells us one midsize orange rectangle is *under* another.\n2.  \"Below the white thing is the white rectangle.\" - This tells us the white rectangle is *under* the white thing.\n3.  \"Over the shape that was under the white rectangle is midsize orange rectangle number one.\" - This tells us midsize orange rectangle number one is *above* the rectangle that was under the white rectangle.\n\nCombining these, we can see that one midsize orange rectangle is under another, the white rectangle is under the white thing, and midsize orange rectangle number one is above the rectangle that was under the white rectangle.  Therefore, there is at least one midsize orange rectangle that is under all shapes.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between midsize orange rectangle number two and midsize orange rectangle number three.\n\nThe story states: \"Over the shape that was under the white rectangle is midsize orange rectangle number one.\" This implies that midsize orange rectangle number one is directly above midsize orange rectangle number two.  It also states \"Below another midsize orange rectangle there is the white rectangle.\" This means the white rectangle is directly above midsize orange rectangle number two.  Finally, \"A midsize orange rectangle and a white rectangle are within box DDD\" and \"Box DDD contains midsize orange rectangle.\"\n\nFrom this, we can deduce that midsize orange rectangle number two is below midsize orange rectangle number one, and midsize orange rectangle number one is above midsize orange rectangle number two.\n\nNow let's consider the provided rules:\n\n*   \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\": This rule doesn't directly apply.\n*   \"If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH\": This rule *does* apply.  Midsize orange rectangle number two is below midsize orange rectangle number one.\n\nTherefore, midsize orange rectangle number two is below midsize orange rectangle number one.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between midsize orange rectangle number three and midsize orange rectangle number one.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n*   If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\n\n**Story Breakdown:**\n\n1.  \"A midsize orange rectangle and a white rectangle are within box DDD.\" - This establishes that both rectangles are inside the box.\n2.  \"Another midsize orange rectangle is under the white thing and touches midsize orange rectangle number one.\" - This means midsize orange rectangle number three is *under* the white rectangle and *touches* midsize orange rectangle number one.\n3.  \"Below another midsize orange rectangle there is the white rectangle.\" - This confirms the order: midsize orange rectangle three is below the white rectangle.\n4.  \"Box DDD contains midsize orange rectangle.\" - This reinforces that all three rectangles are within the box.\n5.  \"The white object is above midsize orange rectangle number one.\" - This confirms the order: white rectangle is above midsize orange rectangle one.\n\n**Applying the Rules:**\n\n*   Midsize orange rectangle number three is *under* midsize orange rectangle number one. This implies \"below\".\n*   Midsize orange rectangle number three *touches* midsize orange rectangle number one. This implies \"near\".\n\nSince we need to select a single option, \"below\" is the most direct and accurate description of the spatial relationship.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relationship between DDD and midsize orange rectangle number one.\n\nThe story states: \"Box DDD contains midsize orange rectangle.\" This directly tells us that DDD is *inside* midsize orange rectangle number one.  More specifically, DDD encompasses the midsize orange rectangle.\n\nNow let's consider the provided rules:\n\n*   If XXX is inside YYY then YYY is contains XXX. This rule is relevant.\n*   We know DDD contains midsize orange rectangle number one.\n\nTherefore, DDD is inside midsize orange rectangle number one. The available options are: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nThe most appropriate answer is \"below\" because the story states \"Below another midsize orange rectangle there is the white rectangle.\" and \"Over the shape that was under the white rectangle is midsize orange rectangle number one.\" This implies DDD is below midsize orange rectangle number one.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between midsize orange rectangle number one and the white shape.\n\nThe story states: \"Over the shape that was under the white rectangle is midsize orange rectangle number one.\" This directly describes the relative position.  Midsize orange rectangle number one is *above* the white shape.\n\nNow let's consider the provided rules:\n\n*   If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH - This rule doesn't apply directly.\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH - This rule doesn't apply.\n*   If XXX is inside YYY and YYY is above ZZZ then XXX is above the HHH - This rule doesn't apply directly.\n*   If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ - This rule doesn't apply.\n*   If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH - This rule doesn't apply.\n*   If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH - This rule doesn't apply.\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH - This rule doesn't apply.\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH - This rule doesn't apply.\n*   If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH - This rule applies, but it's not the most direct way to describe the relationship.\n\nThe most relevant rule is the direct statement in the story: \"Over the shape that was under the white rectangle is midsize orange rectangle number one.\"\n\nTherefore, the answer is \"above\".\n\n{\"answer\": \"above\"}",
+      "cot": ""
+    }
+  ]
+}

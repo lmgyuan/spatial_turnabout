@@ -1,0 +1,94 @@
+{
+  "case_id": "3020-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "far"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    },
+    {
+      "q_id": 6,
+      "answer": "far"
+    },
+    {
+      "q_id": 7,
+      "answer": "near"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:08:52.420349",
+    "processing_mode": "per_question",
+    "pipeline": "rules_generated",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Here's how we can solve this:\n\n1. **Identify Relevant Rules:**\n   - \"If a block contains a square then it has a spatial location.\" (This is generally true but not directly helpful here)\n   - \"If block XXX is above block YYY then block XXX is vertically positioned higher than block YYY.\" (Relevant for understanding 'above')\n   - \"If a block is over multiple objects then it is over all of them.\" (Important for the question)\n   - \"If a block is not directly connected to an object then it is not over it.\" (Important for the question)\n\n2. **Analyze the Story:**\n   - Block AAA has a medium yellow square and a medium blue square.\n   - Block BBB is above block AAA and has a medium black square.\n   - Block CCC has a medium blue square and a medium black square.\n   - Block AAA is disconnected from and away from block BBB.\n\n3. **Reasoning:**\n   - The question asks if block BBB is over *all* medium blue squares.\n   - We know block BBB is above block AAA. Block AAA contains a medium blue square.\n   - We also know block CCC contains a medium blue square.\n   - The story states that block AAA is disconnected from block BBB. Therefore, block BBB is not over block CCC.\n   - Since block BBB is not over *all* medium blue squares (it's not over CCC), the answer is No.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this problem:\n\n1. **Identify Relevant Rules:**\n   - \"If a square is farther from all other squares then it has the greatest spatial distance.\"\n   - \"If a block is disconnected and away from another block then the squares on those blocks are spatially distant.\"\n   - \"If block CCC contains a black square and a blue square then these squares are on the same block.\"\n   - \"If a square is not on the same block as another square then they are spatially separated by at least one block.\"\n\n2. **Analyze the Story:**\n   - AAA: Yellow and Blue squares (touching)\n   - BBB: Black square (above AAA, disconnected and away from AAA)\n   - CCC: Blue and Black squares (on the same block)\n\n3. **Reasoning:**\n   - The black square on BBB is disconnected and away from AAA. This means the black square on BBB is spatially distant from the blue square on AAA.\n   - The black square on CCC is on the same block as a blue square.\n   - The question asks if *any* medium black square is farther from *all* medium blue squares. The black square on BBB is far from the blue square on AAA. It's also far from the blue square on CCC because AAA and CCC are disconnected and away from each other.\n\n4. **Conclusion:**\n   The black square on BBB is farther from all medium blue squares.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this:\n\n1. **Relevant Rules:**\n   - \"If a block contains a medium black square then it has a black square.\"\n   - \"If a block does not contain a medium black square then it lacks a black square.\"\n\n2. **Story Information:**\n   - Block AAA contains a medium yellow square and a medium blue square.\n   - Block BBB is above block AAA and contains a medium black square.\n   - Block AAA is disconnected from and away from block BBB.\n   - Block CCC is inside block AAA and contains a medium blue square and a medium black square.\n\n3. **Reasoning:**\n   - The story states that block CCC, which is *inside* block AAA, contains a medium black square.\n   - Therefore, block AAA *does* contain a medium black square.\n\n4. **Answer:**\n   Yes\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "Here's how we can solve this:\n\n1. **Relevant Rules:**\n   - \"If a square touches another square then it is considered adjacent within the spatial context.\"\n   - \"If a square is not present in a block then it does not touch any square in that block.\"\n\n2. **Information from the Story:**\n   - AAA contains a medium yellow square and a medium blue square, and they touch.\n   - BBB contains a medium black square.\n   - CCC contains a medium blue square and a medium black square.\n   - AAA is disconnected from BBB.\n\n3. **Reasoning:**\n   - We know a medium blue square in AAA touches a medium yellow square.\n   - We don't know if there are any other medium yellow squares. The story only mentions the one in AAA.\n   - Since we don't know of any other medium yellow squares, we cannot say that the medium blue square touches *all* of them.\n\n4. **Answer:**\n   No\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "far",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Rules:**\n\n*   \"If block XXX is above block YYY then block YYY is below block XXX.\" - This is the most directly relevant rule.\n*   The story provides the spatial relationship \"above\" between BBB and AAA.\n\n**2. Analyze the Story:**\n\n*   BBB is above AAA.\n*   AAA is disconnected from CCC, and away from CCC.\n*   CCC contains a medium blue square.\n\n**3. Apply Reasoning:**\n\nSince BBB is above AAA, and AAA is away from CCC, we can infer that BBB is also away from CCC. The question asks about BBB's position relative to the medium blue square *in* CCC. Since the story doesn't give us any direct relationship between BBB and CCC, and we know they are away from each other, the best answer from the provided options is \"far\".\n\n```json\n{\"answer\": \"far\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Rules:**\n\n*   \"If a square is in block BBB then it is part of block BBB.\" - This establishes the location of the black square.\n*   \"If a square is in block CCC then it is part of block CCC.\" - This establishes the location of the blue square.\n*   \"If a block is above another block then it is vertically positioned higher.\" - This tells us the relative vertical position of BBB and AAA.\n*   \"If two blocks are disconnected and away then they have significant spatial separation.\" - This tells us that BBB and AAA are far apart.\n*   We need to infer the relative position of the black square in BBB and the blue square in CCC. The story states that BBB contains CCC. Therefore, BBB is above CCC. Since the black square is in BBB and the blue square is in CCC, the black square is above the blue square.\n\n**2. Apply Reasoning:**\n\nThe story states that BBB contains CCC. This means CCC is within BBB. The question asks about the position of the black square in BBB relative to the blue square in CCC. Since CCC is within BBB, and the black square is in BBB, the black square is above the blue square.\n\n**3. Select the Answer:**\n\nThe option that best represents \"above\" is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "far",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Rules:**\n\n*   \"If AAA and CCC are separate blocks then the contents of CCC are not directly related to AAA's contents by adjacency.\" - This is key because it tells us that anything *within* CCC isn't directly adjacent to anything in AAA.\n*   \"If a block is away from another block then they are spatially separated.\" - This reinforces the separation between AAA and CCC.\n\n**2. Apply Rules and Reasoning:**\n\nThe story states that AAA and CCC are \"disconnected from and away from\" each other. This means they are spatially separated. The question asks about the location of the medium black square *in CCC* regarding AAA. Since AAA and CCC are separate, the medium black square in CCC cannot be \"left,\" \"right,\" \"above,\" \"below,\" \"behind,\" \"front,\" or \"near\" AAA. The only option that reflects this separation is \"far.\"\n\n**3. Final Answer:**\n\n```json\n{\"answer\": \"far\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "near",
+      "full_response": "Here's how we can solve this:\n\n**1. Identify Relevant Rules:**\n\n*   \"If two shapes touch then they are adjacent.\" - This is the most relevant rule.\n*   \"If a shape touches another shape then it shares a boundary.\" - This reinforces the adjacency concept.\n\n**2. Apply Rules to the Story:**\n\nThe story states: \"A block called AAA contain a medium yellow square and a medium blue square. The medium yellow square touches the medium blue square.\"\n\nSince the yellow and blue squares touch, they are adjacent. The options provided include \"left\", \"right\", \"near\", and \"adjacent\". Since \"adjacent\" isn't an option, we need to infer a relative position. \"Near\" is a reasonable inference, but \"left\" and \"right\" are more specific. The story doesn't give us enough information to determine if it's specifically left or right. However, \"near\" is the closest option to \"adjacent\" among the choices.\n\n**3. Determine the Answer:**\n\nBased on the rules and the story, the medium blue square is near the medium yellow square.\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    }
+  ]
+}

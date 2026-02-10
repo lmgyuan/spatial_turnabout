@@ -1,0 +1,74 @@
+{
+  "case_id": "2729-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:21:43.651678",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a box has a medium green apple number two.\n\nThe story states: \"Another medium green apple and a medium yellow apple are inside box three.\" This tells us that box three contains two medium green apples. We are asked if *a* box has a medium green apple number two. Since box three contains at least one medium green apple, and we are not given any information about other boxes, we can conclude that box three has a medium green apple number two.\n\nRelevant Propositions: None of the provided propositions directly address the question of whether a specific box contains a specific apple. We need to rely on the information given in the story.\n\nAnswer: Yes\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the spatial reasoning propositions to determine if a box is disconnected from a medium yellow apple.\n\n**Relevant Propositions:**\n\n*   **Prop 1:** If object A covers object B and object B is disconnected from object C and object D covers object C, then object A is disconnected from object D.\n*   **Prop 2:** If object A is inside object B and object B is disconnected from object C and object D is inside object C, then object A is disconnected from object D.\n*   **Prop 5:** If object A is disconnected from object B, then object B is disconnected from object A.\n*   **Prop 7:** If object A covers object B and object B is disconnected from object C and object D is covered by object C, then object A is disconnected from object D.\n\n**Applying the Propositions:**\n\n1.  **Prop 1:** Box three covers the medium orange apple. The medium orange apple touches the medium yellow apple. The medium yellow apple is *in* box one. Box three is *above* the medium orange apple. This doesn't directly establish disconnection, but it's relevant to the overall spatial arrangement.\n\n2.  **Prop 2:** The medium yellow apple is *in* box one. Box one is to the left of box two, and box two is to the left of box three.  The medium green apple is *above* the medium orange apple, which is covered by box three.  The medium yellow apple is *inside* box one.  Since box three covers the medium orange apple, and the medium yellow apple is inside box one, the medium yellow apple is disconnected from the medium orange apple (which is covered by box three).  However, the question asks if a *box* is disconnected from the medium yellow apple.\n\n3.  **Prop 5:** This proposition is about disconnection in both directions. It doesn't directly apply to the question of whether a box is disconnected from the yellow apple.\n\n4. **Prop 7:** Box three covers the medium orange apple. The medium yellow apple is in box one. Since box three covers the medium orange apple, and the medium yellow apple is inside box one, the medium yellow apple is disconnected from the medium orange apple (which is covered by box three).\n\n**Conclusion:**\n\nBased on the spatial relationships described, box three is disconnected from the medium yellow apple.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the question and the story to determine if all medium orange apples are to the right of all fruits.\n\nThe question asks about the relative position of *all* medium orange apples compared to *all* fruits.\n\nHere's a breakdown of the relevant information from the story:\n\n*   **Medium orange apple 1:** Covered by box three, located below the medium green apple in box three.\n*   **Medium orange apple 2:** Touches a medium yellow apple, located inside box one.\n*   **Fruits:** Medium yellow apple, medium green apple, and medium orange apple (as a whole, considering it's covered).\n\nNow let's consider the spatial reasoning propositions:\n\n*   **Prop 1-5:** These propositions are all essentially the same and relate to the position of object A (the box) relative to object B (the apple) when A covers B. They are not directly relevant to comparing the *position* of the orange apples to other fruits.\n*   **Prop 6:** If object A covers object B and object B is to the right of object C, then object A is to the right of object C. This is relevant because it deals with relative right/left positioning.\n*   **Prop 7-9:** These propositions deal with relative vertical positioning (above, below) and are not directly relevant to the horizontal (left/right) comparison.\n*   **Prop 8:** If object A covers object B and object B is in front of object C, then object A is in front of object C. This is not relevant.\n\nFrom the story, we know:\n\n*   The medium orange apple 1 is *below* the medium green apple in box three. This means it's to the *right* of the green apple (assuming the green apple is in the center of the box).\n*   The medium orange apple 2 is *inside* box one, which is to the left of box two.\n\nSince the orange apple 1 is below the green apple, it's to the right of the green apple. The orange apple 2 is inside box one, which is to the left of box two.  Therefore, it's not necessarily true that *all* medium orange apples are to the right of *all* fruits.\n\nSince the question asks if *all* medium orange apples are to the right of *all* fruits, and we've identified a case where one is below another, the answer is no.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if box three contains any fruit.\n\nThe story states: \"The medium green apple is above a medium orange apple. The medium orange apple is covered by box three. Another medium green apple and a medium yellow apple are inside box three.\"\n\nThis clearly indicates that box three contains a medium green apple, a medium yellow apple, and is covering a medium orange apple. Therefore, box three contains fruit.\n\nRelevant Propositions:\n*   Prop 9: If box three contains object A and object A covers object B, then box three contains object B. (Applies to the orange apple)\n*   Prop 10: If box three contains object A and object A contains object B, then box three contains object B. (Applies to the green and yellow apples)\n\nSince box three contains the green and yellow apples, and is covering the orange apple, it definitely contains fruit.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Let's analyze the question and the story to determine the relationship between box three and the second medium green apple.\n\nThe question asks \"Where is box three regarding medium green apple number two?\".  We need to find the spatial relationship between box three and the second medium green apple.\n\nHere's how we can apply the propositions:\n\n*   **Prop 3:** If box A covers object B and object B is above object C and object D is covered by object C then box A is above object D. This doesn't directly help us.\n*   **Prop 6:** If box A covers object B and object B is below object C and object D is covered by object C then box A is below object D. This doesn't directly help us.\n*   **Prop 7:** If box A covers object B and object B is near object C and object D is covered by object C then box A is near object D. This is potentially relevant.\n*   **Prop 9:** If object X is inside object Y and object Y overlaps object Z and object W is inside object Z then object X overlaps object W. This doesn't directly help us.\n\nThe story states: \"The medium green apple is above a medium orange apple. The medium orange apple is covered by box three. Another medium green apple and a medium yellow apple are inside box three.\"\n\nThis means:\n\n1.  One medium green apple is above the medium orange apple.\n2.  Box three covers the medium orange apple.\n3.  There's *another* medium green apple *inside* box three.\n\nTherefore, box three is *below* the first medium green apple and *contains* the second medium green apple.  Since the first green apple is above the orange apple, and box three covers the orange apple, box three is below the first green apple.\n\nThe most appropriate option is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning propositions and the answer.\n\nThe question asks about the position of the medium orange apple in box one *regarding* the medium orange apple in box three. This is essentially asking about their relative positions.\n\nHere's a breakdown of the relevant propositions:\n\n*   **Prop 2:** If A is covered by B and B is to the left of C then A is to the left of C. - Not directly relevant.\n*   **Prop 3:** If A is covered by B and B is in front of C and D is covered by C then A is in front of D. - Not directly relevant.\n*   **Prop 4:** If A is covered by B and B is overlaps C and D is covered by C then A is overlaps D. - Not directly relevant.\n*   **Prop 5:** If A is inside B and B is overlaps C and D is inside C then A is overlaps D. - Not directly relevant.\n*   **Prop 6:** If A is covered by B and B is in front of C then A is in front of C. - Not directly relevant.\n*   **Prop 7:** If A is covered by B and B is above C and D is covered by C then A is above D. - Not directly relevant.\n*   **Prop 8:** If A is covered by B and B is to the right of C and D is covered by C then A is to the right of D. - Not directly relevant.\n*   **Prop 9:** If A is covered by B and B is above C then A is above C. - Not directly relevant.\n*   **Prop 10:** If A is inside B and B is to the left of C and D is inside C then A is to the left of D. - Relevant.\n\nProp 10 states that if A is inside B and B is to the left of C and D is inside C, then A is to the left of D.\n\nNow let's apply this to the story:\n\n*   Box one contains the medium orange apple.\n*   Box three contains a medium green apple and a medium yellow apple.\n*   The medium orange apple is *covered* by box three. This means box three is above the medium orange apple.\n*   The medium green apple is *above* the medium orange apple.\n\nTherefore, the medium orange apple is below the medium green apple.\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    }
+  ]
+}

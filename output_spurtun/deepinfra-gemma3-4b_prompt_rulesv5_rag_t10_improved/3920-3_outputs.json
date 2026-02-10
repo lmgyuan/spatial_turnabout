@@ -1,0 +1,74 @@
+{
+  "case_id": "3920-3",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "below"
+    },
+    {
+      "q_id": 4,
+      "answer": "near"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.252914",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\nThe story states: \"Box one has a medium green apple which is over this fruit.\" This means the green apple is *above* the orange thing.\n\nThe question asks \"Are all things under a medium green apple?\". Since we only know the orange thing is *under* the apple, and we don't know about any other objects, we can conclude that not all things are under the apple.\n\nRelevant rule: If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ (This rule is not directly applicable here, but helps to understand the spatial relationships).\n\nApplying the rule: The orange thing is under the apple. Therefore, not all things are under the apple.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question.\n\nThe story states: \"A medium orange thing is inside and touching box one. Box one has a medium green apple which is over this fruit.\"\n\nThe question is: \"Does box cover the medium orange thing?\"\n\nRule 1: If XXX is covers YYY then YYY is covered by XXX.\nRule 2: If XXX is covered by YYY then YYY is covers XXX.\n\nFrom the story, the orange thing is *inside* box one.  The apple is *over* the orange thing. This means box one does *not* cover the orange thing.  It contains it.\n\nTherefore, the answer is \"No\".\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if the green fruit is inside all boxes.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY then YYY is contains XXX\n*   If XXX is inside YYY and YYY is covered by ZZZ then XXX is inside ZZZ\n*   If XXX is contains YYY then YYY is inside XXX\n\n**Applying the Rules:**\n\n1.  **\"A medium orange thing is inside and touching box one.\"** This tells us the orange thing is *inside* box one.  Therefore, box one contains the orange thing.\n\n2.  **\"Box one has a medium green apple which is over this fruit.\"** This means the green apple is *inside* box one and *above* the orange thing.  Therefore, box one contains the green apple.\n\nSince both the orange thing and the green apple are inside box one, and box one is the only box mentioned, the green fruit is inside all boxes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the position of the orange thing relative to the green fruit.\n\nThe story states: \"A medium orange thing is inside and touching box one. Box one has a medium green apple which is over this fruit.\"\n\n\"Inside and touching\" implies the orange thing is *within* box one. \"Over\" indicates the apple is *above* the orange thing.\n\nNow let's consider the relevant spatial reasoning rules:\n\n*   **If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ:** This rule applies because the orange thing is inside box one and the apple is above it. Therefore, the orange thing is below the apple.\n*   **If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ:** This rule applies because the orange thing is inside box one and the apple is above it. Therefore, the orange thing is below the apple.\n\nBased on these rules, the orange thing is below the green fruit.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "near",
+      "full_response": "Let's analyze the story and the question.\n\nThe story states: \"There exists one box called one. A medium orange thing is inside and touching box one. Box one has a medium green apple which is over this fruit.\"\n\nThe question asks: \"Where is box one relative to the orange fruit?\"\n\nRelevant rules:\n*   If XXX is inside YYY and YYY is touching ZZZ then XXX is touching the ZZZ. (This is close to the relevant rule)\n*   If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ.\n\nIn this case, the orange fruit is inside box one, and box one is touching the orange fruit. Therefore, box one is near to the orange fruit.\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question.\n\nThe story states: \"There exists one box called one. A medium orange thing is inside and touching box one. Box one has a medium green apple which is over this fruit.\"\n\nThe question is: \"Where is the green thing relative to box?\"\n\nRelevant rules:\n*   If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ\n*   If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n*   If XXX is inside YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n\nThe green apple is \"over\" the orange thing inside box one. This means the apple is above the orange thing. Therefore, the green thing is above the box.\n\n{\"answer\": \"above\"}",
+      "cot": ""
+    }
+  ]
+}

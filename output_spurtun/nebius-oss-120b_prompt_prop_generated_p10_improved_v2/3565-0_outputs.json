@@ -1,0 +1,74 @@
+{
+  "case_id": "3565-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntppi"
+    },
+    {
+      "q_id": 5,
+      "answer": "ntpp"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:29:40.310409",
+    "processing_mode": "per_question",
+    "pipeline": "prop_generated",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "The propositions describe the contents of each box:\n\n- Box one contains orange and green apples but no yellow apples.  \n- Box two contains green and yellow apples but no orange apples.  \n- Box three contains an orange and a yellow apple but no green apple.\n\nSince no single box contains every fruit, the statement “all boxes have all fruits” is false.\n\n{\"answer\": \"No\"}",
+      "cot": "We need to answer: \"Do all boxes have all fruits?\" Means: Are all boxes containing all fruits? Probably means each box contains all fruits? Let's interpret: There are three boxes: one, two, three. Fruits: medium orange apple(s), medium green apple(s), medium yellow apple(s). Let's list.\n\nFrom propositions:\n\nBox one contains a medium orange apple (Prop1). Box one contains a medium green apple (Prop2). Box one contains another medium orange apple (Prop3). So box one has 2 orange apples, 1 green apple. No yellow apples mentioned in box one.\n\nBox two contains a medium green apple (Prop4). Box two contains a medium yellow apple (yellow apple #1) (Prop5). Box two contains a medium yellow apple that is touching box two (yellow apple #2) (Prop6). So box two has 1 green apple, 2 yellow apples. No orange apples mentioned.\n\nBox three contains a medium orange apple (Prop8). Box three contains a medium yellow apple (the one it covers) (Prop9). So box three has 1 orange apple, 1 yellow apple. No green apple.\n\nThus not all boxes have all fruits. The question: \"Do all boxes have all fruits?\" Means does each box contain every fruit type? No. So answer: No.\n\nWe need to output JSON: {\"answer\": \"No\"}.\n\nBut need to identify relevant propositions: all of them. Provide explanation optional but final line must be JSON.\n\nThus final answer."
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 1 (“medium orange apple number one is inside box one”) and Prop 2 (“box one contains medium orange apple number one”), both indicating that medium orange apple number one is inside a box. Therefore the answer is Yes.\n\n{\"answer\":\"Yes\"}",
+      "cot": "We need to answer: \"Is medium orange apple number one in a box?\" Options Yes/No.\n\nWe have propositions: Prop1: medium orange apple number one is inside box one. Prop2: box one contains medium orange apple number one. Both indicate it's inside a box (box one). So answer Yes.\n\nWe need to output explanation optionally, but final line must be JSON: {\"answer\":\"Yes\"}.\n\nMake sure no extra text after."
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are:\n\n- Prop 10: “All medium orange apples are inside a box.”\n- Props 1, 2, 3, 7, 8, 9 also specify that each medium orange apple is located in a specific box.\n\nThese collectively confirm that every medium orange apple mentioned is indeed inside a box. Therefore, the answer to the question is **Yes**.\n\n{\"answer\":\"Yes\"}",
+      "cot": "We need to answer: Are all medium orange apples inside a box? Options Yes/No.\n\nWe have propositions: Prop 10: All medium orange apples are inside a box. That's directly stating the answer is Yes. Also other props indicate each apple is in a box. So answer Yes.\n\nWe need to output JSON: {\"answer\":\"Yes\"} as last line.\n\nWe may include explanation before, but final line must be JSON only.\n\nProceed."
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 1 and Prop 2, both stating that box three covers a medium yellow apple (i.e., a medium yellow apple is covered by a box). Therefore, the answer to the question is **Yes**.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: Is a medium yellow apple covered by any box? Options Yes/No.\n\nWe have propositions: Prop1: Box three covers a medium yellow apple. Prop2: A medium yellow apple is covered by box three. Both state that a medium yellow apple is covered by box three. So yes, a medium yellow apple is covered by a box (box three). Also story: \"Box three ... covers a medium yellow apple.\" So answer Yes.\n\nWe need to identify relevant propositions: Prop1, Prop2, maybe Prop3/4 about covering relationships but not needed. So answer Yes.\n\nOutput JSON: {\"answer\": \"Yes\"} as last line."
+    },
+    {
+      "q_id": 4,
+      "answer": "ntppi",
+      "full_response": "{\"answer\": \"ntppi\"}",
+      "cot": "We need to answer: \"Where is box one relative to medium orange apple number two?\" So we need spatial relation of box one with respect to that apple.\n\nWe have propositions: Box one contains medium orange apple number two. Also \"Medium orange apple number two is inside box one.\" So box one contains the apple. The relation of container to contained: The box is around the apple? In spatial reasoning tasks, typical relations: \"contains\" corresponds to \"dc\" (disconnected?) No. Let's recall typical RCC8 or topological relations: \"contains\" is inverse of \"inside\". In many datasets, relations: \"contains\" (c), \"inside\" (i), \"covers\" (covers), \"covered by\", \"overlaps\", \"disconnected\", \"equal\". But the options given: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. These are RCC8 relations: dc (disconnected), ec (externally connected), po (partial overlap), tpp (tangential proper part), ntpp (non-tangential proper part), tppi (tangential proper part inverse), ntppi (non-tangential proper part inverse). Also directional relations.\n\nBox one relative to apple: Box one contains apple, i.e., apple is inside box one. In RCC terms, box one is a \"tppi\" (tangential proper part inverse) or \"ntppi\" (non-tangential proper part inverse) depending on whether apple touches box boundaries. The proposition says \"Box one does not cover medium orange apple number two.\" Cover means box covers apple (apple touches box interior?). Actually \"covers\" means the container touches the interior of the object? In RCC, \"covers\" is the inverse of \"covered by\". If box covers apple, then apple is inside and touching box boundaries (i.e., apple is a tangential proper part of box). But they say box one does not cover apple, and apple does not cover box one. So apple is not touching box boundaries. So apple is strictly inside box one, not touching. That corresponds to \"non-tangential proper part\" (ntpp) relation: apple is a non-tangential proper part of box. The inverse relation (box relative to apple) is \"ntppi\" (non-tangential proper part inverse). So answer should be ntppi.\n\nCheck: Prop 9: Box one does not cover medium orange apple number two. So box does not cover apple. Cover would be box covering apple (apple touches box). Since not covering, apple is not touching box boundaries. So apple is inside box (non-tangential). So relation is ntpp (apple ntpp box). Inverse: box ntppi apple.\n\nThus answer: ntppi.\n\nReturn JSON."
+    },
+    {
+      "q_id": 5,
+      "answer": "ntpp",
+      "full_response": "{\"answer\": \"ntpp\"}",
+      "cot": "We need to answer: Where is medium orange apple number one relative to box one? Options include spatial relations: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. The story says: \"A box named one has a medium orange apple.\" That indicates the apple is in box one. Also propositions: Prop1: medium orange apple number one is in box one. Prop2: box one contains medium orange apple number one. Prop9: box one has a medium orange apple. Prop10: medium orange apple number one is inside box one. So relation is \"inside\". The options list includes \"po\", \"tpp\", etc. We need to map \"inside\" to one of these codes. In spatial reasoning tasks, typical RCC8 relations: \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part, \"ntpp\" = non-tangential proper part, \"tppi\" = tangential proper part inverse, \"ntppi\" = non-tangential proper part inverse. For an object inside a container, the relation is usually \"ntpp\" (non-tangential proper part) if it's fully inside not touching boundaries. If it's \"inside and touching\", that would be \"tpp\". The story says \"A box named one has a medium orange apple.\" Usually \"has\" means inside but not necessarily touching. No mention of touching. So relation is \"inside\" (non-tangential proper part). So answer: ntpp.\n\nThus output JSON: {\"answer\": \"ntpp\"}"
+    }
+  ]
+}

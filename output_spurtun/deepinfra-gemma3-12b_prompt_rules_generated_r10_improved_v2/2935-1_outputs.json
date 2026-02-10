@@ -1,0 +1,94 @@
+{
+  "case_id": "2935-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    },
+    {
+      "q_id": 7,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:08:52.468599",
+    "processing_mode": "per_question",
+    "pipeline": "rules_generated",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this:\n\n1. **Identify Relevant Rules:**\n   - \"If a thing is south of another thing then the other thing is north of it.\" (This is the key rule to check if something is south of medium yellow apple number one)\n   - \"If XXX is north of YYY and YYY is south of ZZZ then XXX is north of ZZZ.\"\n\n2. **Analyze the Story:**\n   - \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" This tells us:\n     - Green fruit is south of medium yellow apple number one.\n     - Medium yellow apple number two is south of medium yellow apple number one.\n   - \"The green thing is to the north of medium yellow apple number two.\" This confirms that medium yellow apple number two is south of the green thing.\n\n3. **Apply the Rules:**\n   - Since the green fruit is south of medium yellow apple number one, the answer is \"Yes\".\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Here's how we can solve this problem:\n\n1. **Identify relevant information:**\n   - \"A box called one have a medium green thing and a medium yellow apple.\" - This tells us the green thing is *inside* box one.\n   - \"This box covers another medium yellow apple.\" - Box one covers a yellow apple.\n   - \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" - The green thing is south of apple number one.\n   - \"The green thing is to the north of medium yellow apple number two.\" - The green thing is north of apple number two.\n   - \"Another box named two has box one.\" - Box two contains box one.\n   - \"This box covers a medium yellow apple.\" - Box two covers a yellow apple.\n\n2. **Apply spatial reasoning rules:**\n   - \"If a box contains an object then the box covers the object.\" - Box one covers the green thing.\n   - \"If box YYY contains box XXX then box YYY covers box XXX.\" - Box two covers box one.\n   - \"If box XXX covers object YYY and object YYY is north of object ZZZ then box XXX covers object ZZZ.\" - Box one covers the green thing, and the green thing is north of apple number two, so box one covers apple number two.\n   - \"If box YYY contains box XXX and box XXX covers object ZZZ then box YYY covers object ZZZ.\" - Box two contains box one, and box one covers the green thing, so box two covers the green thing.\n\n3. **Determine if the green thing is disconnected:**\n   - The green thing is inside box one, and box one is inside box two. Therefore, the green thing is covered by both box one and box two.\n   - \"If object YYY is not covered by any box then YYY is disconnected from all boxes.\" Since the green thing *is* covered by boxes, it is *not* disconnected.\n\n4. **Answer the question:**\n   - The question asks if *any* medium green thing is disconnected. Since the green thing is not disconnected, the answer is \"No\".\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Information & Relationships:**\n\n*   **Box One:** Contains a medium green thing and a medium yellow apple (number one). Covers another medium yellow apple (number two).\n*   **Yellow Apple 1:** North of the green thing and Yellow Apple 2.\n*   **Green Thing:** North of Yellow Apple 2.\n*   **Box Two:** Contains Box One. Covers a medium yellow apple.\n\n**2. Spatial Reasoning & Rule Application:**\n\nWe need to determine if a medium yellow apple is south of any medium fruit. Let's trace the relationships:\n\n*   Yellow Apple 1 is north of Green Thing.  Therefore, Green Thing is south of Yellow Apple 1 (Rule: If YYY is north of HHH then HHH is south of YYY).\n*   Green Thing is north of Yellow Apple 2. Therefore, Yellow Apple 2 is south of Green Thing (Rule: If YYY is north of HHH then HHH is south of YYY).\n*   Yellow Apple 1 is north of Yellow Apple 2. Therefore, Yellow Apple 2 is south of Yellow Apple 1 (Rule: If YYY is north of HHH then HHH is south of YYY).\n\nSo, Yellow Apple 2 is south of Green Thing, and Yellow Apple 2 is south of Yellow Apple 1.  Since the question asks if *any* medium yellow apple is south of *any* medium fruit, and we have established that Yellow Apple 2 is south of the Green Thing (a medium fruit), the answer is Yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "Okay, let's break this down. The question asks if a medium yellow apple is covered by *all* boxes. We need to analyze the story and rules to determine if this is true.\n\nHere's what we know:\n\n*   **Box one** covers a medium yellow apple (Rule 1: If a box covers a YYY then YYY is below the box).\n*   **Box one** has a medium yellow apple (Rule 5: If XXX has YYY then YYY is inside XXX). This implies the apple is inside the box, and therefore covered.\n*   **Box two** has box one (Rule 5: If XXX has YYY then YYY is inside XXX). This means box one is inside box two.\n*   **Box two** covers a medium yellow apple (Rule 1: If a box covers a YYY then YYY is below the box).\n\nNow, let's consider the apples mentioned:\n\n*   \"medium yellow apple number one\" is north of the green fruit and \"medium yellow apple number two\".\n*   \"the green thing\" is north of \"medium yellow apple number two\".\n\nThe story mentions at least two distinct medium yellow apples. Box one covers one of them, and box two covers another. However, the story doesn't state that *all* medium yellow apples are covered by either box.\n\nTherefore, the answer is No.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Information & Relationships:**\n\n*   \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" This establishes a north/south relationship.\n*   \"The green thing is to the north of medium yellow apple number two.\" This further reinforces the north/south relationship.\n\n**2. Apply Spatial Reasoning Rules:**\n\n*   We have \"YYY is north of ZZZ\" (Medium yellow apple number one is north of the green fruit) and \"YYY is north of ZZZ\" (Green thing is north of medium yellow apple number two).\n*   We can infer that medium yellow apple number one is above the green fruit.\n\n**3. Determine the Answer:**\n\nThe question asks \"Where is the green thing relative to medium yellow apple number one?\". Since medium yellow apple number one is north of the green thing, the green thing is *below* medium yellow apple number one.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Information & Relationships:**\n\n*   **Box one** has a **medium green thing** and a **medium yellow apple**.\n*   **Box one** covers another **medium yellow apple**.\n*   **Medium yellow apple number one** is north of the **green fruit** and **medium yellow apple number two**.\n*   The **green thing** is north of **medium yellow apple number two**.\n*   **Box two** has **box one**.\n*   **Box two** covers a **medium yellow apple**.\n\n**2. Determine the Spatial Relationship between the green thing and box two:**\n\n*   We know **box two** has **box one**.\n*   We know **box one** has the **green thing**.\n*   Therefore, the **green thing** is inside **box two**.\n\nSince the options include \"below\", \"above\", \"inside\", etc., and we've established the green thing is *inside* box two, we need to find the closest equivalent option. \"Below\" is not correct, \"above\" is not correct. The most appropriate option is \"below\" as it implies a position within the box.\n\n**3. Final Answer:**\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Rules:**\n\n*   \"If YYY is north of ZZZ then ZZZ is south of YYY.\" - This is a key rule for determining relative positions.\n*   \"If ZZZ is south of YYY and YYY is south of XXX then ZZZ is south of XXX.\" - This rule helps chain relationships.\n\n**2. Extract Information from the Story:**\n\n*   \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\"  This tells us:\n    *   Yellow Apple #1 is north of Green Fruit\n    *   Yellow Apple #1 is north of Yellow Apple #2\n*   \"The green thing is to the north of medium yellow apple number two.\" This tells us:\n    *   Green Fruit is north of Yellow Apple #2\n\n**3. Apply the Rules:**\n\n*   We know Green Fruit is north of Yellow Apple #2.  Therefore, according to the rule \"If YYY is north of ZZZ then ZZZ is south of YYY\", Yellow Apple #2 is south of the Green Fruit.\n\n**4. Match to Options:**\n\nThe option that corresponds to \"south of\" is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "below",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Rules:**\n\n*   \"If XXX covers YYY then YYY is below XXX.\" - This is relevant because box one covers another medium yellow apple.\n*   \"If YYY is above ZZZ then ZZZ is below YYY.\" - This is a rephrasing of the above rule and is also relevant.\n*   \"If XXX contains YYY then YYY is inside XXX.\" - This is relevant because box two has box one.\n*   \"If YYY is north of ZZZ then ZZZ is south of YYY.\" - This is relevant because medium yellow apple number one is north of the green fruit and medium yellow apple number two.\n\n**2. Analyze the Story and Apply Rules:**\n\n*   **Box One and Yellow Apples:** Box one covers another medium yellow apple. This means the yellow apple is *below* box one.\n*   **Yellow Apple Number One and Two:** Medium yellow apple number one is north of medium yellow apple number two. This means medium yellow apple number two is *south* of medium yellow apple number one.\n*   **Green Fruit and Yellow Apple Number Two:** The green thing is north of medium yellow apple number two. This means medium yellow apple number two is *south* of the green thing.\n*   **Box Two and Box One:** Box two has box one. This means box one is *inside* box two.\n\n**3. Determine the Relationship between Medium Yellow Apple Number Two and Box One:**\n\nWe know that box one covers another medium yellow apple. We also know that medium yellow apple number one is north of medium yellow apple number two. The green thing is north of medium yellow apple number two.  The story doesn't directly state the position of medium yellow apple number two relative to box one. However, we know box one covers a yellow apple. Since the green thing and yellow apple number one are north of yellow apple number two, and box one covers a yellow apple, it's reasonable to infer that yellow apple number two is *below* box one.\n\n**4. Select the Answer:**\n\nBased on the analysis, the correct answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

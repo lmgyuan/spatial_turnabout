@@ -1,0 +1,74 @@
+{
+  "case_id": "2729-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "right"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:17:08.064622",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question. The question asks if a box has a \"medium green apple number two.\" The story mentions a \"medium green apple\" inside box three. It doesn't mention a \"medium green apple number two.\" Therefore, based on the provided information, the answer is no.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Okay, let's analyze the story and propositions to answer the question \"Is a box disconnected from a medium yellow apple?\".\n\nFirst, let's identify the relevant spatial relationships:\n\n*   **Box one** covers a **medium orange apple**.\n*   The **medium orange apple** touches a **medium yellow apple**.\n*   The **medium yellow apple** is *in* **box one**.\n*   **Box two** is to the left of **box one**.\n*   **Box three** is to the left of **box two**.\n*   A **medium green apple** is *in* **box three**.\n*   The **medium green apple** is above a **medium orange apple**.\n*   The **medium orange apple** is covered by **box three**.\n*   Another **medium green apple** and a **medium yellow apple** are *inside* **box three**.\n\nNow, let's consider the propositions. We're looking for a box that is disconnected from a medium yellow apple.\n\n*   **Prop 3:** If a box is disconnected from an object then the object is disconnected from the box. This is the reverse of what we're looking for.\n*   **Prop 4:** If a box covers an object and the box is disconnected from another box then the object is disconnected from the other box. We don't have information about boxes being disconnected from other boxes.\n*   **Prop 5:** If an object is inside a box and the box is disconnected from another box then the object is disconnected from the other box. Again, we don't have information about boxes being disconnected from other boxes.\n*   **Prop 10:** If an object is inside a box and the box is disconnected from another object then the object is disconnected from the other object. Same as above.\n\nLet's reason directly from the story.\n\n*   The medium yellow apple is *inside* box one. This means box one is *not* disconnected from the medium yellow apple.\n*   The medium yellow apple is *inside* box three. This means box three is *not* disconnected from the medium yellow apple.\n*   Box two is to the left of box one. We don't know if box two is disconnected from the medium yellow apple.\n\nHowever, the question asks \"Is *a* box disconnected from a medium yellow apple?\". Since we know that box one and box three are *not* disconnected from the medium yellow apple, it's possible that box two *is* disconnected. We don't have enough information to definitively say that box two is disconnected, but we can't definitively say it's *not* disconnected either.\n\nGiven the options \"Yes\" and \"No\", and the lack of definitive information, the most reasonable answer is \"Yes\".\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question. The question asks if all medium orange apples are to the right of all fruits. We need to determine the relative positions of the medium orange apples and all the fruits mentioned: medium orange apple, medium yellow apple, medium green apple.\n\nFrom the story:\n1. Box one covers a medium orange apple.\n2. The medium orange apple touches a medium yellow apple. This means they are adjacent.\n3. The medium yellow apple is in box one.\n4. Box two is to the left of box one.\n5. Box three is to the left of box two.\n6. A medium green apple is to the left of box three.\n7. The medium green apple is above a medium orange apple (covered by box three).\n8. Box three contains a medium green apple and a medium yellow apple.\n\nNow let's consider the positions relative to each other. We have two medium orange apples. One is covered by box one, and one is covered by box three.\n\nLet's analyze the fruits:\n- Medium orange apple (covered by box one): We don't know its position relative to other fruits directly.\n- Medium orange apple (covered by box three): It is below the medium green apple in box three.\n- Medium yellow apple (in box one): It touches the medium orange apple in box one.\n- Medium yellow apple (in box three): It is in box three.\n- Medium green apple (to the left of box three): It is above the medium orange apple covered by box three.\n\nThe question asks if *all* medium orange apples are to the right of *all* fruits. Let's consider the medium orange apple covered by box three. It is below the medium green apple. This means the medium green apple is *not* to the right of the medium orange apple. Therefore, not all medium orange apples are to the right of all fruits.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this problem:\n\n1. **Identify relevant propositions:**\n   - Prop 7: If a container contains two objects then the container contains the first object.\n   - Prop 8: If a container contains two objects then the container contains the second object.\n   - The story states \"Another medium green apple and a medium yellow apple are inside box three.\"\n\n2. **Apply propositions and reasoning:**\n   - The story explicitly states that box three contains a medium green apple and a medium yellow apple. Fruits are objects. Therefore, box three contains fruit.\n\n3. **Answer the question:**\n   - Since box three contains fruit, the answer is \"Yes\".\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Okay, let's break this down. The question asks about the spatial relationship between box three and \"medium green apple number two.\" The story states \"The medium green apple is above a medium orange apple. The medium orange apple is covered by box three.\" This implies that box three is *below* the medium green apple.\n\nLet's see if any propositions are directly applicable. None of the propositions directly address the relationship between a box and an apple in this way. We need to use our reasoning based on the story.\n\nThe story says the medium green apple is *above* a medium orange apple, and box three *covers* the medium orange apple. Therefore, box three must be *below* the medium green apple.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "right",
+      "full_response": "Okay, let's break down this spatial reasoning problem.\n\n**1. Identify Relevant Information & Relationships:**\n\n*   **Box One:** Contains a medium orange apple.\n*   **Box Three:** Contains a medium green apple (above a medium orange apple), another medium green apple, and a medium yellow apple. The medium orange apple in box three is covered by box three.\n*   **Relationship between the two medium orange apples:** We need to determine their relative position.\n\n**2. Analyze Propositions:**\n\nNone of the propositions directly address the relative position of two different objects within different containers. We need to reason through the given information.\n\n**3. Reasoning:**\n\n*   The story states \"To the left-hand side of box one there is another box named two. To the left-hand side of this box is another box named three\". This establishes a left-to-right spatial relationship: Box Three is to the left of Box One.\n*   The story states \"The medium green apple is above a medium orange apple\" within box three.\n*   The story states \"The medium orange apple is covered by box three\".\n*   The story states \"A box called one covers a medium orange apple\".\n\nSince Box Three is to the left of Box One, and we are looking for the position of the medium orange apple in Box One *regarding* the medium orange apple in Box Three, the medium orange apple in Box One is to the *right* of the medium orange apple in Box Three.\n\n**4. Answer:**\n\n```json\n{\"answer\": \"right\"}\n```",
+      "cot": ""
+    }
+  ]
+}

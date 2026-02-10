@@ -1,0 +1,80 @@
+{
+  "case_id": "295-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": [
+        "left",
+        "above"
+      ]
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp"
+    },
+    {
+      "q_id": 5,
+      "answer": "tpp"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:29:40.228593",
+    "processing_mode": "per_question",
+    "pipeline": "prop_generated",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "{\"answer\":\"Yes\"}",
+      "cot": "We need to answer: Is the medium green melon west of the medium orange melon? Options Yes/No.\n\nWe have propositions: Prop 8: The medium green melon is west of the medium orange melon. Also Prop 4 says medium green melon is west of big orange apple, but not needed. Prop 3 says big orange apple west of medium orange melon, but not directly. So we have direct proposition that medium green melon is west of medium orange melon. So answer Yes.\n\nWe need to output JSON: {\"answer\":\"Yes\"}.\n\nMake sure it's last line, no extra."
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are:\n- Prop 1: The medium green melon is inside box one.\n- Prop 2: Box one is inside box two.\n- Prop 3: The medium green melon is inside box two.\n\nThese indicate that the medium green melon is contained in both box one and box two, i.e., it is inside every box mentioned. Therefore the answer to the yes/no question is **Yes**.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: \"Is any medium green melon inside all boxes?\" There are boxes: box one, box two. Possibly more? The story mentions box one and box two. The question: \"any medium green melon inside all boxes?\" Means: Is there a medium green melon that is inside every box (i.e., inside box one and also inside box two). We have propositions: Prop1: The medium green melon is inside box one. Prop2: Box one is inside box two. Prop3: The medium green melon is inside box two. So the medium green melon is inside both box one and box two. So yes, there is a medium green melon inside all boxes (the two boxes). So answer Yes.\n\nWe need to output JSON: {\"answer\": \"Yes\"}.\n\nWe should include explanation before but final line must be JSON only. So produce explanation then JSON line."
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "The relevant proposition is Prop 10, which states that all orange melons mentioned are covered by a box. The story mentions only one orange melon—the medium orange melon—and it is explicitly covered by box one. Therefore, the statement “All orange melons are covered by a box” is true.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer Yes/No: Are all orange melons covered by a box? Use propositions.\n\nWe have Prop 10: All orange melons mentioned are covered by a box. That directly answers Yes.\n\nCheck story: orange melons mentioned: medium orange melon (covered by box one). Any other orange melons? The big orange apple is not a melon. So only orange melon is medium orange melon, which is covered. So yes.\n\nThus answer Yes.\n\nWe need to output JSON: {\"answer\": \"Yes\"} as last line.\n\nWe may include explanation before, but final line must be JSON only.\n\nProceed."
+    },
+    {
+      "q_id": 3,
+      "answer": [
+        "left",
+        "above"
+      ],
+      "full_response": "{\"answer\": [\"left\", \"above\"]}",
+      "cot": "We need to answer: Where is the medium green melon regarding the medium orange melon? So relative position of medium green melon to medium orange melon.\n\nWe have propositions:\n\nProp 9: The medium green melon is north of the medium orange melon.\nProp 10: The medium green melon is west of the medium orange melon.\n\nAlso Prop 1: big orange apple south of medium green melon (irrelevant). Prop 2: big orange apple west of medium orange melon (irrelevant). Prop 3: medium orange melon south of big orange apple (irrelevant). Prop 4: medium green melon west of big orange apple (irrelevant). Prop 5: big green watermelon east of medium green melon (irrelevant). Prop 6: medium orange melon east of big green watermelon (irrelevant). Prop 7,8 about containment (irrelevant). So relevant are Prop 9 and Prop 10.\n\nThus medium green melon is north (above) and west (left) of medium orange melon. The question asks \"Where is the medium green melon regarding the medium orange melon?\" Could be multiple relations. Options list includes left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. We have both left and above. Should we output both? The answer format allows array of strings for multi-answer. So we should output [\"left\",\"above\"] maybe order not important. Usually they might want both. Provide array.\n\nThus final JSON: {\"answer\": [\"left\",\"above\"]}"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp",
+      "full_response": "The medium green melon is inside box one, and box one is inside box two. By transitivity (Prop 3) the melon is also inside box two. “Inside” corresponds to the RCC8 relation **non‑tangential proper part (ntpp)**, i.e., the melon is a proper part of box two without touching its boundary.\n\n{\"answer\": \"ntpp\"}",
+      "cot": "We need to answer: Where is the medium green melon relative to box two? Options include spatial relations like left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. The story: Box one contains medium green melon and big orange apple. Box one is inside box two (since \"Another box named two contains box one.\" So box one is inside box two). So medium green melon is inside box one, which is inside box two. So medium green melon is inside box two. The relation \"inside\" corresponds to which of the given options? The options list includes \"dc\", \"ec\", \"po\", \"tpp\", \"ntpp\", \"tppi\", \"ntppi\". These are RCC8 or topological relations: dc = disconnected, ec = externally connected, po = partial overlap, tpp = tangential proper part, ntpp = non-tangential proper part, tppi = tangential proper part inverse, ntppi = non-tangential proper part inverse. For \"inside\" (object inside container) the relation is \"tpp\" (tangential proper part) if the object is inside but may touch the boundary? Actually in RCC8: \"tpp\" means A is a tangential proper part of B (A is inside B and touches the boundary). \"ntpp\" means non-tangential proper part (strictly inside, not touching). The story says \"inside\" but not \"cover\". Box one contains medium green melon (inside). Box one is inside box two. So medium green melon is inside box two, but we don't know if it touches the boundary. Usually \"inside\" implies not touching, i.e., ntpp. However the story uses \"contain\" and \"covers\". \"Contain\" means inside but not touching? In typical spatial reasoning tasks, \"contain\" means inside (maybe not touching). \"Cover\" means the container covers the object (object touches boundary). So \"contains\" is like \"contains\" relation: the container contains the object, which is inside but not touching. So medium green melon is inside box two, and box two contains the medium green melon (Prop 5,6). That suggests the relation is \"contains\" from box two to melon, i.e., melon is \"inside\" box two, which is \"ntpp\" (non-tangential proper part). The proposition list: Prop 5: If an object is inside box two then box two contains the object. Prop 6: Box two contains the medium green melon. So the relation from box two to melon is \"contains\". The inverse relation (melon relative to box two) is \"inside\". In RCC8, the inverse of \"contains\" is \"inside\". The relation \"inside\" is \"tpp\" or \"ntpp\"? Actually \"contains\" is the inverse of \"inside\". In RCC8, \"A contains B\" means B is a proper part of A (maybe touching). The standard RCC8 relations: \"TPP\" (tangential proper part) and \"NTPP\" (non-tangential proper part). The inverse relations are \"TPPi\" and \"NTPPi\". So \"contains\" corresponds to \"TPPi\" or \"NTPPi\". Which one? If B is inside A but not touching, B is NTPP of A, and A is NTPPi of B. If B touches boundary, B is TPP of A, and A is TPPi of B. The story says \"contains\" (box two contains the medium green melon). Usually \"contains\" implies the object is inside but not touching. So that would be NTPP (object is non-tangential proper part of container). So the relation from melon to box two is NTPP. The options include \"ntpp\". So answer: \"ntpp\". Let's verify: The question: \"Where is the medium green melon relative to box two?\" So we need relation of melon relative to box two: it's inside, i.e., ntpp. So answer JSON: {\"answer\": \"ntpp\"}.\n\nWe should include explanation? The instruction: may output explanation, but answer must end with JSON line. So we can give explanation then final line. Ensure final line only JSON."
+    },
+    {
+      "q_id": 5,
+      "answer": "tpp",
+      "full_response": "{\"answer\": \"tpp\"}",
+      "cot": "We need to answer: Where is the medium orange melon relative to box one? Options include spatial relations like left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. These are RCC or directional relations? The story: \"Box one covers a big green watermelon which is east of the medium green melon. Box one covers the medium orange melon.\" Also earlier: \"Box one contain a medium green melon and a big orange apple.\" So box one contains those items. \"Box one covers the medium orange melon.\" In spatial reasoning, \"covers\" means the object is partially overlapped? In typical dataset, \"covers\" means the box covers the object: the object is inside and touching the border? Actually in these tasks, relations: \"contains\", \"covers\", \"inside\", \"overlaps\", \"covers\" etc. The question: Where is the medium orange melon relative to box one? Since box one covers the medium orange melon, the relation of the melon to the box is \"inside and touching\" maybe \"tpp\"? Let's recall mapping: In RCC8, relations: \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part (inside and touching boundary), \"ntpp\" = non-tangential proper part (inside not touching), \"tppi\" = tangential proper part inverse (i.e., box is tpp of object?), \"ntppi\" = inverse of ntpp. But here we need relation of object relative to box. If box covers the object, then object is inside and touching the box's interior? Actually \"covers\" means the container covers the object: the object is inside and touching the container's border. So object is a \"tpp\" of the box? Wait: In RCC, \"tpp\" is proper part that touches the boundary of the whole. So if A is tpp of B, then A is inside B and touches B's boundary. So the object (medium orange melon) is tpp of box one. So answer: \"tpp\". Let's verify: Prop 1: Box one covers the medium orange melon. Prop 2: The medium orange melon is covered by box one. So indeed the relation is \"covered by\". The inverse of \"covers\". So the melon is \"covered by\" box one. In RCC terms, \"covered by\" corresponds to \"tpp\" (object is tangential proper part of container). So answer \"tpp\". Options include tpp. So output JSON.\n\n"
+    }
+  ]
+}

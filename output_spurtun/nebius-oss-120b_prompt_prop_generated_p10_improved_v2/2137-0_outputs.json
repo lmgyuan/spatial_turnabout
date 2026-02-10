@@ -1,0 +1,94 @@
+{
+  "case_id": "2137-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "ec"
+    },
+    {
+      "q_id": 5,
+      "answer": "tpp"
+    },
+    {
+      "q_id": 6,
+      "answer": "ntppi"
+    },
+    {
+      "q_id": 7,
+      "answer": "tppi"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:29:40.160393",
+    "processing_mode": "per_question",
+    "pipeline": "prop_generated",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "The relevant propositions are Prop 1, Prop 2 (medium yellow apple in box 1 touches green apple 1), and Prop 5, Prop 6 (medium yellow apple in box 2 touches orange apple 1). These show that only some objects touch a medium yellow apple; other objects (e.g., the second green apple, the second orange apple) have no touching relation with any medium yellow apple. Therefore, not all things touch a medium yellow apple.\n\n{\"answer\": \"No\"}",
+      "cot": "We need to answer: \"Do all things touch a medium yellow apple?\" Means: For all objects in the scenario, do they touch a medium yellow apple? Or perhaps \"all things\" meaning all objects present? Need to interpret.\n\nWe have objects: medium yellow apple in box one, medium green apple #1, medium green apple #2, medium yellow apple in box two, medium orange apple #1, medium orange apple #2 (the one covered by box two). Also boxes themselves? Probably \"things\" refers to objects (apples). The question: Do all things touch a medium yellow apple? We need to see if every object touches a medium yellow apple. Let's list touches:\n\nFrom propositions:\n\n- Prop1: medium yellow apple in box one touches medium green apple #1. So that yellow apple touches green #1.\n- Prop2: medium green apple #1 touches medium yellow apple in box one (same).\n- Prop3: medium green apple #1 touches medium green apple #2.\n- Prop4: medium green apple #2 touches medium green apple #1.\n- Prop5: medium yellow apple in box two touches medium orange apple #1.\n- Prop6: medium orange apple #1 touches medium yellow apple in box two.\n- Prop7: medium orange apple #1 is above medium yellow apple in box two (spatial but not touch).\n- Prop8: medium yellow apple in box one is inside box one (location).\n- Prop9: medium yellow apple in box two is inside box two.\n- Prop10: medium green apple #2 is covered by box one.\n\nAlso story mentions \"Another medium orange apple is covered by box two.\" That's orange apple #2, but no touch relations given.\n\nThus which objects touch a medium yellow apple? There are two medium yellow apples: one in box one, one in box two. The question \"a medium yellow apple\" ambiguous. Could refer to any medium yellow apple. \"Do all things touch a medium yellow apple?\" Means does every object touch at least one medium yellow apple? Let's check each object:\n\nObjects list:\n- medium yellow apple in box one: does it touch a medium yellow apple? It touches green apple #1, not a yellow apple. Does it touch itself? No. So does it touch a medium yellow apple? It is a medium yellow apple itself, but does it touch another medium yellow apple? Not given. So maybe not.\n\n- medium green apple #1: touches medium yellow apple in box one (yes). So touches a yellow apple.\n\n- medium green apple #2: touches medium green apple #1, not a yellow apple. No relation to yellow apple.\n\n- medium yellow apple in box two: touches medium orange apple #1, not a yellow apple.\n\n- medium orange apple #1: touches medium yellow apple in box two (yes).\n\n- medium orange apple #2: no touch relations given.\n\nThus not all objects touch a medium yellow apple. So answer No.\n\nRelevant propositions: Prop1,2,5,6 show touches with yellow apples. Also maybe story. So answer No.\n\nReturn JSON."
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 1 (Box one covers medium green apple 2), Prop 2 and Prop 3 (covering implies being inside and touching), and Prop 10 (medium green apple 2 is inside and touching a box). These show that at least one medium green apple (number 2) is both inside and touching a box. Hence the answer is **Yes**.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: Is a medium green apple inside and touching any box? Options Yes/No.\n\nWe have propositions about medium green apple number two: Prop 1 says Box one covers medium green apple number two. Prop 2: If X is covered by Y then X is inside Y. Prop 3: If X is covered by Y then X touches Y. Prop 4: Medium green apple number two is inside box one. Prop 5: Medium green apple number two touches box one. Prop 10: Medium green apple number two is inside and touching a box.\n\nAlso medium green apple number one is inside box one (Prop 6,7) but not necessarily touching box one. No proposition says it touches box one. So at least one medium green apple (number two) is inside and touching a box (box one). So answer Yes.\n\nWe need to identify relevant propositions: Prop 1,2,3,4,5,10. Use them to infer.\n\nThus answer Yes.\n\nOutput JSON: {\"answer\": \"Yes\"} as last line."
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to answer: \"Do all boxes contain all medium orange fruits?\" Options Yes/No.\n\nWe have boxes one and two. Need to see if each box contains all medium orange fruits. Identify medium orange fruits: there are medium orange apple number one and medium orange apple number two (from propositions). Also story mentions \"A medium orange apple and a medium yellow apple are within box two. Another medium orange apple is covered by box two.\" So both orange apples are in box two (one inside, one covered). No mention of orange apples in box one. So box one does NOT contain any medium orange fruit. Therefore not all boxes contain all medium orange fruits. So answer No.\n\nRelevant propositions: Prop4,5,6,7,8,9,10 about box two. Also maybe none about box one containing orange apples. So answer No.\n\nReturn JSON."
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 1 and Prop 2, which state that medium green apple 1 touches medium green apple 2 and vice‑versa. Therefore, there is a medium green apple (apple 2) that touches medium green apple 1.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: \"Does a medium green apple touch medium green apple number one?\" The question asks if a medium green apple (unspecified which) touches medium green apple number one. In the story, there are two medium green apples: number one and number two. The propositions: Prop1: Medium green apple number one touches medium green apple number two. Prop2: Medium green apple number two touches medium green apple number one. So medium green apple number two touches medium green apple number one. The question: \"Does a medium green apple touch medium green apple number one?\" That is true because there exists a medium green apple (number two) that touches number one. So answer Yes.\n\nWe need to identify relevant propositions: Prop1, Prop2. Use them. Answer Yes.\n\nOutput JSON: {\"answer\": \"Yes\"} as last line."
+    },
+    {
+      "q_id": 4,
+      "answer": "ec",
+      "full_response": "{\"answer\": \"ec\"}",
+      "cot": "We need to answer: position of medium green apple number one regarding the medium yellow apple in box one. Options include spatial relations: left, right, above, below, behind, front, near, far, dc (disconnected), ec (externally connected?), po (partial overlap?), tpp (touching?), ntpp (non-tangential proper part?), tppi (tangential proper part inverse?), ntppi. The story and propositions mention touching. Prop5: The medium yellow apple touches the medium green apple number one. Prop6: If touches then reverse touches. Prop7: The medium green apple number one touches the medium yellow apple. So they touch each other. Also Prop10: The medium green apple number one is not disconnected from the medium yellow apple. So relation is touching. The appropriate label for touching is likely \"tpp\"? Wait typical RCC8 relations: DC (disconnected), EC (externally connected), PO (partial overlap), TPP (tangential proper part), NTPP (non-tangential proper part), TPPi (inverse), NTPPi (inverse). But \"touching\" is often EC (externally connected) in RCC8? Actually EC means their boundaries touch but interiors do not intersect. That matches \"touching\". However the options include \"tpp\" which is tangential proper part (one inside and touching boundary). But here both apples are inside same box, they touch each other, not containment. So EC is appropriate. However the story uses \"touches\". In many spatial reasoning tasks, \"touching\" maps to \"ec\". So answer likely \"ec\". Also Prop10 says not disconnected, consistent.\n\nThus answer: {\"answer\": \"ec\"}"
+    },
+    {
+      "q_id": 5,
+      "answer": "tpp",
+      "full_response": "{\"answer\": \"tpp\"}",
+      "cot": "We need to answer: Where is medium green apple number two regarding box one? Options include spatial relations: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. The story and propositions give relationships.\n\nWe have propositions:\n\nProp1: Box one covers medium green apple number two.\nProp2: Medium green apple number two is covered by box one. (same)\nProp3: Medium green apple number one is inside box one.\nProp4: Box one contains medium green apple number one.\nProp5: Medium yellow apple is inside box one.\nProp6: Box one contains medium yellow apple.\nProp7: Medium green apple number one touches medium green apple number two.\nProp8: Medium yellow apple touches medium green apple number one.\nProp9: If X is covered by Y then Y covers X. (inverse)\nProp10: If X is inside Y then Y contains X.\n\nWe need relation of apple2 relative to box1. The proposition says \"medium green apple number two is covered by box one\". So apple2 is covered by box1. The relation \"covered by\" is a spatial relation. In the set of answer options, we have \"dc\", \"ec\", \"po\", \"tpp\", etc. These are RCC8 or topological relations? Let's recall: In spatial reasoning tasks, \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part, \"ntpp\" = non-tangential proper part, \"tppi\" = tangential proper part inverse, \"ntppi\" = non-tangential proper part inverse. \"covers\" is a relation where the container covers the object: The container covers the object means the object is inside and touching the container's boundary? In RCC, \"covers\" corresponds to \"tpp\" (tangential proper part) inverse? Actually, in RCC, \"A covers B\" means B is a tangential proper part of A? Let's recall: In RCC8, \"TPP\" = tangential proper part: A is a proper part of B and touches the boundary of B. So B is a \"tangential proper part inverse\" (TPPi) of A. So if box1 covers apple2, then apple2 is a tangential proper part of box1 (TPP). So relation of apple2 regarding box1 is \"tpp\". The options include \"tpp\". So answer: \"tpp\". Check if any other relation like \"inside\" vs \"covered by\". \"Covered by\" is more specific than \"inside\". So answer \"tpp\". Provide JSON.\n\n"
+    },
+    {
+      "q_id": 6,
+      "answer": "ntppi",
+      "full_response": "{\"answer\": \"ntppi\"}",
+      "cot": "We need to answer: \"What is the position of box two regarding medium orange apple number one?\" So relation of box two relative to the apple.\n\nWe have propositions: Prop 1: apple1 inside box2. Prop 2: box2 contains apple1. Prop 9: box2 is the immediate container of apple1. Also Prop 10: apple1 is not outside box2.\n\nThus box two contains apple1. The question: position of box two regarding apple1. If apple is inside box, then box is around apple? In spatial relation taxonomy, \"contains\" is relation from container to object: container contains object. The inverse relation is \"inside\". But they ask position of box two regarding apple. So we need relation from box to apple. Since apple is inside box, box is \"around\" apple? In typical set of relations used in dataset (like \"contains\", \"covers\", \"overlaps\", \"left of\", etc). The options list includes: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. These are RCC8-like? Actually dc = disconnected, ec = externally connected, po = partial overlap, tpp = tangential proper part, ntpp = non-tangential proper part, tppi = tangential proper part inverse, ntppi = non-tangential proper part inverse. For containment, \"contains\" corresponds to inverse of \"inside\". In RCC, if A contains B, then B is inside A. The relation from container to contained is \"tppi\" (tangential proper part inverse) if B touches the boundary? Or \"ntppi\" if B is strictly inside not touching. Here apple is inside box, but not necessarily touching. Prop 1 says apple is inside box two. Prop 2 says box two contains apple. In RCC, \"contains\" is the inverse of \"inside\". If inside is \"tpp\" (tangential proper part) if touching, or \"ntpp\" if not touching. Since we have no info about touching box boundary. The apple is inside, not touching. So relation from box to apple is \"ntppi\" (non-tangential proper part inverse). However we also have Prop 9: immediate container. That suggests apple is directly inside, not via other container. Still not touching.\n\nThus answer likely \"ntppi\". Check options: includes ntppi. So answer: ntppi.\n\nWe should output JSON.\n\n"
+    },
+    {
+      "q_id": 7,
+      "answer": "tppi",
+      "full_response": "{\"answer\": \"tppi\"}",
+      "cot": "We need to answer: position of medium green apple number two regarding medium green apple number one. Options include spatial relations: left, right, above, below, behind, front, near, far, dc (disconnected), ec (externally connected?), po (partial overlap?), tpp (touching?), ntpp (non-tangential proper part?), tppi (tangential proper part inverse?), ntppi (non-tangential proper part inverse?). Actually typical RCC relations: dc (disconnected), ec (externally connected), po (partial overlap), tpp (tangential proper part), ntpp (non-tangential proper part), tppi (tpp inverse), ntppi (ntpp inverse). Also near, far.\n\nWe have propositions: Prop 1: medium green apple number one touches medium green apple number two. Prop 2: medium green apple number two is touched by medium green apple number one. So they touch each other. Also Prop 3: medium green apple number one is inside medium green apple number two. Prop 4: medium green apple number two contains medium green apple number one. So apple1 is inside apple2, apple2 contains apple1. That suggests apple1 is a proper part of apple2. Since they also touch, that is tangential proper part (tpp) relation: apple1 is a tangential proper part of apple2. The inverse relation (apple2 regarding apple1) would be tppi (tangential proper part inverse). Also they touch, so also \"touching\" relation (tpp? Actually tpp is a topological relation, not same as \"touching\". But we have explicit \"touches\". The options include \"tpp\" and \"tppi\". The question: position of medium green apple number two regarding medium green apple number one. So we need relation from apple2 to apple1. Since apple1 is inside apple2 (prop3) and apple2 contains apple1 (prop4). So apple2 is a container of apple1. In RCC terms, if A is a tangential proper part of B, then B is a tangential proper part inverse (tppi) of A. So answer likely \"tppi\". Also they touch, but the relation \"touches\" is not in options; but \"tpp\" and \"tppi\" are. So answer: tppi.\n\nCheck other possibilities: Could also be \"contains\" but not in options. So tppi is correct.\n\nThus output JSON.\n\n"
+    }
+  ]
+}

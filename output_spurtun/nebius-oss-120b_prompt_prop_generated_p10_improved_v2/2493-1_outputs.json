@@ -1,0 +1,110 @@
+{
+  "case_id": "2493-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": [
+        "above",
+        "behind",
+        "dc"
+      ]
+    },
+    {
+      "q_id": 5,
+      "answer": "tpp"
+    },
+    {
+      "q_id": 6,
+      "answer": [
+        "below",
+        "front",
+        "dc"
+      ]
+    },
+    {
+      "q_id": 7,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:29:40.176877",
+    "processing_mode": "per_question",
+    "pipeline": "prop_generated",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "{\"answer\":\"Yes\"}",
+      "cot": "We need to answer: Is AAA over a medium black square? Options Yes/No.\n\nWe have propositions: AAA is over BBB (Prop1). AAA is behind BBB (Prop2). AAA is disconnected from BBB (Prop3). BBB contains medium black square B1 (Prop4). BBB contains medium black square B3 (Prop5). BBB covers medium black square B2 (Prop6). B2 is under B3 (Prop7). B3 is below B1 (Prop8). B1 is a medium black square (Prop9). AAA covers a medium yellow square (Prop10).\n\nWe need to know if AAA is over a medium black square. AAA is over BBB. Does that imply AAA is over any object inside BBB? Typically, if AAA is over BBB, AAA is above BBB as a whole. If BBB contains a medium black square, then that square is inside BBB, thus its location is within BBB's region. If AAA is over BBB, AAA is above the block, thus also above the objects inside? Usually spatial reasoning: If A is over B, then A is over everything that is inside B (since B contains them). So AAA is over the medium black squares inside BBB. So answer Yes.\n\nCheck story: \"Block AAA with a medium yellow square is over, behind and disconnected from block BBB.\" So AAA is over BBB. \"Block BBB contains medium black square.\" So AAA is over that square. So answer Yes.\n\nThus output JSON: {\"answer\":\"Yes\"}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "The question asks whether medium yellow square number 2 is both inside **and** touching **all** blocks (AAA and BBB).\n\nRelevant propositions:\n- Prop 6: the square is inside block AAA.\n- Prop 7: the square is touching block AAA.\n- Prop 9: the square is **not** inside block BBB.\n- Prop 10: the square does **not** touch block BBB.\n\nSince the square fails to be inside and touching block BBB, it is not inside and touching **all** blocks.\n\nThus the correct answer is **No**.\n\n{\"answer\": \"No\"}",
+      "cot": "We need to parse the question: \"Is medium yellow square number two inside and touching all blocks?\" So we need to see if medium yellow square #2 is inside and touching all blocks (i.e., both block AAA and block BBB). The propositions given:\n\nProp 4: Block AAA covers medium yellow square number two.\nProp 5: Medium yellow square number two is covered by block AAA.\nProp 6: Medium yellow square number two is inside block AAA.\nProp 7: Medium yellow square number two is touching block AAA.\nProp 8: Medium yellow square number two is disconnected from block BBB.\nProp 9: Medium yellow square number two is not inside block BBB.\nProp 10: Medium yellow square number two does not touch block BBB.\n\nThus, for block AAA: inside and touching (yes). For block BBB: not inside, does not touch, disconnected. So it's not inside and touching all blocks. Therefore answer is No.\n\nWe need to output JSON: {\"answer\": \"No\"}.\n\nBut also need to \"First identify which propositions are relevant to this question, then apply them\". We can include explanation before JSON, but final line must be JSON only.\n\nThus produce explanation then JSON."
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are:\n- Prop 2: AAA is behind BBB.\n- Prop 10: BBB is in front of AAA.\n- Prop 4 & Prop 5: Both medium yellow squares are inside/covered by AAA.\n- Prop 6: Medium black square #1 is inside BBB.\n\nSince BBB is in front of AAA, any object in BBB (including medium black square #1) is in front of any object in AAA (including all medium yellow squares). Therefore, medium black square #1 is in front of all medium yellow squares.\n\n{\"answer\":\"Yes\"}",
+      "cot": "We need to parse the story and propositions. Determine spatial relations.\n\nWe have blocks AAA and BBB. AAA is above BBB (Prop1). AAA is behind BBB (Prop2). AAA is disconnected from BBB (Prop3). Also Prop10 says BBB is in front of AAA, which is consistent (inverse of behind). So AAA behind BBB, BBB in front of AAA.\n\nWe have medium yellow squares: Prop4: medium yellow square number one is inside AAA. Prop5: medium yellow square number two is covered by AAA. So both yellow squares are in AAA (one inside, one covered). So they are located within AAA.\n\nMedium black squares: Prop6: medium black square number one is inside BBB. Prop7: medium black square number two is covered by BBB. Prop8: medium black square number two is below medium black square number three. Prop9: medium black square number three is below medium black square number one.\n\nThus we have three black squares: #1 inside BBB, #2 covered by BBB, #3? Not directly described but appears in relations: #2 below #3, #3 below #1. So #3 is also in BBB? Not explicitly, but likely also in BBB (maybe inside). But we only need #1.\n\nQuestion: \"Is medium black square number one in front of all medium yellow squares?\" So we need to know relative front/back between black square #1 (in BBB) and yellow squares (in AAA). We have block-level relations: AAA is behind BBB (Prop2). That means AAA is behind BBB, so BBB is in front of AAA (Prop10). So any object inside BBB is in front of any object inside AAA? Typically spatial reasoning: If block A is behind block B, then everything in A is behind everything in B, assuming no contradictory info. So black square #1 (in BBB) is in front of yellow squares (in AAA). So answer Yes.\n\nCheck if any other propositions affect front/back: None. So answer Yes.\n\nThus output JSON: {\"answer\":\"Yes\"}"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "The question concerns the vertical ordering of the three medium black squares.  \nRelevant propositions are:\n\n- Prop 2: “Medium black square number two is under medium black square number three.”\n- Prop 3: “Medium black square number three is below medium black square number one.”\n- Prop 7: “Medium black square number two is below medium black square number one.”\n\nFrom Prop 3 we know the order #1 > #3 (where “>” means higher).  \nProp 2 tells us #3 > #2.  \nProp 7 directly confirms #1 > #2.  \n\nThus the vertical hierarchy is #1 (highest), then #3, then #2 (lowest).  \nTherefore medium black square #2 is below every other black square.\n\n**Answer:** Yes.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to parse the story and propositions. The question: \"Is medium black square number two below all black squares?\" Means: Is square #2 below every black square present (i.e., #1, #2, #3 maybe). Need to determine if #2 is below all black squares. If there are three black squares: #1, #2, #3. We need to see relative positions.\n\nFrom propositions:\n\nProp 1: Block BBB covers medium black square number two\nProp 2: Medium black square number two is under medium black square number three\nProp 3: Medium black square number three is below medium black square number one\nProp 4: Medium black square number one is within block BBB\nProp 5: Block BBB contains medium black square number one\nProp 6: Medium black square number two is covered by block BBB (same as 1)\nProp 7: Medium black square number two is below medium black square number one\nProp 8: Block AAA is over block BBB\nProp 9: Block AAA is behind block BBB\nProp 10: Block AAA is disconnected from block BBB\n\nWe have relationships: #2 under #3 (Prop2). #3 below #1 (Prop3). Also #2 below #1 (Prop7). So ordering: #1 is top, #3 is below #1, #2 is below #3? Wait #2 under #3 means #2 is below #3. So #2 is lowest. So #2 is below #1 and #3. Are there any other black squares? Only three. So #2 is below all black squares (including itself? Usually \"below all black squares\" means below every other black square, not itself. So yes.\n\nThus answer Yes.\n\nWe need to identify relevant propositions: 2,3,7 maybe. Provide explanation then final JSON.\n\n"
+    },
+    {
+      "q_id": 4,
+      "answer": [
+        "above",
+        "behind",
+        "dc"
+      ],
+      "full_response": "{\"answer\": [\"above\", \"behind\", \"dc\"]}",
+      "cot": "We need to parse story and propositions. The question: position of block AAA relative to medium black square number two.\n\nWe have propositions: Prop 6: Block AAA is above medium black square number two. Prop 7: Block AAA is behind medium black square number two. Prop 8: Block AAA is disconnected from medium black square number two. Also Prop 1-3 about AAA relative to BBB, but not needed.\n\nThus relative positions: above, behind, disconnected (dc). The answer options include \"above\", \"behind\", \"dc\". The question likely expects multiple answers? The answer_type is single, but could be multiple? It says answer_type single, but we have multiple relations. Usually they expect list of all applicable relations? In prior tasks, they sometimes output multiple labels as list. But answer_type single suggests one label. However they ask \"What is the position of block AAA relative to medium black square number two?\" Could be multiple positions; they might expect list. The schema allows answer to be string OR [string]. So we can output array of strings.\n\nThus answer: [\"above\",\"behind\",\"dc\"].\n\nCheck ordering? Not specified. Provide as array.\n\nThus final line JSON."
+    },
+    {
+      "q_id": 5,
+      "answer": "tpp",
+      "full_response": "{\"answer\": \"tpp\"}",
+      "cot": "We need to answer: position of medium yellow square number two regarding AAA.\n\nWe have propositions: Prop1: AAA covers medium yellow square number two. Prop2: Medium yellow square number two is covered by AAA. Both say same relationship: the square is covered by AAA (i.e., AAA covers the square). So the relation of the square relative to AAA is \"covered by\". The question: \"position of medium yellow square number two regarding AAA\". So we need relation of square to AAA. If AAA covers the square, then the square is \"inside and touching\" AAA? In spatial reasoning tasks, \"covers\" means the container covers the object: the object is inside and touching the container's border. The relation from object to container is \"covered by\". The options list includes: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. These are typical RCC/Directional relations: dc (disconnected), ec (externally connected), po (partial overlap), tpp (tangential proper part), ntpp (non-tangential proper part), tppi (tangential proper part inverse), ntppi (non-tangential proper part inverse). For \"covered by\", the relation is \"tpp\" (tangential proper part) or \"tppi\"? Let's recall: In RCC-8, \"tpp\" is tangential proper part: A is a proper part of B and touches the boundary. The inverse relation is \"tppi\": B is a tangential proper part inverse of A (i.e., B contains A and touches). So if AAA covers the square, AAA is the container, square is inside and touching AAA. So square is a tangential proper part of AAA: relation from square to AAA is tpp. Yes.\n\nThus answer: \"tpp\". Check if any other relevant proposition: Prop1 and Prop2 both indicate same. So answer is tpp.\n\nReturn JSON: {\"answer\": \"tpp\"}"
+    },
+    {
+      "q_id": 6,
+      "answer": [
+        "below",
+        "front",
+        "dc"
+      ],
+      "full_response": "{\"answer\": [\"below\", \"front\", \"dc\"]}",
+      "cot": "We need to answer: Where is medium black square number one relative to medium yellow square number one? Determine spatial relation(s). Options include left, right, above, below, behind, front, near, far, dc (disconnected), ec (?? maybe \"enclosed\"?), po (??), tpp, ntpp, tppi, ntppi. Usually these are RCC relations: dc = disconnected, ec = externally connected, po = partial overlap, tpp = tangential proper part, ntpp = non-tangential proper part, tppi = tangential proper part inverse, ntppi = non-tangential proper part inverse. But likely only need directional relations: above, below, behind, front, left, right, near, far, dc.\n\nFrom propositions:\n\nProp 8: Medium yellow square number one is disconnected from medium black square number one.\nThus black square #1 is disconnected from yellow square #1. So relation includes dc.\n\nProp 9: Medium yellow square number one is behind medium black square number one. That means yellow is behind black, so black is in front of yellow.\n\nProp 10: Medium black square number one is below medium yellow square number one. So black is below yellow.\n\nThus relative to yellow, black is below, in front, and disconnected.\n\nWe need to output answer(s). The question: \"Where is medium black square number one relative to medium yellow square number one?\" Could be multiple relations. Options allow multiple answers? The answer_type is single, but could be list? It says \"single\". Probably they expect one relation, maybe the most specific? In similar tasks, they often output all applicable relations as list. But answer_type single suggests one answer. Which one is most salient? Usually they ask \"relative to\" and we list all that apply. But they said \"single\". Might be they expect a list of strings? The schema allows answer to be string OR [string]. So we can output array.\n\nThus we include \"below\", \"front\", \"dc\". Order? Not specified. Provide array.\n\nThus final JSON: {\"answer\": [\"below\",\"front\",\"dc\"]}.\n\nCheck if \"front\" is correct term; options include \"front\". Yes.\n\nThus output."
+    },
+    {
+      "q_id": 7,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to answer: Where is medium black square number two regarding medium black square number one? Options include spatial relations: left, right, above, below, behind, front, near, far, dc (disconnected), ec (externally connected?), po (partially overlapping?), tpp (touching?), ntpp, tppi, ntppi. The story and propositions give relations.\n\nWe have propositions:\n\nProp 1: square1 inside BBB.\nProp 2: square2 covered by BBB.\nProp 3: square3 inside BBB.\nProp 4: square2 below square3.\nProp 5: square3 below square1.\nProp 6: square2 below square1.\nProp 7: square1 above square3.\nProp 8: square3 above square2.\nProp 9: AAA above BBB.\nProp 10: AAA behind BBB and disconnected.\n\nWe need relation of square2 relative to square1. Prop 6 says square2 is below square1. Also Prop 4 and 5 combine: square2 below square3, square3 below square1 => square2 below square1 (consistent). So answer: below.\n\nCheck if any other relation like behind/front? No. Both are inside same block, no mention of left/right, front/back. So answer is \"below\".\n\nThus output JSON: {\"answer\": \"below\"}.\n\nMake sure no extra text."
+    }
+  ]
+}

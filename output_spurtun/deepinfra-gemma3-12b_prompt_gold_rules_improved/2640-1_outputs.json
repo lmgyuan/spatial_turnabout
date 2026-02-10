@@ -1,0 +1,94 @@
+{
+  "case_id": "2640-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "above"
+    },
+    {
+      "q_id": 7,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:45:33.848715",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the spatial relationships described in the story:\n\n1. **DDD covers a midsize green rectangle:** This means the green rectangle is below DDD.\n2. **The green rectangle is under midsize orange rectangle number two and the white thing:** This means both orange rectangle number two and the white thing are above the green rectangle.\n3. **The midsize white rectangle is over midsize orange rectangle number two:** This means orange rectangle number two is below the white rectangle.\n4. **The white rectangle touches midsize orange rectangle number one:** This implies they are adjacent, but doesn't establish a strict above/below relationship.\n5. **Midsize orange rectangle number one is over this object (DDD):** This means DDD is below orange rectangle number one.\n6. **Midsize orange rectangle number two is under this thing (orange rectangle number one):** This means orange rectangle number one is above orange rectangle number two.\n\nNow let's summarize the relationships relevant to the question:\n\n*   **Green rectangle:** Below DDD, below orange rectangle number two, below the white thing.\n*   **Orange rectangle number one:** Above DDD, above orange rectangle number two.\n*   **Orange rectangle number two:** Below orange rectangle number one, above the green rectangle, below the white rectangle.\n*   **White rectangle:** Above the green rectangle, above orange rectangle number two.\n*   **DDD:** Above the green rectangle.\n\nAll shapes (green rectangle, orange rectangle number one, orange rectangle number two, white rectangle, and DDD) are midsize objects. The question asks if *all* shapes are below *any* midsize object.\n\n*   Green rectangle is below DDD, orange rectangle number one, and the white rectangle.\n*   Orange rectangle number one is below orange rectangle number one.\n*   Orange rectangle number two is below orange rectangle number one and the white rectangle.\n*   White rectangle is below orange rectangle number one.\n*   DDD is below orange rectangle number one.\n\nTherefore, all shapes are below at least one midsize object.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the spatial relationships described in the story:\n\n1. **DDD covers a green rectangle:** This establishes that the green rectangle is *under* DDD.\n2. **Green rectangle is under orange rectangle number two and the white thing:** This means orange rectangle number two and the white thing are *above* the green rectangle.\n3. **White rectangle is over orange rectangle number two:** This means orange rectangle number two is *under* the white rectangle.\n4. **White rectangle touches orange rectangle number one:** This tells us their relative position, but doesn't directly relate to the green rectangle.\n5. **Orange rectangle number one is over this object (DDD):** This means DDD is *under* orange rectangle number one.\n6. **Orange rectangle number two is under this thing (orange rectangle number one):** This confirms the vertical relationship between orange rectangle number one and two.\n\nNow, let's consider the question: \"Are all orange rectangles over the green shape?\"\n\n*   **Orange rectangle number one:** It's over DDD, and DDD is over the green rectangle. So, orange rectangle number one is over the green rectangle.\n*   **Orange rectangle number two:** It's above the green rectangle.\n*   **Orange rectangle number two is under orange rectangle number one:** This doesn't change the fact that it is above the green rectangle.\n\nTherefore, all orange rectangles are over the green shape.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the spatial relationships described in the story:\n\n1. **DDD covers a midsize green rectangle:** This establishes a covering relationship.\n2. **The green rectangle is under midsize orange rectangle number two and the white thing:** This means orange rectangle #2 and the white thing are *above* the green rectangle.  Applying the rule \"If XXX is below YYY then YYY is above XXX\", we get:  The white thing is above the green rectangle, and orange rectangle #2 is above the green rectangle.\n3. **The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one:** This means the white rectangle is *above* orange rectangle #2. Applying the rule: orange rectangle #2 is below the white rectangle. It also touches orange rectangle #1.\n4. **Over this object (the white rectangle) there is midsize orange rectangle number one:** This means orange rectangle #1 is *above* the white rectangle. Applying the rule: the white rectangle is below orange rectangle #1.\n5. **Midsize orange rectangle number two is under this thing (orange rectangle #1):** This means orange rectangle #1 is *above* orange rectangle #2. Applying the rule: orange rectangle #2 is below orange rectangle #1.\n\nNow let's summarize the vertical relationships:\n\n*   Orange rectangle #1 is above the white rectangle.\n*   The white rectangle is above orange rectangle #2.\n*   Orange rectangle #1 is above orange rectangle #2.\n\nThe question asks: \"Is any midsize orange rectangle over all midsize orange rectangles?\"\n\nOrange rectangle #1 is above orange rectangle #2, but it is not above itself. Therefore, no orange rectangle is over *all* orange rectangles.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the rules to determine if all midsize shapes are inside all boxes.\n\nThe story states:\n1. A box called DDD contains two midsize orange rectangles and a midsize white rectangle.\n2. The box DDD covers a midsize green rectangle.\n3. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one.\n4. Midsize orange rectangle number one is over the box.\n5. Midsize orange rectangle number two is under the box.\n\nFrom the first statement, we know that the two orange rectangles and the white rectangle are inside the box DDD. The green rectangle is covered by the box DDD, which implies it is also inside the box DDD.\n\nTherefore, all midsize shapes (orange rectangles, white rectangle, and green rectangle) are inside the box DDD. Since the question asks if all midsize shapes are inside *all* boxes, and we only have information about box DDD, we must assume the question is referring to box DDD.\n\nSo, the answer is Yes.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Okay, let's break down the spatial relationships described in the story and determine the position of the green rectangle relative to orange rectangle number one.\n\n1. **DDD covers a midsize green rectangle:** This means the green rectangle is *below* DDD.\n2. **The green rectangle is under midsize orange rectangle number two and the white thing:** This means the green rectangle is *below* both orange rectangle number two and the white rectangle.\n3. **The midsize white rectangle is over midsize orange rectangle number two:** This means orange rectangle number two is *below* the white rectangle.\n4. **The midsize white rectangle touches midsize orange rectangle number one:** This tells us they are adjacent, but doesn't specify which is above/below.\n5. **Midsize orange rectangle number one is over this object (DDD):** This means DDD is *below* orange rectangle number one.\n6. **Midsize orange rectangle number two is under this thing (orange rectangle number one):** This means orange rectangle number two is *below* orange rectangle number one.\n\nCombining these:\n\n*   Green rectangle is below DDD.\n*   DDD is below orange rectangle number one.\n*   Therefore, the green rectangle is below orange rectangle number one.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Okay, let's break down the spatial relationships described in the story and determine the position of midsize orange rectangle number two relative to the midsize green rectangle.\n\nHere's how we can analyze the story:\n\n1. **\"It covers a midsize green rectangle...\"**: This means the box (DDD) is above the green rectangle.\n2. **\"...which are under midsize orange rectangle number two and the white thing.\"**: This tells us the green rectangle is *below* both midsize orange rectangle number two and the white rectangle.\n3. **\"The midsize white rectangle is over midsize orange rectangle number two...\"**: The white rectangle is *above* midsize orange rectangle number two.\n4. **\"...and touches midsize orange rectangle number one.\"**: This gives us a horizontal relationship, but isn't directly relevant to the question.\n5. **\"Over this object there is midsize orange rectangle number one.\"**: This means midsize orange rectangle number one is *above* the box (DDD).\n6. **\"Midsize orange rectangle number two is under this thing.\"**: This refers to midsize orange rectangle number one, so midsize orange rectangle number two is *below* midsize orange rectangle number one.\n\nCombining these relationships, we can conclude that the midsize green rectangle is *below* midsize orange rectangle number two.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "above",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to answer the question.\n\nThe story states: \"Over this object there is midsize orange rectangle number one. Midsize orange rectangle number two is under this thing.\"\n\nThis directly tells us that midsize orange rectangle number one is *above* midsize orange rectangle number two.\n\nTherefore, the answer is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "above",
+      "full_response": "Okay, let's break down the spatial relationships described in the story and determine the position of midsize orange rectangle number one relative to the box DDD.\n\nHere's how we can analyze the story:\n\n1. **Box DDD contains:** two midsize orange rectangles and a midsize white rectangle. This establishes that everything else is *inside* the box.\n2. **Green rectangle:** A midsize green rectangle is *under* midsize orange rectangle number two and the white thing.\n3. **White rectangle:** The midsize white rectangle is *over* midsize orange rectangle number two and *touches* midsize orange rectangle number one.\n4. **Orange rectangle number one:** Midsize orange rectangle number one is *over* the white rectangle.\n5. **Orange rectangle number two:** Midsize orange rectangle number two is *under* midsize orange rectangle number one.\n\nFrom this, we can deduce the following order from bottom to top:\n\n*   Green rectangle\n*   Midsize orange rectangle number two\n*   White rectangle\n*   Midsize orange rectangle number one\n\nSince all these elements are contained within the box DDD, and orange rectangle number one is on top of the white rectangle, which is inside the box, orange rectangle number one is *above* the box.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    }
+  ]
+}

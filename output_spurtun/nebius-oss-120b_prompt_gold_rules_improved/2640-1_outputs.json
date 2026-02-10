@@ -1,0 +1,94 @@
+{
+  "case_id": "2640-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    },
+    {
+      "q_id": 6,
+      "answer": "above"
+    },
+    {
+      "q_id": 7,
+      "answer": "ntpp"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:18:30.993157",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Entities: box DDD contains two midsize orange rectangles (let's call orange1 and orange2) and a midsize white rectangle (white). It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing. So green rectangle is under orange2 and under white. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one. Midsize orange rectangle number two is under this thing.\n\nLet's decode:\n\n- white is over orange2. So white above orange2. Also white touches orange1 (touching doesn't give vertical relation, but maybe they are adjacent). \n- Over this object there is midsize orange rectangle number one. \"this object\" refers to the white rectangle? The previous sentence: \"The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one.\" The phrase \"this object\" likely refers to the white rectangle (the subject of previous sentence). So orange1 is over white rectangle. So orange1 above white.\n\n- \"Midsize orange rectangle number two is under this thing.\" \"this thing\" likely refers to orange1 (the last mentioned). So orange2 is under orange1.\n\nThus we have vertical ordering:\n\nTop: orange1\nThen white (since orange1 over white)\nThen orange2 (since white over orange2, and orange2 under orange1)\nGreen rectangle is under orange2 and under white (so below orange2). So green is lowest.\n\nThus all shapes: orange1, white, orange2, green. Are all shapes below any midsize object? The question: \"Are all shapes below any midsize object?\" Means: For each shape, is there at least one midsize object that is above it? Or does it ask if all shapes are below some midsize object? Let's interpret: \"Are all shapes below any midsize object?\" Could be asking: Is every shape located below at least one midsize object? If yes, answer Yes. Let's check each shape:\n\n- orange1: Is orange1 below any midsize object? It is the topmost; there is no object above it. So orange1 is not below any midsize object. Therefore not all shapes are below a midsize object. So answer No.\n\nThus output JSON: {\"answer\": \"No\"}.\n\nMake sure no extra text before."
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called DDD have two midsize orange rectangles and a midsize white rectangle. It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one. Midsize orange rectangle number two is under this thing.\"\n\nLet's decode.\n\nObjects:\n- orange rectangle #1 (OR1)\n- orange rectangle #2 (OR2)\n- white rectangle (W)\n- green rectangle (G)\n\nRelations:\n\n1. \"It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing.\" Means G is under OR2 and under W. So G is below OR2 and below W.\n\n2. \"The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one.\" So W is over OR2 (W above OR2). Also W touches OR1 (touch relation not needed for over/under).\n\n3. \"Over this object there is midsize orange rectangle number one.\" \"this object\" refers to the previous mentioned object, which is the white rectangle? The sentence: \"The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one.\" The \"this object\" likely refers to the white rectangle (the subject of previous sentence). So OR1 is over the white rectangle. So OR1 is above W.\n\n4. \"Midsize orange rectangle number two is under this thing.\" \"this thing\" likely refers to the previous object, which is orange rectangle number one? The previous sentence: \"Over this object there is midsize orange rectangle number one.\" So \"this thing\" could be orange rectangle number one. So OR2 is under OR1.\n\nThus we have hierarchy:\n\nTop: OR1 (maybe highest)\nThen below OR1: W (since OR1 over W)\nThen below W: OR2 (since W over OR2)\nThen below OR2: G (since G under OR2)\nAlso G under W (consistent).\n\nThus all orange rectangles (OR1 and OR2) are over the green shape? OR1 is above G (since OR1 > W > OR2 > G). OR2 is above G (since OR2 > G). So yes, both orange rectangles are over G.\n\nThus answer: Yes.\n\nReturn JSON: {\"answer\": \"Yes\"}.\n\nMake sure no extra text before JSON."
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "{\"answer\":\"No\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called DDD have two midsize orange rectangles and a midsize white rectangle. It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one. Midsize orange rectangle number two is under this thing.\"\n\nWe need to determine: Is any midsize orange rectangle over all midsize orange rectangles? Means: Is there an orange rectangle that is over both orange rectangles (i.e., over itself? Over all orange rectangles includes itself? Usually \"over all midsize orange rectangles\" means over every orange rectangle, including possibly itself? Typically a rectangle cannot be over itself; but the phrase \"any midsize orange rectangle over all midsize orange rectangles\" means is there an orange rectangle that is over every orange rectangle (including the other one). If one rectangle is over the other, then that rectangle is over all orange rectangles? It would be over the other one, but not over itself. Usually \"over all\" includes itself? In logic, \"over all\" means for all orange rectangles, that rectangle is over them. That would require it to be over itself, which is impossible. So answer likely No.\n\nBut let's parse relationships.\n\nWe have two orange rectangles: orange rectangle #1 and #2.\n\nSentences:\n\n1. \"The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one.\"\n\n=> white over orange2. white touches orange1 (touching doesn't give vertical relation).\n\n2. \"Over this object there is midsize orange rectangle number one.\"\n\n\"This object\" refers to the midsize white rectangle (the previous subject). So orange rectangle #1 is over the white rectangle.\n\nThus orange1 is over white rectangle.\n\n3. \"Midsize orange rectangle number two is under this thing.\"\n\n\"This thing\" likely refers to orange rectangle #1 (the last mentioned). So orange2 is under orange1.\n\nThus we have: orange1 over orange2 (since orange2 under orange1). Also orange1 over white (since orange1 over white). White over orange2.\n\nThus ordering: top: orange1, then white, then orange2 (maybe). So orange1 is over orange2. Also orange1 is over white, but white is not orange.\n\nQuestion: Is any midsize orange rectangle over all midsize orange rectangles? We have two orange rectangles. Is there an orange rectangle that is over both orange rectangles? For orange1: is orange1 over orange1? No. Over orange2? Yes. For orange2: is orange2 over orange1? No. So none is over both (including itself). So answer No.\n\nThus output JSON: {\"answer\":\"No\"}.\n\nWe must ensure final line only JSON."
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story. Entities: box called DDD. It \"have two midsize orange rectangles and a midsize white rectangle.\" So DDD contains those shapes? \"have\" likely means inside. Also \"It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing.\" So DDD covers a midsize green rectangle. \"covers\" means the box covers the rectangle, i.e., rectangle is inside and touching the box? Usually \"covers\" means the box is covering the rectangle, i.e., rectangle is inside and touching the box boundaries. So rectangle is inside DDD.\n\nThus all shapes (two orange rectangles, one white rectangle, one green rectangle) are inside DDD.\n\nQuestion: \"Are all midsize shapes inside all boxes?\" There is only one box DDD. All midsize shapes (the rectangles) are inside the box DDD. So answer Yes.\n\nCheck rule: If XXX contains YYY then YYY is inside XXX. We have DDD have (contains) shapes, so they are inside.\n\nThus answer Yes.\n\nReturn JSON: {\"answer\": \"Yes\"}"
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called DDD have two midsize orange rectangles and a midsize white rectangle. It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one. Midsize orange rectangle number two is under this thing.\"\n\nWe need relation of green shape (green rectangle) regarding midsize orange rectangle number one.\n\nLet's decode.\n\nObjects:\n- Box DDD (contains)\n- orange rectangle #1 (OR1)\n- orange rectangle #2 (OR2)\n- white rectangle (WR)\n- green rectangle (GR)\n\nSentences:\n\n1. \"It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing.\" \"It\" refers to box DDD? The box covers a green rectangle. The green rectangle is under OR2 and the white thing (WR). So GR is below OR2 and below WR.\n\n2. \"The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one.\" So WR is above OR2, and WR touches OR1. So WR is above OR2.\n\n3. \"Over this object there is midsize orange rectangle number one.\" \"this object\" refers to WR (the previous object). So OR1 is over WR. So OR1 is above WR.\n\n4. \"Midsize orange rectangle number two is under this thing.\" \"this thing\" likely refers to OR1 (the last mentioned). So OR2 is under OR1.\n\nThus we have hierarchy:\n\nOR1 (top)\nWR (below OR1)\nOR2 (below OR1, also below WR? Actually WR is over OR2, so OR2 is below WR.)\nGR (below OR2 and below WR)\n\nWe need relation of GR regarding OR1.\n\nFrom chain: OR1 above WR, WR above OR2, OR2 above GR? Actually GR is under OR2, so OR2 above GR. So OR1 is above WR, WR above OR2, OR2 above GR. So OR1 is above GR. Therefore GR is below OR1.\n\nThus answer: below.\n\nCheck options: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nSo answer \"below\".\n\nReturn JSON: {\"answer\": \"below\"}"
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "{\"answer\": \"above\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called DDD have two midsize orange rectangles and a midsize white rectangle. It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one. Midsize orange rectangle number two is under this thing.\"\n\nLet's decode.\n\nObjects: DDD (box). Inside: orange rectangle #1, orange rectangle #2, white rectangle, green rectangle (covered by DDD). Relations:\n\n- The green rectangle is under orange rectangle #2 and the white thing. So green is below both orange #2 and white rectangle.\n\n- The white rectangle is over orange rectangle #2 and touches orange rectangle #1.\n\n- Over this object (the white rectangle) there is orange rectangle #1. So orange #1 is above white rectangle.\n\n- Orange rectangle #2 is under this thing (the orange rectangle #1). So orange #2 is below orange #1.\n\nWe need position of orange rectangle #2 relative to green rectangle.\n\nWe have: green is under orange #2 (green below orange #2). That means orange #2 is above green. So relation: orange #2 is above green rectangle.\n\nThus answer: \"above\". Options include above.\n\nReturn JSON.\n\n"
+    },
+    {
+      "q_id": 6,
+      "answer": "above",
+      "full_response": "{\"answer\": \"above\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called DDD have two midsize orange rectangles and a midsize white rectangle. It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one. Over this object there is midsize orange rectangle number one. Midsize orange rectangle number two is under this thing.\"\n\nWe need relation of orange rectangle #1 relative to orange rectangle #2.\n\nLet's decode.\n\nObjects: orange rectangle #1, orange rectangle #2, white rectangle, green rectangle.\n\nSentences:\n\n1. Box DDD have two midsize orange rectangles and a midsize white rectangle. (just existence)\n\n2. It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing.\n\nInterpret: The green rectangle is under orange rectangle #2 and under the white rectangle.\n\n3. The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one.\n\nInterpret: white rectangle is over orange #2. Also white rectangle touches orange #1.\n\n4. Over this object there is midsize orange rectangle number one.\n\n\"This object\" refers to the white rectangle (the previous subject). So orange rectangle #1 is over the white rectangle.\n\n5. Midsize orange rectangle number two is under this thing.\n\n\"This thing\" likely refers to orange rectangle #1 (the last mentioned). So orange rectangle #2 is under orange rectangle #1.\n\nThus we have: orange #1 is over white rectangle; white rectangle is over orange #2; also orange #2 is under orange #1 (consistent). So orange #1 is above orange #2.\n\nThus answer: above.\n\nCheck rule: If XXX is below YYY then YYY is above XXX. We have orange #2 is under orange #1 => orange #1 is above orange #2.\n\nThus answer \"above\".\n\nReturn JSON.\n\n"
+    },
+    {
+      "q_id": 7,
+      "answer": "ntpp",
+      "full_response": "{\"answer\": \"ntpp\"}",
+      "cot": "We need to parse story. Entities: box DDD, two midsize orange rectangles (number one and number two), a midsize white rectangle, a midsize green rectangle.\n\nRelations:\n\n- \"A box called DDD have two midsize orange rectangles and a midsize white rectangle.\" So box DDD contains those rectangles? \"have\" likely means contains. So the orange rectangles and white rectangle are inside DDD.\n\n- \"It covers a midsize green rectangle which are under midsize orange rectangle number two and the white thing.\" \"It\" refers to box DDD? The box covers a midsize green rectangle. So green rectangle is covered by box DDD (i.e., box covers green rectangle). Also green rectangle is under orange rectangle #2 and the white rectangle.\n\n- \"The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one.\"\n\n- \"Over this object there is midsize orange rectangle number one.\"\n\n- \"Midsize orange rectangle number two is under this thing.\"\n\nNeed to interpret \"this object\" and \"this thing\". Let's step through.\n\nSentence: \"The midsize white rectangle is over midsize orange rectangle number two and touches midsize orange rectangle number one.\" So white rectangle is above orange #2, and touches orange #1.\n\nNext: \"Over this object there is midsize orange rectangle number one.\" \"this object\" likely refers to the white rectangle (the last mentioned object). So orange rectangle #1 is over the white rectangle.\n\nNext: \"Midsize orange rectangle number two is under this thing.\" \"this thing\" likely refers to orange rectangle #1 (the last mentioned). So orange #2 is under orange #1.\n\nThus we have vertical ordering: orange #1 is over white rectangle, which is over orange #2. Also orange #2 is under orange #1 (consistent). Also white rectangle touches orange #1 (they are adjacent maybe). Also green rectangle is under orange #2 and white rectangle.\n\nNow question: \"Where is midsize orange rectangle number one relative to box?\" So we need relation of orange #1 to box DDD.\n\nWe know box DDD \"have\" orange #1, meaning contains. The rule: If XXX contains YYY then YYY is inside XXX. So orange #1 is inside box DDD. The options list includes \"dc\", \"ec\", \"po\", \"tpp\", etc. Need to map \"inside\" to one of these codes. Usually in spatial reasoning tasks, \"dc\" = \"disconnected\", \"ec\" = \"externally connected\", \"po\" = \"partial overlap\", \"tpp\" = \"tangential proper part\", \"ntpp\" = \"non-tangential proper part\", \"tppi\" = \"tangential proper inverse\", \"ntppi\" = \"non-tangential proper inverse\". \"inside\" could be \"ntpp\" (non-tangential proper part) if fully inside not touching border. If \"contains\" maybe means inside but not touching. However we don't know if orange #1 touches box. No mention of touching box. So likely it's inside (non-tangential proper part). The typical mapping: If A is inside B (and not touching), then A is a \"non-tangential proper part\" of B (ntpp). If A is inside and touching border, it's \"tangential proper part\" (tpp). Since not mentioned, assume not touching, so ntpp.\n\nThus answer: ntpp.\n\nCheck options: includes ntpp. So answer JSON: {\"answer\": \"ntpp\"}.\n\nMake sure no extra text."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "case_id": "901-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "left"
+    },
+    {
+      "q_id": 5,
+      "answer": "ntppi"
+    },
+    {
+      "q_id": 6,
+      "answer": "ntpp"
+    },
+    {
+      "q_id": 7,
+      "answer": "tpp"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:29:40.228593",
+    "processing_mode": "per_question",
+    "pipeline": "prop_generated",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to answer: Is the large green diamond to the left-hand side of all shapes? Options Yes/No.\n\nWe have propositions about relative positions. Need to see if large green diamond is left of every other shape in the scene.\n\nList shapes: large green diamond, large white rectangle, midsize white rectangle, midsize green diamond, also maybe other shapes: large green oval, large orange rectangle, large green rectangle (in box EEE). Also maybe box boundaries but not shapes.\n\nPropositions given:\n\n1: large green diamond left of large white rectangle.\n2: large green diamond left of midsize white rectangle.\n3: midsize green diamond right of large white rectangle.\n4: midsize white rectangle left of midsize green diamond.\n5: large white rectangle left of midsize green diamond.\n6: large green diamond covered by box DDD.\n7: large white rectangle inside DDD.\n8: midsize white rectangle inside DDD.\n9: box EEE inside DDD.\n10: large green diamond left of midsize green diamond.\n\nThus we have explicit left relations: large green diamond left of large white rectangle, midsize white rectangle, midsize green diamond. Also left of midsize green diamond (prop10). So left of all three other shapes in DDD.\n\nBut there are also shapes in box EEE: large green oval, large orange rectangle, large green rectangle. No explicit relations given between large green diamond and those shapes. However we can infer maybe via containment: large green diamond is covered by DDD (i.e., touches boundary?). The other shapes are inside box EEE which is inside DDD. No relative left/right given. So we cannot guarantee large green diamond is left of those shapes. The question: \"Is the large green dimond to the left-hand side of all shapes?\" All shapes includes those in EEE. Since we lack info, we cannot assert yes. The answer likely No, because not enough evidence that it's left of all shapes. The question expects using propositions: we have left of some shapes but not all. So answer No.\n\nThus output JSON.\n\n"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: \"Does a box contain all large green ovals?\" The question: \"Does a box contain all large green ovals?\" Means: Is there a box that contains all large green ovals? Or does a box contain all large green ovals? Probably they ask: Is there a box that contains all large green ovals? In story, there is a large green oval (singular) covered by box EEE. So there is only one large green oval. Does a box contain all large green ovals? Since there is only one large green oval, and it is covered by box EEE. Covered means the box covers the oval, i.e., the oval is inside and touching the box? In spatial reasoning, \"covers\" means the box covers the shape, i.e., the shape is inside and touching the box boundaries. So the box contains the shape? Usually \"covers\" is a relation where the container covers the object, meaning the object is inside and touching the container. So the box does contain the oval. So there is a box (EEE) that contains the large green oval. Since there is only one large green oval, that box contains all large green ovals. So answer Yes.\n\nRelevant propositions: Prop 3: Box EEE covers large green oval. Prop 4: Large green oval is covered by box EEE. Those indicate containment.\n\nThus answer Yes.\n\nReturn JSON: {\"answer\": \"Yes\"}"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 1, Prop 2, Prop 3 and Prop 4, which state that Box EEE covers a large green oval and has a large green rectangle. Both of these green objects are inside Box EEE. Therefore, there is at least one green thing within EEE.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: \"Is a green thing within EEE?\" Options Yes/No.\n\nWe have propositions: Box EEE covers the large green oval. Box EEE has the large green rectangle. Also \"Box EEE cover a large green oval and a large orange rectangle. This box has a large green rectangle.\" So within EEE there are green things: large green oval (covered by EEE) and large green rectangle (inside EEE). The question: \"Is a green thing within EEE?\" Within means inside (including covered?). Covered means the object touches the boundary but is still inside the box. So yes, there is a green thing within EEE. So answer Yes.\n\nWe need to identify relevant propositions: Prop1, Prop2, Prop3, Prop4. Those indicate green oval and rectangle are in EEE. So answer Yes.\n\nOutput JSON: {\"answer\": \"Yes\"} as last line."
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 1 (“Box EEE covers a large orange rectangle”) and Prop 2 (“The large orange rectangle is covered by Box EEE”), both stating that an orange rectangle is covered by EEE. Therefore the answer is Yes.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: \"Is any orange rectangle covered by EEE?\" Options Yes/No.\n\nWe have spatial reasoning propositions. Prop 1: Box EEE covers a large orange rectangle. Prop 2: The large orange rectangle is covered by Box EEE. Both indicate that EEE covers a large orange rectangle. So yes, there is an orange rectangle covered by EEE.\n\nThus answer Yes.\n\nWe need to output explanation optionally, but final line must be JSON: {\"answer\": \"Yes\"}.\n\nMake sure no extra text after."
+    },
+    {
+      "q_id": 4,
+      "answer": "left",
+      "full_response": "The relevant spatial relations are given in the propositions:\n- Prop 5 states that the large green diamond is to the left of the midsize green diamond.\n- Prop 9 confirms it is not to the right of the midsize green diamond.\n- Prop 10 says the midsize green diamond is to the right of the large green diamond, which is the same relationship.\n\nThus, the large green diamond is located **left** of the midsize green diamond.\n\n{\"answer\":\"left\"}",
+      "cot": "We need to answer: Where is the large green diamond relative to the midsize green diamond? Options include left, right, etc. From propositions: Prop 5: Large green diamond is to the left of midsize green diamond. Also Prop 9: Large green diamond is not to the right of midsize green diamond. Prop 10: Midsize green diamond is to the right of large green diamond. So answer: left.\n\nThus output JSON: {\"answer\":\"left\"}.\n\nWe need to include explanation? It says may output explanation, but answer JSON must be last line. So we can give explanation then final line. Ensure no extra after JSON."
+    },
+    {
+      "q_id": 5,
+      "answer": "ntppi",
+      "full_response": "{\"answer\": \"ntppi\"}",
+      "cot": "We need to answer: Where is DDD relative to the large green oval? So relationship of container DDD to the oval.\n\nWe have spatial reasoning propositions: many about containment. Let's parse.\n\nProp 1: EEE is inside DDD. So DDD contains EEE.\n\nProp 2: Large green oval is covered by EEE. Means the oval is inside and touching EEE? In typical spatial reasoning, \"covered by\" means the container covers the object, i.e., the object is inside and touching the container's border. So large green oval is inside EEE and touching EEE.\n\nProp 3: EEE covers the large green oval. Same as above.\n\nProp 4: DDD contains EEE. (same as 1)\n\nProp 5: DDD contains the large green oval.\n\nProp 6: The large green oval is inside DDD.\n\nProp 7: DDD contains the object that covers the large green oval. The object that covers the oval is EEE, so DDD contains EEE (already known).\n\nProp 8: The large green oval is inside an object that is inside DDD. That object is EEE.\n\nProp 9: DDD is the container of the large green oval.\n\nProp 10: The large green oval is not outside DDD.\n\nAll these indicate that DDD contains the large green oval (i.e., the oval is inside DDD). The question: \"Where is DDD relative to the large green oval?\" So we need the spatial relation of DDD with respect to the oval. If the oval is inside DDD, then DDD is around the oval, i.e., DDD contains the oval. In the set of options, we have \"dc\", \"ec\", \"po\", \"tpp\", \"ntpp\", \"tppi\", \"ntppi\". These are typical RCC (Region Connection Calculus) relations: dc = disconnected, ec = externally connected, po = partial overlap, tpp = tangential proper part, ntpp = non-tangential proper part, tppi = tangential proper part inverse, ntppi = non-tangential proper part inverse. For container relationship, DDD is the container of the oval, i.e., the oval is a proper part of DDD. So DDD is a \"tpp\" (tangential proper part) of the oval? Wait: In RCC, if A is a proper part of B (A inside B, not touching), that's \"ntpp\" (non-tangential proper part). If A is a proper part of B and touches the boundary, that's \"tpp\". Here the oval is covered by EEE, but regarding DDD, we only know the oval is inside DDD, not necessarily touching DDD. The story: DDD covers a large green diamond, but not the oval. The oval is covered by EEE, which is inside DDD. So the oval is inside EEE, which is inside DDD. Since EEE is inside DDD (not touching DDD), the oval is also inside DDD, but likely not touching DDD. So the relation is that the oval is a non-tangential proper part of DDD. Therefore DDD is the inverse relation: DDD contains the oval, i.e., DDD is a \"ntppi\" (non-tangential proper part inverse) relative to the oval. In RCC, \"ntppi\" means B contains A as a non-tangential proper part (i.e., A is inside B, not touching). So DDD relative to the oval is ntppi.\n\nCheck options: includes ntppi. So answer: \"ntppi\".\n\nThus final JSON: {\"answer\": \"ntppi\"}"
+    },
+    {
+      "q_id": 6,
+      "answer": "ntpp",
+      "full_response": "{\"answer\":\"ntpp\"}",
+      "cot": "We need to answer: Where is the large green rectangle regarding EEE? Options include spatial relations: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. The story: \"Box EEE cover a large green oval and a large orange rectangle. This box has a large green rectangle.\" So EEE has a large green rectangle. In spatial reasoning, \"has\" likely means inside (contains). The propositions list: Prop1: The large green rectangle is inside EEE. Prop2: EEE contains the large green rectangle. Prop3: EEE is inside DDD. etc. So the relation of large green rectangle regarding EEE is \"inside\". Among options, which corresponds to \"inside\"? The list includes \"dc\", \"ec\", \"po\", \"tpp\", \"ntpp\", \"tppi\", \"ntppi\". These are RCC8/9 relations: \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part, \"ntpp\" = non-tangential proper part, \"tppi\" = tangential proper part inverse, \"ntppi\" = non-tangential proper part inverse. Inside (strictly inside) could be \"ntpp\" (non-tangential proper part) if not touching boundaries, or \"tpp\" if touching. The story says \"has\" which likely means inside but not necessarily touching. The propositions: Prop7: The large green rectangle is not covered by EEE. \"Covered by\" means EEE covers rectangle (i.e., rectangle is inside and touching boundaries?). Not covered means it's not touching boundaries. So it's inside but not touching => non-tangential proper part (ntpp). Also Prop10: The spatial relation of the large green rectangle regarding EEE is “inside”. So answer should be the code for inside: likely \"ntpp\". In many datasets, \"inside\" maps to \"ntpp\". So answer: {\"answer\":\"ntpp\"}.\n\nCheck if any other relation like \"ec\" (externally connected) would be if touching. Not covered => not touching, so ntpp.\n\nThus final answer JSON."
+    },
+    {
+      "q_id": 7,
+      "answer": "tpp",
+      "full_response": "{\"answer\": \"tpp\"}",
+      "cot": "We need to determine position of large orange rectangle relative to EEE. From story: \"Box EEE cover a large green oval and a large orange rectangle.\" So EEE covers the large orange rectangle. In spatial relations, \"covers\" means the rectangle is inside and touching the container? Usually in these tasks, \"covers\" means the container covers the object, i.e., the object is inside and touching the container's interior boundary. The relation of object relative to container is \"inside and touching\" which is often denoted as \"ec\" (object is \"inside and touching\" the container). However we need to see mapping of options: they include \"dc\", \"ec\", \"po\", \"tpp\", \"ntpp\", \"tppi\", \"ntppi\". These are RCC8-like relations? Actually \"dc\" = disconnected, \"ec\" = externally connected (touching), \"po\" = partial overlap, \"tpp\" = tangential proper part (inside and touching), \"ntpp\" = non-tangential proper part (inside not touching), \"tppi\" = tangential proper part inverse (container), \"ntppi\" = non-tangential proper part inverse. But here we need position of rectangle relative to EEE. If EEE covers rectangle, rectangle is inside and touching EEE. That corresponds to \"tpp\" (tangential proper part) from rectangle to EEE. However sometimes \"covers\" is defined as container covers object, meaning object is inside and touching container, i.e., object is \"tpp\" of container. So rectangle relative to EEE is \"tpp\". Let's verify with propositions: Prop 1: EEE covers the large orange rectangle. Prop 2: The large orange rectangle is covered by EEE. Both indicate same. So rectangle is covered by EEE, meaning rectangle is inside and touching EEE. So answer: \"tpp\". Provide JSON.\n\n"
+    }
+  ]
+}

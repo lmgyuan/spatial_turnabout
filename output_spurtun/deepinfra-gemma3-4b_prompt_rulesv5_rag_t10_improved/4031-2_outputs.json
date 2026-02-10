@@ -1,0 +1,74 @@
+{
+  "case_id": "4031-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "above"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.173699",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question using the provided spatial reasoning rules.\n\nThe story states: \"A midsize orange rectangle is inside box DDD. Over the orange object there is the midsize green rectangle.\"\n\nThe question is: \"Does a box cover the orange object?\"\n\nRule 1: If XXX is covers YYY then YYY is covered by XXX.\nIn this case, we have \"Over the orange object there is the midsize green rectangle.\" This can be rephrased as \"The midsize green rectangle covers the orange object.\"  Therefore, applying Rule 1, we can conclude that a box (DDD) covers the orange object.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question using the provided spatial reasoning rules.\n\nThe story states:\n1. There exists one box named DDD.\n2. A midsize orange rectangle is inside box DDD and touching a midsize green rectangle.\n3. A midsize green rectangle is *over* the orange rectangle.\n\nThe question is: Does a box contain all midsize green rectangles?\n\nRule 1: \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule isn't relevant.\nRule 2: \"If XXX is inside YYY and YYY is covered by ZZZ then XXX is inside ZZZ\" - This rule isn't relevant.\nRule 3: \"If XXX is inside YYY and YYY is inside ZZZ then XXX is inside ZZZ\" - This rule is relevant. We know the green rectangle is *inside* the box DDD.\nRule 4: \"If XXX is inside YYY then YYY is contains XXX\" - This rule is relevant. The box contains the green rectangle.\nRule 5: \"If XXX is contains YYY then YYY is inside XXX\" - This rule is relevant. The box contains the green rectangle.\nRule 6: \"If XXX is inside YYY and YYY covered by ZZZ then XXX inside ZZZ\" - This rule is not directly applicable.\nRule 7: \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\" - This rule is not directly applicable.\nRule 8: \"If XXX is touches YYY then YYY is touches XXX\" - This rule is not directly applicable.\nRule 9: \"If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH\" - This rule is not directly applicable.\nRule 10: \"If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ\" - This rule is not directly applicable.\n\nThe story indicates that *one* midsize green rectangle is inside the box DDD.  The question asks if the box contains *all* midsize green rectangles. Since we only know about one, the answer is no.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\nThe story states: \"There exists one box named DDD. A midsize orange rectangle is inside and touching and a midsize green rectangle is inside box DDD. Over the orange object there is the midsize green rectangle.\"\n\nThe question is: \"Is the orange thing below the midsize green rectangle?\"\n\nRelevant rule: \"If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ\" and \"If XXX is inside YYY and YYY is below ZZZ then XXX is below the ZZZ\".  In this case, the orange rectangle (XXX) is inside the green rectangle (YYY), and the green rectangle is *above* the orange rectangle. Therefore, the orange rectangle is below the green rectangle.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question.\n\nThe story states: \"There exists one box named DDD. A midsize orange rectangle is inside box DDD. A midsize green rectangle is inside box DDD. Over the orange object there is the midsize green rectangle.\"\n\nThe question asks: \"What is the position of DDD relative to the orange thing?\"\n\nRelevant rule: \"If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ\" - This rule isn't directly applicable here.\nRelevant rule: \"If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - This rule isn't directly applicable here.\nRelevant rule: \"If XXX is inside YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - This rule isn't directly applicable here.\nRelevant rule: \"If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - This rule isn't directly applicable here.\nRelevant rule: \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\" - This rule isn't directly applicable here.\n\nHowever, the key information is that the orange rectangle is *inside* the box DDD.  Since the green rectangle is *on top* of the orange rectangle *inside* DDD, this means DDD is below the green rectangle.  The question asks about DDD's position relative to the orange rectangle.  Because the orange rectangle is inside DDD, DDD is above the orange rectangle.\n\nTherefore, the answer is \"above\".\n\n{\"answer\": \"above\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the position of box DDD relative to the green thing.\n\nThe story states: \"There exists one box named DDD. A midsize orange rectangle is inside box DDD. A midsize green rectangle is inside box DDD. Over the orange object there is the midsize green rectangle.\"\n\nThis means:\n1. Box DDD contains the orange rectangle.\n2. Box DDD contains the green rectangle.\n3. The green rectangle is *on top* of the orange rectangle *inside* the box DDD.\n\nNow, let's consider the provided rules:\n\n*   \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\" - This rule isn't directly applicable because we don't have a ZZZ.\n*   \"If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - Not applicable.\n*   \"If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH\" - Not applicable.\n*   \"If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH\" - Not applicable.\n*   \"If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH\" - Not applicable.\n*   \"If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - Not applicable.\n*   \"If XXX is inside YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - Not applicable.\n*   \"If XXX is in front of YYY then YYY is behind XXX\" - Not applicable.\n*   \"If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - Not applicable.\n*   \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\" - Not applicable.\n*   \"If XXX is behind YYY then YYY is in front of XXX\" - Not applicable.\n\nHowever, we can infer that since the green rectangle is *on top* of the orange rectangle *inside* the box, the box DDD is *below* the green rectangle.\n\nTherefore, the answer is \"below\".\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question.\n\nThe story states: \"There exists one box named DDD. A midsize orange rectangle is inside and touching and a midsize green rectangle is inside box DDD. Over the orange object there is the midsize green rectangle.\"\n\nThe question asks: \"What is the position of the orange thing regarding the green object?\"\n\nRelevant rules:\n1. If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ\n2. If XXX is inside YYY and YYY is touching ZZZ then XXX is touching the ZZZ\n3. If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n4. If XXX is inside YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n\nIn this case, the orange rectangle is inside box DDD, and the green rectangle is *over* the orange rectangle (inside box DDD). This means the green rectangle is above the orange rectangle.\n\nTherefore, the answer is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "case_id": "3864-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "dc"
+    },
+    {
+      "q_id": 5,
+      "answer": "far"
+    },
+    {
+      "q_id": 6,
+      "answer": "left"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:45:33.853788",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 7,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Okay, let's break this down.\n\n1. **Spatial Relationships:**\n   - Box one is east of box two.\n   - Box two is disconnected from box three.\n   - Box three is east of box two.\n   - Box two covers a medium yellow apple.\n   - Box two has another medium yellow apple.\n   - Box three covers a medium green apple.\n   - A medium green apple is inside and touching box one.\n\n2. **Apples:**\n   - Box one: Medium green apple\n   - Box two: Medium yellow apple (covered), another medium yellow apple, medium orange apple\n   - Box three: Medium yellow apple, medium green apple (covered)\n\n3. **The Question:** Are all medium green apples east of any medium yellow apple?\n\nLet's analyze:\n\n*   **Green Apple 1:** Inside box one. Box one is east of box two. Box two has a yellow apple. Therefore, Green Apple 1 is east of a yellow apple.\n*   **Green Apple 2:** Inside box three. Box three is east of box two. Box two has a yellow apple. Therefore, Green Apple 2 is east of a yellow apple.\n\nSince both green apples are east of at least one yellow apple, the statement \"all medium green apples are east of any medium yellow apple\" is true.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story to determine if a medium yellow apple is in all boxes.\n\n*   **Box one:** Contains a medium green apple. No mention of a medium yellow apple.\n*   **Box two:** Covers a medium yellow apple and has another medium yellow apple, and also contains a medium orange apple. So, box two has two medium yellow apples.\n*   **Box three:** Has a medium yellow apple and covers a medium green apple. So, box three has a medium yellow apple.\n\nSince box one does not contain a medium yellow apple, the statement \"a medium yellow apple is in all boxes\" is false.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Okay, let's break this down using the spatial reasoning rules.\n\n1. **Box two covers a medium yellow apple and has another medium yellow apple.** This means there are two medium yellow apples inside box two. Let's call them Yellow Apple 2a and Yellow Apple 2b.\n\n2. **Box two is disconnected from box three.** This is a crucial piece of information.\n\n3. **Box three has a medium yellow apple.** Let's call it Yellow Apple 3.\n\n4. **Box three covers a medium green apple.**\n\n5. **Box one is east of and box two is disconnected from box three.**\n\nNow, let's apply the rules:\n\n*   **Rule:** If XXX is disconnected from YYY then YYY is disconnected from XXX.\n    *   Applying this to Box two and Box three: Box two is disconnected from Box three, therefore Box three is disconnected from Box two.\n\n*   **Rule:** If XXX is inside YYY and YYY is disconnected from ZZZ then XXX is disconnected from the ZZZ.\n    *   Yellow Apple 2a and Yellow Apple 2b are inside Box two. Box two is disconnected from Box three. Therefore, Yellow Apple 2a and Yellow Apple 2b are disconnected from Box three.\n\n*   **Rule:** If XXX is disconnected from YYY then YYY is disconnected from XXX.\n    *   Yellow Apple 2a and Yellow Apple 2b are disconnected from Box three, therefore Box three is disconnected from Yellow Apple 2a and Yellow Apple 2b.\n\n*   Since Box three is disconnected from Box two, and Box three contains Yellow Apple 3, then Yellow Apple 3 is disconnected from Box two.\n\nThe question asks if \"medium yellow apple number two\" (presumably Yellow Apple 2a or 2b) is disconnected from *all* apples. We know Yellow Apple 2a and 2b are disconnected from Yellow Apple 3. We don't have information about any other apples. The medium green apple is inside box one, and we don't know if box one is connected to box two. Therefore, we cannot definitively say that Yellow Apple 2a and 2b are disconnected from *all* apples.\n\nTherefore, the answer is No.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Okay, let's break this down.\n\n1. **Box Relationships:**\n   - Box one is east of box three.\n   - Box two is disconnected from box three.\n   - Box three is east of box two.\n   This implies the order: Box two, Box three, Box one (from west to east).\n\n2. **Apple Locations:**\n   - A medium green apple is inside box one.\n   - Box two covers a medium yellow apple and has another medium yellow apple. A medium orange apple is inside box two.\n   - Box three has a medium yellow apple and covers a medium green apple.\n\n3. **The Question:** Are all medium orange apples west of box one?\n\n   - We know there's one medium orange apple inside box two.\n   - We know box two is west of box one.\n   - Therefore, the medium orange apple is west of box one.\n\nSo, the answer is Yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "dc",
+      "full_response": "Okay, let's break this down.\n\nThe question asks about the relative position of the medium green apple in box one to the medium yellow apple number one.\n\nThe story states:\n*   \"A medium green apple is inside and touching box one.\"\n*   \"Box two covers a medium yellow apple and has another medium yellow apple.\"\n*   \"A medium orange apple is inside this box.\"\n*   \"Box three has a medium yellow apple and covers a medium green apple.\"\n\nThe question refers to \"medium yellow apple number one\". Since box two covers two medium yellow apples, and box three has one, we can assume \"medium yellow apple number one\" refers to one of the apples in box two.\n\nThe story doesn't give us any direct spatial relationship between the green apple in box one and the yellow apples in box two. However, the spatial reasoning rule provided is: \"If XXX is covered by YYY and YYY is to the right of ZZZ and HHH is covered by ZZZ then XXX is to the right of the HHH\". This rule doesn't directly apply to the question.\n\nSince the question asks for a relative position and we have no information to determine a specific spatial relationship, the most appropriate answer is \"dc\" (disconnected).\n\n```json\n{\"answer\": \"dc\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "far",
+      "full_response": "Okay, let's break this down.\n\n1. **Establish Spatial Relationships:**\n   - Box one is east of box two.\n   - Box two is disconnected from box three.\n   - Box three is east of box two.\n   - Medium green apple is inside box one.\n   - Box two covers a medium yellow apple and has another medium yellow apple.\n   - Medium orange apple is inside box two.\n   - Box three has a medium yellow apple and covers a medium green apple.\n\n2. **Focus on the Question:** We need to determine the position of \"medium yellow apple number two\" relative to the \"medium green apple in box three.\"  Since the story mentions \"a medium yellow apple and *another* medium yellow apple\" inside box two, we're referring to the second medium yellow apple in box two.\n\n3. **Apply Spatial Reasoning Rules:**\n   - We know box three covers the medium green apple.\n   - We know box two is disconnected from box three.\n   - We know box two covers a medium yellow apple (the second one).\n   - Since box two is disconnected from box three, and box two covers the second medium yellow apple, then the second medium yellow apple is disconnected from box three.\n   - Since box three covers the medium green apple, and box two is disconnected from box three, then the second medium yellow apple is disconnected from the medium green apple.\n\n4. **Determine the Answer:** The question asks for a *relative* position. Disconnected implies \"far\" in this context.\n\n```json\n{\"answer\": \"far\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "left",
+      "full_response": "Okay, let's break down the spatial relationships and determine the position of the medium orange apple in box two regarding box one.\n\n1. **Box Relationships:**\n   - Box one is east of box two.\n   - Box two is east of box three.\n   - Therefore, Box one is east of box two, and box two is east of box three, so box one is east of box three.\n\n2. **Apple Relationships within Boxes:**\n   - Box one contains a medium green apple.\n   - Box two contains a medium orange apple, a medium yellow apple, and another medium yellow apple.\n   - Box three contains a medium yellow apple and covers a medium green apple.\n\n3. **The Question:** We need to determine the position of the medium orange apple (inside box two) relative to box one. Since box one is east of box two, box two is to the west of box one. Therefore, the medium orange apple is to the west of box one. The provided options include \"left\".\n\n```json\n{\"answer\": \"left\"}\n```",
+      "cot": ""
+    }
+  ]
+}

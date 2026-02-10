@@ -1,0 +1,94 @@
+{
+  "case_id": "600-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "behind"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    },
+    {
+      "q_id": 7,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.241525",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a thing is in front of a block.\n\nThe story states: \"In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\"\n\nThis clearly indicates that the block BBB is *in front of* the small block AAA.\n\nRelevant rule: \"If XXX is in front of YYY and YYY is in front of ZZZ then XXX is in front of ZZZ\"\n\nApplying this rule:\n*   XXX = the small black triangle\n*   YYY = block AAA\n*   ZZZ = block BBB\n\nSince the triangle is inside AAA and AAA is in front of BBB, the triangle is in front of BBB.\n\nTherefore, the answer is Yes.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules.\n\nThe story states:\n*   Block AAA is south of block BBB.\n*   Block AAA is disconnected from block BBB.\n*   A small black triangle is within block AAA.\n*   Block BBB has a big blue circle, a medium yellow circle, and another medium yellow circle.\n\nThe question is: \"Is the big thing north of the small black triangle?\"\n\nRelevant rules:\n1.  If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n2.  If XXX is inside YYY and YYY is behind ZZZ then XXX is behind the ZZZ\n\nSince block BBB is \"in front of\" block AAA (as AAA is south of BBB), we can use rule 1.  AAA contains the small black triangle, and BBB is in front of AAA. Therefore, the small black triangle is behind block BBB.  This means the big blue circle (part of block BBB) is north of the small black triangle.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if a small black triangle is behind a medium yellow circle.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is behind ZZZ then XXX is behind the ZZZ\n\n**Applying the Rule:**\n\n*   We know a small black triangle is *inside* block AAA.\n*   Block AAA is *south of, disconnected from and away from* block BBB.\n*   Block BBB contains a big blue circle, a medium yellow circle, and another medium yellow circle.\n\nSince AAA is disconnected from BBB, and AAA contains the triangle, the triangle is not directly behind anything within BBB. However, the triangle is *inside* AAA, and AAA is south of BBB.  The question asks if the triangle is *behind* a medium yellow circle.  Because AAA is disconnected from BBB, and the triangle is inside AAA, it's not directly behind anything in BBB.\n\nTherefore, the triangle is not behind a medium yellow circle.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if AAA is close to all objects.\n\nThe story states:\n*   AAA is south of, disconnected from, and away from BBB.\n*   BBB contains a big blue circle, a medium yellow circle, and another medium yellow circle.\n*   A small black triangle is within AAA.\n\nNow let's consider the relevant spatial reasoning rules:\n\n1.  **If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ:** This rule isn't directly applicable because AAA is disconnected from BBB.\n2.  **If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH:** This rule isn't applicable as AAA is not overlapping with anything.\n3.  **If XXX is inside YYY and YYY is behind ZZZ then XXX is behind the ZZZ:** This rule isn't applicable as AAA is not behind BBB.\n4.  **If XXX is inside YYY and YYY is far from ZZZ then XXX is far from the ZZZ:** AAA is far from BBB.\n5.  **If XXX is inside YYY and YYY is far from ZZZ and HHH is inside ZZZ then XXX is far from the HHH:** AAA is far from the medium yellow circles within BBB.\n\nSince AAA is disconnected from BBB and far from BBB, it is not close to all objects.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "behind",
+      "full_response": "Let's analyze the story and the question to determine the relationship between the big blue circle and AAA.\n\nThe story states: \"In front of this block there is block BBB with a big blue circle and a medium yellow circle.\"  \"Block AAA is south of, disconnected from and away from block BBB.\" This means BBB is north of AAA.\n\nRule 1: If XXX is inside YYY and YYY is behind ZZZ then XXX is behind the ZZZ.  This rule isn't directly applicable here because we're looking for the relative position of the circle to the block, not the block to the circle.\n\nRule 2: If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH. This rule isn't directly applicable.\n\nRule 3:  We need to consider the spatial relationship between BBB and AAA. BBB is *in front* of AAA.\n\nTherefore, the big blue circle is *behind* AAA.\n\n```json\n{\"answer\": \"behind\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states:\n*   AAA is south of, disconnected from, and away from BBB.\n*   A small black triangle is within AAA.\n*   BBB has a big blue circle, a medium yellow circle, and another medium yellow circle.\n\nThe question asks: \"Where is the big shape regarding the small black triangle?\"\n\nRelevant rules:\n\n1.  If XXX is inside YYY and YYY is south of ZZZ then XXX is south of the ZZZ. (Not directly applicable, but helps understand the relative positions)\n2.  If XXX is inside YYY and YYY is disconnected from ZZZ and HHH is inside ZZZ then XXX is disconnected from the HHH. (Not directly applicable)\n3.  If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ. (Potentially relevant, but needs more information)\n4.  If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH. (Not directly applicable)\n5.  If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH. (Not directly applicable)\n6.  If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH. (Not directly applicable)\n7.  If XXX is inside YYY and YYY is behind ZZZ and HHH is inside ZZZ then XXX is behind the HHH. (Not directly applicable)\n\nSince AAA is south of BBB, and the triangle is *inside* AAA, the big blue circle (part of BBB) is *north* of the triangle.  The question asks about the *location* of the big shape relative to the triangle.  The most appropriate answer is \"below\".\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states:\n*   AAA is south of, disconnected from, and away from BBB.\n*   BBB contains a big blue circle, a medium yellow circle, and another medium yellow circle.\n*   A small black triangle is within AAA.\n\nThe question asks: \"Where is the small black triangle relative to medium yellow circle number two?\"\n\nRelevant Rules:\n\n1.  \"If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH\" - This rule isn't directly applicable.\n2.  \"If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ\" - This rule isn't directly applicable.\n3.  \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule isn't directly applicable.\n4.  \"If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH\" - This rule isn't directly applicable.\n5.  \"If XXX is inside YYY and YYY is disconnected from ZZZ and HHH is inside ZZZ then XXX is disconnected from the HHH\" - This rule isn't directly applicable.\n6.  \"If XXX is inside YYY and YYY is disconnected from ZZZ and HHH is inside ZZZ then XXX is disconnected from the HHH\" - This rule isn't directly applicable.\n7.  \"If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH\" - This rule isn't directly applicable.\n8.  \"If XXX is inside YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - This rule isn't directly applicable.\n9.  \"If XXX is inside YYY and YYY is behind ZZZ and HHH is inside ZZZ then XXX is behind the HHH\" - This rule isn't directly applicable.\n\nSince none of the provided rules directly address the relative position of the triangle and the second yellow circle, we must use spatial reasoning based on the story's description. AAA is south of and disconnected from BBB. The second yellow circle is *within* BBB. The small black triangle is *within* AAA.  Therefore, the triangle is *below* the second yellow circle.\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states:\n*   Block AAA is south of, disconnected from, and away from block BBB.\n*   Block BBB contains a big blue circle, a medium yellow circle, and another medium yellow circle.\n\nThe question asks: \"Where is AAA regarding medium yellow circle number one?\"\n\nRelevant Rules:\n\n1.  \"If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ\" - This rule could be relevant if we can establish a spatial relationship between AAA and the first medium yellow circle.\n2. \"If XXX is inside YYY and YYY is south of ZZZ then XXX is south of the ZZZ\" - This rule could be relevant if we can establish a spatial relationship between AAA and the first medium yellow circle.\n\nSince AAA is south of and disconnected from BBB, and BBB contains the first medium yellow circle, AAA must be to the south of the first medium yellow circle.\n\nTherefore, the answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

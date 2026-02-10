@@ -1,0 +1,94 @@
+{
+  "case_id": "901-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "left"
+    },
+    {
+      "q_id": 5,
+      "answer": "left"
+    },
+    {
+      "q_id": 6,
+      "answer": "behind"
+    },
+    {
+      "q_id": 7,
+      "answer": "near"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:21:43.669535",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if the large green diamond is to the left-hand side of all shapes.\n\n**Relevant Propositions:**\n\n*   **Prop 2:** If one object is to the left of another object, then the first object is positioned earlier in a linear sequence.\n*   **Prop 4:** If one object covers another object, and the covering object is to the left of a third object, then the covering object is to the left of the third object.\n*   **Prop 9:** If one object is covered by another object, and the covering object is to the left of a third object, then the first object is to the left of the third object.\n\n**Analysis:**\n\n1.  The story states: \"The midsize green dimond is to the right of the large white rectangle.\" This means the large green diamond is *not* to the left of the large white rectangle.\n\n2.  The story also states: \"Box DDD covers a midsize green dimond.\"  Since DDD is to the left of the large white rectangle, and DDD covers the midsize green dimond, the midsize green dimond is to the left of the large white rectangle.\n\n3.  The story states: \"Box DDD covers a large green dimond which are to the left of a large white rectangle and the midsize white rectangle.\" This confirms the large green dimond is to the left of the large white rectangle and the midsize white rectangle.\n\nTherefore, the large green diamond is to the left of the large white rectangle and the midsize white rectangle.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if a box contains all large green ovals.\n\n**Relevant Propositions:**\n\n*   **Prop 2:** If one object is inside another object, then the smaller object is located within the larger object. This is crucial for determining containment.\n*   **Prop 3:** If one object covers another object, then the covering object obscures the covered object. This can help infer relationships, but isn't directly about containment.\n\n**Applying Propositions:**\n\n1.  **Box EEE:** The story states \"Box EEE cover a large green oval\". This means box EEE contains the large green oval.\n2.  **No other green ovals are mentioned:** The story only explicitly mentions *one* large green oval being contained within box EEE. There's no mention of any other large green ovals existing or being contained within any other box.\n\n**Conclusion:**\n\nSince box EEE contains the only large green oval mentioned in the story, it does not contain *all* large green ovals.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a green thing is within EEE.\n\n**Relevant Propositions:**\n\n*   Prop 9: If an object is inside a box, then the object is contained within the boundaries of the box.\n*   Prop 10: If a box contains an object, then the object is located within the box.\n\n**Analysis:**\n\nThe story states: \"Box EEE cover a large green oval and a large orange rectangle. This box has a large green rectangle.\" This clearly indicates that a large green rectangle is *inside* box EEE.\n\n**Answer:**\n\nYes\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the spatial reasoning propositions to determine if any orange rectangle is covered by EEE.\n\nThe story states: \"Box EEE cover a large green oval and a large orange rectangle.\" This directly tells us that EEE contains a large orange rectangle. The question asks if this orange rectangle is *covered* by EEE.\n\nProp 1: If one object is inside another object, then the smaller object is also inside the larger object. This proposition is relevant because EEE contains the orange rectangle. However, it doesn't tell us if the orange rectangle is covered *by* EEE.\n\nProp 2-10: These propositions deal with covering, overlapping, and relative positions (left, right, front, behind, near). They don't directly address whether one object is covered by another.\n\nSince EEE contains the orange rectangle, and the question asks if it's covered, we need to consider if EEE is covering the orange rectangle. The story doesn't explicitly state that EEE covers the orange rectangle. It only states that EEE *contains* it.\n\nTherefore, based on the information provided, we cannot definitively say that the orange rectangle is covered by EEE.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "left",
+      "full_response": "Let's analyze the story and the question to determine the relationship between the large green diamond and the midsize green diamond.\n\nThe story states: \"Box DDD covers a midsize green dimond. The midsize green dimond is to the right of the large white rectangle. The midsize white rectangle is to the left of it.\"\n\nThis directly tells us that the midsize green diamond is to the right of the large white rectangle.  Since the large white rectangle is to the left of the midsize green diamond, the midsize green diamond is to the right of the large white rectangle.\n\nNow let's consider the spatial reasoning propositions:\n\n*   **Prop 5:** If one object covers another object, and the second object overlaps a third object, and the third object covers a fourth object, then the first object overlaps the fourth object. - This isn't relevant as we're not dealing with overlaps in this case.\n*   **Prop 4:** If one object covers another object, and the second object is to the left of a third object, then the first object is to the left of the third object. - This is relevant, as it describes the relative position of the midsize green diamond and the large white rectangle.\n*   **Prop 10:** If one object is inside another object, and the second object is to the left of a third object, then the first object is to the left of the third object. - This isn't relevant as we're not dealing with containment.\n\nBased on the story and Prop 4, the large green diamond is to the left of the midsize green diamond.\n\n```json\n{\"answer\": \"left\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "left",
+      "full_response": "Let's analyze the story and the question to determine the relationship between DDD and the large green oval.\n\nThe story states: \"Box EEE cover a large green oval and a large orange rectangle. This box has a large green rectangle.\"  It also states \"Box DDD covers a midsize green dimond.\"  Crucially, the large green oval is *covered* by EEE.  DDD covers a large green diamond and a midsize green diamond.\n\nNow let's consider the relevant propositions:\n\n*   **Prop 2:** If one object covers another object, and the second object is in front of a third object, then the first object is in front of the third object. This doesn't directly apply because we're dealing with covering, not front/back.\n*   **Prop 5:** If one object is covered by another object, and the second object overlaps a third object, then the first object overlaps the third object. This is also not directly relevant.\n*   **Prop 7:** If one object is covered by another object, and the second object is to the left of a third object, then the first object is to the left of the third object. This is relevant. Since EEE covers the large green oval, and EEE is to the right of DDD, DDD must be to the left of the large green oval.\n\nTherefore, DDD is to the left of the large green oval.\n\n```json\n{\"answer\": \"left\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "behind",
+      "full_response": "Let's analyze the story and the question to determine the location of the large green rectangle relative to EEE.\n\nThe story states: \"Box EEE cover a large green oval and a large orange rectangle. This box has a large green rectangle.\"  This directly tells us that EEE contains a large green rectangle.\n\nNow let's consider the spatial reasoning propositions:\n\n*   **Prop 1:** If one object is inside another object, then the first object is inside the second object. This is directly relevant as EEE contains the large green rectangle.\n*   **Prop 2-10:** These propositions don't directly relate to the relationship between the large green rectangle and EEE.\n\nTherefore, based on the information provided, the large green rectangle is inside EEE.  The available options are: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.  Since the large green rectangle is *inside* EEE, the most appropriate answer is \"inside\". However, \"inside\" is not an option. The closest option is \"behind\" as EEE covers the large green rectangle.\n\n{\"answer\": \"behind\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "near",
+      "full_response": "Let's analyze the story and the question to determine the position of the large orange rectangle relative to EEE.\n\nThe story states: \"Box EEE cover a large green oval and a large orange rectangle.\" This directly tells us that the large orange rectangle is *inside* box EEE.\n\nProp 1: If one object is inside another object, the smaller object is also inside the larger object. This proposition directly supports our conclusion.\n\nTherefore, the large orange rectangle is inside EEE. Since the question asks for the *position* relative to EEE, and the orange rectangle is inside, the most appropriate answer is \"inside\". However, the provided options don't include \"inside\". The closest option is \"near\". But since the orange rectangle is *contained* within EEE, \"near\" is not precise enough. Let's consider the other options. \"left\", \"right\", \"above\", \"below\", \"behind\", \"front\" are all incorrect because the orange rectangle is *inside* EEE.\n\nSince \"near\" is the best available option, and the orange rectangle is inside EEE, we'll select \"near\".\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    }
+  ]
+}

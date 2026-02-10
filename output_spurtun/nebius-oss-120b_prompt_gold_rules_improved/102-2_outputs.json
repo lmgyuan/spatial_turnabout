@@ -1,0 +1,74 @@
+{
+  "case_id": "102-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "right"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:18:30.928519",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story.\n\nBoxes: DDD and EEE.\n\n- A midsize orange oval is inside and touching box DDD. So the oval is inside DDD and touching DDD. That implies DDD covers the oval? The rule: If XXX is covered by YYY then YYY covers XXX. But we have \"inside and touching\". Usually \"inside and touching\" means the object touches the boundary, but not necessarily \"covered by\". In typical spatial reasoning tasks, \"inside and touching\" is a relation where the container covers the object? Actually \"cover\" is opposite: YYY covers XXX means XXX is inside and touching YYY. So \"XXX is covered by YYY\" is same as \"YYY covers XXX\". The rule given: If XXX is covered by YYY then YYY is covers XXX. So \"covered by\" is the relation from object to container. So if an object is covered by a box, the box covers the object. In story: \"A midsize orange oval is inside and touching box DDD.\" That is equivalent to \"The midsize orange oval is covered by box DDD\". So DDD covers the midsize orange oval.\n\n- Box DDD has a tiny orange rectangle. (irrelevant)\n\n- To the left of the midsize orange oval is the tiny object. (irrelevant)\n\n- Box DDD contains box EEE. So EEE is inside DDD (not touching necessarily). So DDD contains EEE.\n\n- Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE. The large green rectangle is covered by box EEE.\n\nSo there is another midsize orange oval (maybe same? It says \"Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE.\" So there is a midsize orange oval inside and touching EEE. So EEE covers that midsize orange oval.\n\nThus we have two midsize orange ovals: one in DDD (touching DDD) and one in EEE (touching EEE). The question: \"Do all boxes cover all midsize orange ovals?\" All boxes = DDD and EEE. All midsize orange ovals = both ovals.\n\nCheck: Does DDD cover both ovals? DDD covers the first oval (inside and touching DDD). Does DDD cover the second oval? The second oval is inside and touching EEE, not DDD. However, EEE is inside DDD (DDD contains EEE). The second oval is not directly touching DDD; it's inside EEE which is inside DDD. So DDD does not cover the second oval. So not all boxes cover all midsize orange ovals. Also does EEE cover the first oval? No, first oval is inside DDD, not EEE. So also fails.\n\nThus answer is No.\n\nReturn JSON: {\"answer\": \"No\"}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story.\n\nBoxes: DDD and EEE.\n\n- A midsize orange oval is inside and touching box DDD. So oval1 (call it O1) is inside DDD and touching DDD (i.e., O1 touches DDD's interior boundary). That means DDD covers O1? Actually rule: If XXX is covered by YYY then YYY covers XXX. But we have \"inside and touching\" not \"covered by\". Usually \"inside and touching\" means shape touches the container's border, but not necessarily \"covered\". In typical spatial reasoning tasks, \"cover\" means container covers shape (shape is inside and touching). So \"inside and touching\" is equivalent to \"covered by\"? Let's see: The rule given: If XXX is covered by YYY then YYY is covers XXX. So \"covered by\" is a relation where container covers shape. So \"inside and touching\" likely corresponds to \"covered by\". So O1 is covered by DDD, thus DDD covers O1.\n\n- Box DDD has a tiny orange rectangle. So rectangle (R1) is inside DDD (maybe not touching). So DDD contains R1.\n\n- To the left of the midsize orange oval is the tiny object. So R1 left of O1.\n\n- Box DDD contains box EEE. So EEE is inside DDD (not touching). So DDD contains EEE.\n\n- Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE. So there is another midsize orange oval (O2) inside and touching EEE, and O2 is over a large green rectangle (G1). So O2 is above G1.\n\n- The large green rectangle is covered by box EEE. So G1 is covered by EEE (i.e., EEE covers G1).\n\nThus we have orange shapes: O1 (midsize orange oval in DDD), O2 (midsize orange oval in EEE), and tiny orange rectangle R1. Are there any other orange shapes? No.\n\nQuestion: Does any box cover all orange shapes? Means is there a single box that covers (i.e., covers relation) all orange shapes (O1, O2, R1). Let's see.\n\n- DDD covers O1 (since O1 inside and touching DDD). Does DDD cover O2? O2 is inside and touching EEE, not DDD. Since EEE is inside DDD (contains), O2 is inside EEE which is inside DDD, but O2 touches EEE, not DDD. So O2 is not touching DDD, so DDD does not cover O2. So DDD does not cover all orange shapes.\n\n- Does DDD cover R1? R1 is just \"has\" (inside) DDD, not touching, so DDD does not cover R1.\n\n- Does EEE cover O2? Yes, O2 is inside and touching EEE, so EEE covers O2. Does EEE cover O1? O1 is inside DDD, not inside EEE. So no.\n\n- Does EEE cover R1? R1 is not inside EEE (R1 is inside DDD but not necessarily inside EEE). So no.\n\nThus no single box covers all orange shapes. Answer: No.\n\nReturn JSON: {\"answer\": \"No\"}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Entities: boxes DDD and EEE. A midsize orange oval is inside and touching box DDD. Box DDD has a tiny orange rectangle. To the left of the midsize orange oval is the tiny object. So tiny rectangle is left of the midsize orange oval. So midsize orange oval is to the right of tiny rectangle.\n\nBox DDD contains box EEE. Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE. The large green rectangle is covered by box EEE.\n\nSo there is another midsize orange oval (maybe same? It says \"a midsize orange oval\" earlier inside DDD. Then later \"Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE.\" Could be a second midsize orange oval inside EEE. So there are two midsize orange ovals: one in DDD, one in EEE. The question: \"Are all midsize orange ovals to the right of the tiny shape?\" The tiny shape is the tiny orange rectangle in DDD. We know relation: tiny rectangle is left of the midsize orange oval (the one in DDD). So that midsize orange oval is right of tiny rectangle. For the midsize orange oval in EEE, we have no explicit spatial relation to the tiny rectangle. However we can infer maybe via box containment? The tiny rectangle is in DDD (has). DDD contains EEE. So the tiny rectangle is somewhere inside DDD, but not necessarily inside EEE. The midsize orange oval in EEE is inside EEE, which is inside DDD. So both are inside DDD. But we don't know relative left/right positions. No rule linking containment to left/right. So we cannot conclude that the second midsize orange oval is to the right of the tiny rectangle. The question asks \"Are all midsize orange ovals to the right of the tiny shape?\" Since we cannot guarantee for the second oval, answer is No.\n\nThus output JSON: {\"answer\": \"No\"}"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story. Entities: boxes DDD and EEE. A midsize orange oval is inside and touching box DDD. Box DDD has a tiny orange rectangle. To the left of the midsize orange oval is the tiny object. Box DDD contains box EEE. Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE. The large green rectangle is covered by box EEE.\n\nWe have two midsize orange ovals? One inside DDD, another over a large green rectangle inside EEE. Could be same? The story: \"A midsize orange oval is inside and touching box DDD.\" Then later: \"Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE.\" Could be another midsize orange oval (maybe same shape but different location). Usually each mention is separate unless indicated same. So there are at least two midsize orange ovals: one in DDD, one in EEE.\n\nQuestion: \"Are all large green rectangles below a midsize orange oval?\" We have only one large green rectangle (the one covered by box EEE). Relationship: \"Over a large green rectangle is a midsize orange oval.\" That means the midsize orange oval is over the large green rectangle, so the rectangle is below the oval. So for that rectangle, it is below a midsize orange oval. Are there any other large green rectangles? No. So \"all large green rectangles\" (just that one) are below a midsize orange oval. Yes, true.\n\nThus answer Yes.\n\nReturn JSON: {\"answer\": \"Yes\"}"
+    },
+    {
+      "q_id": 4,
+      "answer": "right",
+      "full_response": "{\"answer\": \"right\"}",
+      "cot": "We need to parse story. Two boxes DDD and EEE. A midsize orange oval is inside and touching box DDD. Box DDD has a tiny orange rectangle. \"To the left of the midsize orange oval is the tiny object.\" So tiny rectangle is left of midsize orange oval. So midsize orange oval is right of tiny rectangle. The question: \"Where is the midsize orange oval in box DDD regarding the tiny object?\" So relative position of midsize orange oval with respect to tiny rectangle. Since tiny is left of oval, oval is right of tiny. So answer: right.\n\nCheck options: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. So \"right\" is valid.\n\nThus answer JSON: {\"answer\": \"right\"}"
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to parse the story.\n\nBoxes DDD and EEE. A midsize orange oval is inside and touching box DDD. Box DDD has a tiny orange rectangle. To the left of the midsize orange oval is the tiny object. Box DDD contains box EEE. Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE. The large green rectangle is covered by box EEE.\n\nWe need: \"Where is the large thing relative to the midsize orange oval in EEE?\" The large thing refers to the large green rectangle. The midsize orange oval in EEE is the one described: \"Over a large green rectangle is a midsize orange oval. It is inside and touching box EEE.\" So the midsize orange oval is over the large green rectangle. So the large green rectangle is below the midsize orange oval. So relative position: large thing (green rectangle) is below the midsize orange oval.\n\nThus answer: below.\n\nCheck options: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. So \"below\" is valid.\n\nThus output JSON: {\"answer\": \"below\"}.\n\nMake sure no extra text."
+    }
+  ]
+}

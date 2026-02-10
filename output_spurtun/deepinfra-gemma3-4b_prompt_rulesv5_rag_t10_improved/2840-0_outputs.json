@@ -1,0 +1,74 @@
+{
+  "case_id": "2840-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "below"
+    },
+    {
+      "q_id": 4,
+      "answer": "near"
+    },
+    {
+      "q_id": 5,
+      "answer": "near"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.163609",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if a medium apple is disconnected from all medium things.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is disconnected from ZZZ then XXX is disconnected from the ZZZ\n*   If XXX is inside YYY and YYY is disconnected from ZZZ and HHH is inside ZZZ then XXX is disconnected from the HHH\n*   If XXX is disconnected from YYY then YYY is disconnected from XXX\n\n**Applying the Rules:**\n\n1.  **Medium Orange Apple:**\n    *   It's inside box one.\n    *   Box one touches box two.\n    *   Box two is disconnected from box three.\n    *   Box three covers a medium green apple.\n    *   Therefore, the medium orange apple is disconnected from box three (because box two is disconnected from box three).\n\n2.  **Medium Yellow Apple (inside box two):**\n    *   It's inside box two.\n    *   Box two is disconnected from box three.\n    *   Therefore, the medium yellow apple inside box two is disconnected from box three.\n\n3.  **Medium Yellow Apple (inside box two, covered by box two):**\n    *   It's inside box two.\n    *   Box two is disconnected from box three.\n    *   Therefore, the medium yellow apple inside box two is disconnected from box three.\n\n4.  **Medium Yellow Apple (in box three):**\n    *   It's inside box three.\n    *   Box three covers a medium green apple.\n    *   Therefore, the medium yellow apple in box three is disconnected from the medium green apple.\n\nSince we've identified that each medium apple is disconnected from at least one other medium thing (box three), the answer is \"No\".\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if all medium yellow apples are disconnected from any box.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is disconnected from ZZZ and HHH is inside ZZZ then XXX is disconnected from the HHH\n*   If XXX is inside YYY and YYY is disconnected from ZZZ then XXX is disconnected from the ZZZ\n\n**Applying the Rules:**\n\n1.  **Medium yellow apple number one:** This apple is inside box two. Box two is disconnected from box three. Therefore, medium yellow apple number one is disconnected from box three.\n2.  **Medium yellow apple number two:** This apple is inside box two. Box two is disconnected from box three. Therefore, medium yellow apple number two is disconnected from box three.\n3.  **Medium yellow apple number one (again):** This apple is inside box two. Box two is south of and disconnected from box three. This implies that the medium yellow apple number one is disconnected from box three.\n\nSince both medium yellow apples are inside box two, and box two is disconnected from box three, both medium yellow apples are disconnected from box three.\n\n**Conclusion:**\n\nYes, all medium yellow apples are disconnected from any box.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if medium yellow apple number two touches any fruit.\n\n**Relevant Rules:**\n\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX contains YYY and YYY covers ZZZ then XXX contains ZZZ\n\n**Applying the Rules:**\n\n*   Medium yellow apple number two is *inside* box two.\n*   Box two covers a medium yellow apple.\n*   Medium yellow apple number one touches medium yellow apple number two.\n\nSince medium yellow apple number two is inside box two, and box two covers a medium yellow apple, it follows that medium yellow apple number two *contains* the medium yellow apple.  However, the question asks if it *touches* any fruit. The rule \"If XXX is touches YYY then YYY is touches XXX\" applies to direct touching.  We know that medium yellow apple number two is inside box two, and box two is disconnected from box three.  Therefore, medium yellow apple number two does not directly touch any other fruit.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe question asks: \"Where is the green thing relative to medium yellow apple number one?\"\n\nThe story states: \"A medium green apple is covered by box three.\"\n\nNow let's consider the rules:\n\n1.  \"If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\" - This rule isn't directly applicable.\n2.  \"If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - This rule isn't directly applicable.\n3.  \"If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\" - This rule isn't directly applicable.\n4.  \"If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\" - This rule isn't directly applicable.\n5.  \"If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\" - This rule isn't directly applicable.\n6.  \"If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - This rule isn't directly applicable.\n7.  \"If XXX is covered by YYY and YYY is near to ZZZ then XXX is near to the ZZZ\" - This rule isn't directly applicable.\n8.  \"If XXX is covered by YYY and YYY is disconnected from ZZZ and HHH is covered by ZZZ then XXX is disconnected from the HHH\" - This rule isn't directly applicable.\n\nSince the green apple is *covered* by box three, and box three is \"West of and near to box two\", this implies the green apple is located *below* medium yellow apple number one.  We can infer this because box three is covering the green apple, and box three is positioned relative to box two.\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "near",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe question asks about the position of the medium yellow apple in box three *regarding* box two. This implies a relative spatial relationship.\n\nRelevant rules:\n1.  \"If XXX is near to ZZZ then XXX is near to the ZZZ\" - This rule is relevant as box three is \"west of and near to\" box two.\n2. \"If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\" - This rule is relevant as box three contains a medium yellow apple and a medium orange apple, and a medium green apple is covered by box three.\n\nApplying the rules:\nBox three is \"west of and near to\" box two.  Therefore, the medium yellow apple in box three is near to box two.\n\n{\"answer\": \"near\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "near",
+      "full_response": "Let's analyze the story and the question to determine the relationship between the two medium yellow apples.\n\nThe story states: \"Medium yellow apple number one touches medium yellow apple number two.\"\n\nRule: \"If XXX is touches YYY then YYY is touches XXX\"\n\nApplying this rule directly, we can conclude that medium yellow apple number two is touching medium yellow apple number one.  Since the question asks for the relative position, and the rule states a direct touch, the answer is \"near\".\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    }
+  ]
+}

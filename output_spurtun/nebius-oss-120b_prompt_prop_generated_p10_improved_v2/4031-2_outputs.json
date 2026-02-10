@@ -1,0 +1,74 @@
+{
+  "case_id": "4031-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "tppi"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntppi"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:29:40.145564",
+    "processing_mode": "per_question",
+    "pipeline": "prop_generated",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "The relevant propositions are Prop 8, Prop 9 and Prop 10, all stating that the midsize orange rectangle is not covered by box DDD (and that no box covers it). Therefore, a box does not cover the orange object.\n\n{\"answer\": \"No\"}",
+      "cot": "We need to answer Yes/No whether a box covers the orange object. The story: \"A midsize orange rectangle is inside and touching and a midsize green rectangle is inside box DDD.\" Inside and touching means the rectangle is inside the box and touches its border. Cover means the box covers the object? In typical spatial reasoning, \"cover\" means the box is covering the object (object is partially overlapped? Actually in these tasks, \"cover\" means the box is covering the object, i.e., the object is partially inside and touching? Let's see propositions: Prop 8: The midsize orange rectangle is not covered by box DDD. Prop 9: Box DDD does not cover the midsize orange rectangle. Prop 10: No box covers the midsize orange rectangle. So all indicate that no box covers the orange rectangle. So answer is No.\n\nRelevant propositions: 8,9,10. Also story says inside and touching, not covered. So answer No.\n\nWe must output JSON: {\"answer\": \"No\"} as last line."
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are Prop 9 (“Every midsize green rectangle is inside DDD”) and Prop 10 (“DDD contains all midsize green rectangles”). Since the only box mentioned is DDD, it follows that a box (DDD) does contain all midsize green rectangles.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer: \"Does a box contain all midsize green rectangles?\" Options Yes, No.\n\nWe have propositions: Prop9: Every midsize green rectangle is inside DDD. Prop10: DDD contains all midsize green rectangles.\n\nThe question: \"Does a box contain all midsize green rectangles?\" The story mentions one box named DDD. So \"a box\" could refer to DDD. The proposition says DDD contains all midsize green rectangles. So answer Yes.\n\nWe need to identify relevant propositions: Prop9 and Prop10. Use them to answer Yes.\n\nOutput JSON: {\"answer\": \"Yes\"}.\n\nMake sure it's last line."
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "The relevant propositions are 7, 8, 9, and 10, all stating that the midsize orange rectangle is below the midsize green rectangle. Therefore, the answer to the question is **Yes**.\n\n{\"answer\": \"Yes\"}",
+      "cot": "We need to answer Yes/No whether orange thing is below midsize green rectangle. The story says: \"Over the orange object there is the midsize green rectangle.\" That means green is over orange, so orange is below green. Also propositions: Prop 7: green above orange. Prop 8: orange below green. Prop 9: green inside DDD and above orange. Prop 10: orange inside DDD and below green. So relevant propositions: 7,8,9,10. They indicate orange is below green. So answer Yes.\n\nWe must output JSON: {\"answer\": \"Yes\"} as last line. Possibly include explanation before, but final line must be JSON only."
+    },
+    {
+      "q_id": 3,
+      "answer": "tppi",
+      "full_response": "{\"answer\":\"tppi\"}",
+      "cot": "We need to answer: position of DDD relative to the orange thing. The orange thing is the orange rectangle. The story: orange rectangle is inside and touching DDD. So DDD contains the orange rectangle, and DDD touches the orange rectangle? Actually \"inside and touching\" means the rectangle is inside DDD and touching its border. So DDD relative to orange rectangle: DDD surrounds it, i.e., the rectangle is inside DDD, so DDD is around the rectangle. In spatial relation terms, DDD \"covers\" the orange rectangle? In the propositions: Prop 9: The orange rectangle is covered by DDD. Prop 10: DDD covers the orange rectangle. So DDD covers the orange rectangle. The answer options include: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. We need to map \"covers\" to one of these codes. The typical dataset (spatial relation dataset) uses codes: \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part, \"ntpp\" = non-tangential proper part, \"tppi\" = tangential proper part inverse, \"ntppi\" = non-tangential proper part inverse. For containment relations: If A contains B (B inside A, not touching), that's \"ntpp\" (non-tangential proper part) for B relative to A, and \"ntppi\" for A relative to B (inverse). If A covers B (B inside and touching), that's \"tpp\" for B relative to A? Actually \"tangential proper part\" means B is a proper part of A and touches the boundary. So B is tpp of A. So B relative to A is tpp. The inverse relation (A relative to B) is tppi (tangential proper part inverse). So DDD relative to orange rectangle is tppi. Also \"covers\" is same as \"contains and touching\". So answer should be \"tppi\". Check options: tppi is present. So answer: {\"answer\":\"tppi\"}"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntppi",
+      "full_response": "{\"answer\": \"ntppi\"}",
+      "cot": "We need to answer: \"What is the position of box DDD regarding the green thing?\" So relation of box DDD relative to the midsize green rectangle.\n\nFrom story: green rectangle is inside box DDD. So box DDD contains the green rectangle. The relation \"contains\" corresponds to which label? Options list: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nWe need mapping of spatial relations to these codes. Usually in these tasks, \"dc\" = \"contains\"? Let's recall typical mapping: In some datasets, \"dc\" stands for \"contains\". \"ec\" = \"covers\"? Actually \"covers\" maybe \"ec\"? Wait typical RCC relations: \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part, \"ntpp\" = non-tangential proper part, \"tppi\" = tangential proper part inverse, \"ntppi\" = non-tangential proper part inverse. But here they also include directional relations left, right, above, below, behind, front, near, far. So they combine topological and directional.\n\nThus \"contains\" is not a directional but topological. In RCC, \"contains\" is the inverse of \"inside\". The relation where A contains B is \"tppi\" (tangential proper part inverse) if B touches the boundary? Actually \"tpp\" = A is a tangential proper part of B (A inside B and touches boundary). Its inverse \"tppi\" = B contains A and A touches B's boundary. Similarly \"ntpp\" = non-tangential proper part (inside not touching). Its inverse \"ntppi\" = B contains A and A does not touch boundary.\n\nIn story: green rectangle is inside box DDD. Does it touch? Not mentioned. It says \"a midsize green rectangle is inside box DDD.\" No touching. So relation is inside (non-touching). So box DDD contains the green rectangle, and the rectangle does not touch the box. That corresponds to \"ntppi\" (non-tangential proper part inverse). Because the rectangle is a non-tangential proper part of the box, so the box is the inverse: contains non-touching.\n\nThus answer should be \"ntppi\". Check if any other relations like above/below? No.\n\nThus output JSON with answer \"ntppi\"."
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to answer: position of the orange thing regarding the green object. From story: \"Over the orange object there is the midsize green rectangle.\" Means green is over orange, so orange is below green. So relation: orange relative to green is below. Options include \"below\". So answer \"below\". Need to consider other propositions: Prop 4: green rectangle is above orange rectangle. Prop5: orange rectangle is below green rectangle. So consistent. So answer is \"below\". Output JSON."
+    }
+  ]
+}

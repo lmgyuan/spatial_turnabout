@@ -1,0 +1,94 @@
+{
+  "case_id": "2493-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "behind"
+    },
+    {
+      "q_id": 5,
+      "answer": "behind"
+    },
+    {
+      "q_id": 6,
+      "answer": "above"
+    },
+    {
+      "q_id": 7,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:55:23.281170",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question.\n\nThe question asks if AAA is over a medium black square.\n\nThe story states:\n- AAA is over, behind and disconnected from BBB.\n- BBB has a medium black square.\n- A medium black square is within block BBB.\n- Block BBB covers another medium black square which is under another medium black square.\n- Below medium black square number one is medium black square number three.\n\nSince AAA is over BBB, and BBB contains a medium black square, it is possible that AAA is over a medium black square. However, the story doesn't explicitly state that AAA is *directly* over a medium black square. It only states that AAA is over BBB.\n\nWe don't have any rules that directly address this scenario. Therefore, we must rely on the information provided in the story. AAA is over BBB, and BBB contains a medium black square. Thus, AAA is over a medium black square.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question.\n\nThe question asks if \"medium yellow square number two\" is inside and touching all blocks. The story states that \"Block AAA with a medium yellow square is over, behind and disconnected from block BBB. This block covers another medium yellow square.\" This implies that \"medium yellow square number two\" is the one covered by block AAA.\n\nWe need to determine if this square is inside and touching all blocks (AAA and BBB). Since AAA covers it, it's inside AAA. The story also states that AAA is disconnected from BBB. Therefore, the yellow square is disconnected from BBB. It is not inside BBB.\n\nSince the question asks if it's inside *all* blocks, and it's not inside BBB, the answer is no.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question.\n\nThe question asks if \"medium black square number one\" is in front of \"all medium yellow squares.\"\n\nFrom the story:\n- AAA with a medium yellow square is over, behind and disconnected from BBB. This means the yellow square on AAA is behind BBB.\n- Block AAA covers another medium yellow square.\n\nTherefore, we have at least two medium yellow squares. The yellow square on AAA is behind BBB, and there's another yellow square covered by AAA.\n\n\"Medium black square number one\" is within block BBB. Since BBB is in front of the yellow square on AAA, and BBB covers another yellow square, \"medium black square number one\" is not in front of all medium yellow squares.\n\nTherefore, the answer is No.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question. The question asks if \"medium black square number two\" is below *all* black squares. The story states:\n\n1. \"Block BBB covers another medium black square which is under another medium black square.\" This implies there's at least one black square (let's call it square 1) and another black square (square 2) is *under* square 1.\n2. \"Below medium black square number one is medium black square number three.\" This means square 3 is below square 1.\n3. \"Block BBB has medium black square.\" This refers to a black square within block BBB. It's not explicitly numbered. Let's call this square 4.\n\nSo, we have at least squares 1, 2, 3, and 4. The question is whether square 2 is below *all* of them. We know square 2 is below square 1 and square 3. We don't know the relative position of square 2 to square 4. Therefore, we cannot definitively say that square 2 is below *all* black squares.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "behind",
+      "full_response": "Let's analyze the story and the question to determine the relationship between block AAA and medium black square number two.\n\nThe story states:\n- Block AAA is over, behind, and disconnected from block BBB.\n- Block BBB covers another medium black square.\n- Block BBB has medium black square.\n- Below medium black square number one is medium black square number three.\n\nWe need to find the position of block AAA relative to medium black square number two. The story doesn't explicitly mention medium black square number two. However, it states that block BBB covers a medium black square, and that block BBB *has* a medium black square. It also states that medium black square number one is followed by medium black square number three. This implies that medium black square number two is the medium black square that block BBB covers.\n\nSince block AAA is behind block BBB, and block BBB covers medium black square number two, then block AAA is behind medium black square number two.\n\nTherefore, the correct answer is \"behind\".\n\n```json\n{\"answer\": \"behind\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "behind",
+      "full_response": "Let's analyze the story and the question.\n\nThe question asks about the position of \"medium yellow square number two\" regarding \"AAA\". The story states that \"Block AAA with a medium yellow square is over, behind and disconnected from block BBB. This block covers another medium yellow square.\" This implies that \"medium yellow square number two\" is the one *covered* by block AAA.\n\nWe need to find a rule that relates the position of something covered by AAA to AAA itself. There are no direct rules that apply. However, we know AAA is \"over, behind\" BBB. Since the yellow square number two is covered by AAA, it must also be \"over, behind\" BBB.  Since AAA is over and behind BBB, and the yellow square number two is covered by AAA, the yellow square number two is over and behind AAA.\n\nThe available options are: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nThe most appropriate options are \"above\" and \"behind\". Since the story states \"over, behind\", we can consider both. However, \"behind\" is a more direct description of the relationship.\n\n```json\n{\"answer\": \"behind\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question.\n\nThe question asks about the relative position of \"medium black square number one\" and \"medium yellow square number one\".\n\nFrom the story:\n- Block AAA with a medium yellow square is over, behind and disconnected from block BBB. This block covers another medium yellow square. So, medium yellow square number one is on block AAA.\n- Block BBB has a medium black square. A medium black square is within block BBB. Block BBB covers another medium black square which is under another medium black square. Below medium black square number one is medium black square number three. So, medium black square number one is within block BBB.\n\nSince block AAA is over, behind, and disconnected from block BBB, and medium yellow square number one is on block AAA, and medium black square number one is within block BBB, we can infer that medium yellow square number one is above medium black square number one.\n\nTherefore, the answer is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question. The question asks about the spatial relationship between \"medium black square number two\" and \"medium black square number one.\" The story states: \"Below medium black square number one is medium black square number three.\" This implies that medium black square number two is not mentioned, and we don't have any direct information about its position relative to medium black square number one. However, the story states \"Below medium black square number one is medium black square number three.\" This implies that medium black square number two must be below medium black square number one.\n\nTherefore, the correct answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

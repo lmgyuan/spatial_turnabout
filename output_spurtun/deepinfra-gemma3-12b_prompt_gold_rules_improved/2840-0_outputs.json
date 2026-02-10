@@ -1,0 +1,74 @@
+{
+  "case_id": "2840-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "far"
+    },
+    {
+      "q_id": 4,
+      "answer": "west"
+    },
+    {
+      "q_id": 5,
+      "answer": "near"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:45:33.692327",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the spatial relationships and determine if a medium apple is disconnected from all medium things.\n\n1. **Medium orange apple inside box one:** This apple is inside box one.\n2. **Medium yellow apple inside box two:** This apple is inside box two.\n3. **Box two covers another medium yellow apple:** This means the yellow apple inside box two is covered by box two.\n4. **Medium yellow apple number one touches medium yellow apple number two:** These two yellow apples are touching.\n5. **Box three west of and near box two, containing medium yellow and orange apples:** Box three is near and west of box two. It contains both a yellow and an orange apple.\n6. **Box two south of and disconnected from box three:** Box two is disconnected from box three.\n7. **Medium green apple covered by box three:** The green apple is covered by box three.\n\nNow let's consider the question: \"Is a medium apple disconnected from all medium things?\"\n\n*   We have a medium orange apple inside box one.\n*   We have a medium yellow apple inside box two.\n*   We have a medium yellow apple inside box three.\n*   We have a medium orange apple inside box three.\n*   We have a medium green apple covered by box three.\n\nThe medium orange apple inside box one is not disconnected from all medium things because the medium orange apple inside box three exists. The medium yellow apple inside box two is not disconnected from all medium things because the medium yellow apple inside box three exists. The medium green apple is not disconnected from all medium things because it is covered by box three, which contains medium yellow and orange apples.\n\nTherefore, the answer is No.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the spatial relationships to determine if all medium yellow apples are disconnected from any box.\n\n1. **Yellow Apple 1 & Box Two:** \"A medium yellow apple is inside box two.\" This means Yellow Apple 1 is inside Box Two.\n2. **Yellow Apple 2 & Box Two:** \"Box two covers another medium yellow apple.\" This means Yellow Apple 2 is inside Box Two.\n3. **Yellow Apple 1 & Yellow Apple 2:** \"Medium yellow apple number one touches medium yellow apple number two.\" This doesn't directly imply disconnection from a box.\n4. **Box Two & Box Three:** \"Box two is south of and disconnected from this box.\" This means Box Two is disconnected from Box Three.\n5. **Yellow Apple & Box Three:** \"West of and near to box two is another box called three with a medium yellow apple and a medium orange apple.\" This means there's a Yellow Apple inside Box Three.\n6. **Green Apple & Box Three:** \"A medium green apple is covered by box three.\" This means the Green Apple is inside Box Three.\n\nNow let's apply the rules:\n\n*   **Rule 1:** \"If XXX is inside YYY and YYY is disconnected from ZZZ then XXX is disconnected from ZZZ\"\n    *   Yellow Apple 1 is inside Box Two, and Box Two is disconnected from Box Three. Therefore, Yellow Apple 1 is disconnected from Box Three.\n    *   Yellow Apple 2 is inside Box Two, and Box Two is disconnected from Box Three. Therefore, Yellow Apple 2 is disconnected from Box Three.\n    *   The Yellow Apple in Box Three is inside Box Three.\n\n*   **Rule 3:** \"If XXX is disconnected from YYY then YYY is disconnected from XXX\"\n    *   Box Two is disconnected from Box Three, so Box Three is disconnected from Box Two.\n\n*   **Rule 2:** \"If XXX contains YYY then YYY is inside XXX\"\n    *   Box Two contains Yellow Apple 1 and Yellow Apple 2.\n    *   Box Three contains a Yellow Apple and a Green Apple.\n\nSince Yellow Apple 1 and Yellow Apple 2 are inside Box Two, and Box Two is disconnected from Box Three, these two yellow apples are disconnected from Box Three. However, there is a yellow apple *inside* Box Three. Therefore, not all medium yellow apples are disconnected from any box.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Okay, let's analyze the story and the question.\n\nThe question asks if medium yellow apple number two touches any fruit.\n\nThe story states: \"Medium yellow apple number one touches medium yellow apple number two.\" This directly indicates that medium yellow apple number two touches at least one fruit (medium yellow apple number one).\n\nTherefore, the answer is Yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "far",
+      "full_response": "Okay, let's break this down using the spatial reasoning rules and the story.\n\n1. **Establish Relationships:**\n   - Apple 1 (orange) is inside Box 1.\n   - Apple 2 (yellow) is inside Box 2.\n   - Box 2 covers Apple 2 (yellow).\n   - Apple 1 (yellow) touches Apple 2 (yellow).\n   - Box 3 is west of and near Box 2.\n   - Box 2 is south of and disconnected from Box 3.\n   - Box 3 covers a green apple.\n   - Box 3 contains a yellow apple and an orange apple.\n\n2. **Reasoning:**\n   - We need to find the relative position of the green apple to Apple 1 (yellow).\n   - Box 3 is disconnected from Box 2.\n   - Apple 2 (yellow) is inside Box 2.\n   - Therefore, Apple 2 (yellow) is disconnected from Box 3 (using \"If XXX is inside YYY and YYY is disconnected from ZZZ then XXX is disconnected from the ZZZ\").\n   - Box 3 covers a green apple.\n   - Since Box 2 is south of and disconnected from Box 3, and Apple 2 is inside Box 2, then Apple 2 is disconnected from Box 3.\n   - The green apple is covered by Box 3.\n   - We don't have direct spatial relationships between Apple 1 and Box 3. However, we know Box 2 is south of and disconnected from Box 3. Apple 1 is inside Box 1. We don't know the relationship between Box 1 and Box 2.\n\n3. **Consider the Options:**\n   - \"left\", \"right\", \"above\", \"below\", \"behind\", \"front\", \"near\", \"far\", \"dc\", \"ec\", \"po\", \"tpp\", \"ntpp\", \"tppi\", \"ntppi\"\n   - Given the information, \"far\" seems like the most reasonable answer. We know Box 2 is disconnected from Box 3, and Apple 1 is inside Box 1. We don't have enough information to determine a closer relationship.\n\n```json\n{\"answer\": \"far\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "west",
+      "full_response": "Okay, let's break down the spatial relationships and determine the position of the medium yellow apple in box three relative to box two.\n\n1. **Box two is south of and disconnected from box three:** This establishes a disconnection between box two and box three.\n\n2. **West of and near to box two is another box called three:** This tells us box three is west of box two and also near to it.\n\n3. **A medium yellow apple is inside box three:** This is a key piece of information.\n\nSince box two is disconnected from box three, and the medium yellow apple is inside box three, the medium yellow apple in box three is disconnected from box two. The question asks for the *position* of the apple in box three *regarding* box two. The story states box three is west of box two and near to box two. Therefore, the apple is west of box two.\n\n```json\n{\"answer\": \"west\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "near",
+      "full_response": "The story states \"Medium yellow apple number one touches medium yellow apple number two.\" This directly implies they are near each other.\n\n{\"answer\": \"near\"}",
+      "cot": ""
+    }
+  ]
+}

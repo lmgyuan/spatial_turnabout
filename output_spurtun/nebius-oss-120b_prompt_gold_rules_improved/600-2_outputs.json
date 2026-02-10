@@ -1,0 +1,134 @@
+{
+  "case_id": "600-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": [
+        "above",
+        "front",
+        "far",
+        "dc"
+      ]
+    },
+    {
+      "q_id": 5,
+      "answer": [
+        "above",
+        "front",
+        "far",
+        "dc"
+      ]
+    },
+    {
+      "q_id": 6,
+      "answer": [
+        "below",
+        "behind",
+        "far",
+        "dc"
+      ]
+    },
+    {
+      "q_id": 7,
+      "answer": [
+        "below",
+        "behind",
+        "far",
+        "dc"
+      ]
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:18:30.926011",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story. Entities: blocks AAA and BBB. A small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\n\nWe need to answer: \"Is a thing in front of a block?\" Options Yes/No.\n\nInterpretation: Is there any thing that is in front of a block? The story says: \"In front of this block there is block BBB\". The phrase \"this block\" refers to block AAA (the previous mention). So block BBB is in front of block AAA. So a block (BBB) is in front of a block (AAA). The question: \"Is a thing in front of a block?\" A block is a thing. So yes, there is a thing (block BBB) in front of a block (AAA). Also there are circles inside block BBB, but not necessarily in front. The rule: If X is in front of Y then Y is behind X. So we can infer that AAA is behind BBB. But the question just asks existence. So answer Yes.\n\nThus output JSON: {\"answer\": \"Yes\"}.\n\nMake sure no extra text before."
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story.\n\nBlocks AAA and BBB. Small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\n\nInterpretation: \"In front of this block there is block BBB\" - \"this block\" refers to block AAA? The previous sentence: \"Block AAA is south of, disconnected from and away from block BBB.\" Then \"In front of this block there is block BBB\". Likely \"this block\" refers to block AAA again, meaning BBB is in front of AAA. So relative positions: AAA south of BBB, and BBB in front of AAA. Also \"big blue circle\" is in BBB. So big thing = big blue circle. Small black triangle is in AAA.\n\nQuestion: Is the big thing north of the small black triangle? Need to determine if big blue circle is north of small black triangle.\n\nWe have AAA south of BBB. So AAA is south of BBB => BBB is north of AAA. The big blue circle is inside BBB. The small black triangle is inside AAA. So relative: big circle is north of AAA (since BBB north of AAA). But need relation between big circle and small triangle. Since triangle inside AAA, and circle inside BBB, and BBB north of AAA, we can infer circle north of triangle (since inside objects inherit block positions). So answer Yes.\n\nCheck rule: If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH. Here we have big circle (XXX) inside BBB (YYY). AAA is below BBB (BBB above AAA). HHH is small triangle inside AAA (ZZZ). So condition: XXX inside YYY, YYY above ZZZ, HHH inside ZZZ => XXX above HHH. That matches: big circle above small triangle. So Yes.\n\nThus answer Yes.\n\nReturn JSON: {\"answer\": \"Yes\"}"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story.\n\nBlocks AAA and BBB. Small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\n\nInterpretation: \"In front of this block there is block BBB\" - \"this block\" refers to block AAA? The previous sentence: \"Block AAA is south of, disconnected from and away from block BBB.\" Then \"In front of this block there is block BBB\". Likely \"this block\" refers to block AAA again, meaning block BBB is in front of block AAA. So relative positions: BBB is in front of AAA. Also AAA is south of BBB (so AAA is north-south relation). Also they are disconnected and away.\n\nNow we have objects: small black triangle inside AAA. Medium yellow circle(s) inside BBB. There are two medium yellow circles: one mentioned with big blue circle, and another \"Another medium yellow circle is in this block.\" So both are inside BBB.\n\nQuestion: Is a small black triangle behind a medium yellow circle? Need to determine if triangle is behind any medium yellow circle.\n\nWe have triangle in AAA, circles in BBB. Relationship between AAA and BBB: BBB is in front of AAA. Therefore AAA is behind BBB (by rule: If X is in front of Y then Y is behind X). So AAA behind BBB. The triangle is inside AAA, circles inside BBB. So triangle is behind circles? Since triangle is in AAA which is behind BBB, and circles are in BBB, we can infer triangle is behind circles (since AAA behind BBB). However need to consider rule: \"If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH\". That's a rule for front relation. We need behind relation. Using contrapositive: If YYY is in front of ZZZ, then any object inside YYY is in front of any object inside ZZZ. So here YYY = BBB, ZZZ = AAA? Actually we have BBB in front of AAA. So YYY=BBB, ZZZ=AAA. Then any object inside BBB is in front of any object inside AAA. So circles (inside BBB) are in front of triangle (inside AAA). Therefore triangle is behind circles. So answer Yes.\n\nThus output JSON with answer \"Yes\"."
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Entities: blocks AAA and BBB. Small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. \"In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\" The phrasing: \"In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\" So block BBB contains a big blue circle, a medium yellow circle, and another medium yellow circle (so two medium yellow circles). So objects: small black triangle (inside AAA), big blue circle (inside BBB), medium yellow circle #1 (inside BBB), medium yellow circle #2 (inside BBB). Also blocks themselves.\n\nQuestion: \"Is AAA close to all objects?\" Options Yes/No.\n\nWe need to determine if AAA is close to all objects. The story says AAA is \"away from\" block BBB. \"away from\" likely means far from. The rule: If XXX is far from YYY then YYY is far from XXX. So AAA far from BBB. Also AAA is disconnected from BBB. No mention of closeness. So AAA is far from BBB. Since objects inside BBB are inside BBB, we can infer distances: If AAA is far from BBB, does that imply AAA is far from objects inside BBB? Not directly given rule. But we have rule: If XXX is inside YYY and YYY is far from ZZZ then XXX is far from ZZZ. So apply: The objects (big blue circle, medium yellow circles) are inside BBB. BBB is far from AAA (since AAA far from BBB). So by rule: If object (inside BBB) is inside YYY (BBB) and YYY is far from ZZZ (AAA), then object is far from ZZZ (AAA). So each object inside BBB is far from AAA. Also small black triangle is inside AAA, so AAA contains triangle, so triangle is inside AAA. The question: \"Is AAA close to all objects?\" For AAA to be close to all objects, AAA must be close to each object. But we have AAA far from BBB and far from objects inside BBB. So AAA is not close to those objects. Also AAA is not close to itself? Not relevant. So answer is No.\n\nThus output JSON: {\"answer\": \"No\"}.\n\nMake sure no extra text before."
+    },
+    {
+      "q_id": 4,
+      "answer": [
+        "above",
+        "front",
+        "far",
+        "dc"
+      ],
+      "full_response": "{\"answer\": [\"above\",\"front\",\"far\",\"dc\"]}",
+      "cot": "We need to parse story.\n\nStory: Two blocks AAA and BBB. A small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\n\nInterpretation: \"Block AAA is south of, disconnected from and away from block BBB.\" So AAA south of BBB. Also disconnected (dc) and far (away) (far = far). Then \"In front of this block there is block BBB...\" The phrase \"this block\" likely refers to AAA (the previous subject). So block BBB is in front of AAA. So BBB is in front of AAA. So AAA is behind BBB.\n\nThus big blue circle is inside block BBB (since \"block BBB with a big blue circle...\"). So big blue circle is within BBB (inside). So relative position of big blue circle to AAA: Since circle is inside BBB, and BBB is in front of AAA, also BBB is north of AAA (since AAA south of BBB). So relative positions: The circle is north (above) of AAA, and in front of AAA, and far (away) from AAA, and disconnected (since blocks are disconnected). Also maybe left/right not mentioned.\n\nWe need to answer with one option? The question: \"Where is the big blue circle relative to AAA?\" Options list includes many: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nWe may need to list all applicable relations? The answer_type is single, but could be multiple? It says answer_type single, but could be multiple? Usually they expect list of applicable relations? But they said \"single\". Might be one best answer. Which one is most directly derived? The story says AAA is south of BBB, and BBB is in front of AAA. So big blue circle is in BBB, so relative to AAA: It is north (above) and front. Also far and disconnected. Which one to choose? Possibly they want \"front\" because they mention \"In front of this block there is block BBB\". The big blue circle is in BBB, so it's in front of AAA. Also \"south of\" gives above relation. Which is more primary? Could be both. But answer_type single suggests one label. Maybe they expect \"front\". Let's see typical tasks: They often ask \"Where is X relative to Y?\" and answer can be multiple relations separated by commas? But they said answer_type single, maybe they expect a single relation that can be deduced directly. Could be \"front\". Let's decide.\n\nGiven rules: If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of ZZZ. So we can infer big blue circle (inside BBB) and BBB in front of AAA => circle in front of AAA. Also if AAA south of BBB then BBB north of AAA => circle north of AAA (above). But rule for north/south not given, but we can infer directly. However they may only consider front/behind, left/right, near/far, dc (disconnected), ec (contains?), po (overlap?), tpp etc. So above is also an option. So both front and above are valid.\n\nWhich one to output? Might need to output all applicable relations as list. But answer_type single contradicts. However they said \"For multi-answer questions, return an array of options.\" So if multiple, we return array. Here maybe multiple. So we should output array with all applicable: [\"above\",\"front\",\"far\",\"dc\"]? Also maybe \"behind\"? No. So include above, front, far, dc. Should we include \"north\"? Not in options; above is north.\n\nThus answer JSON: {\"answer\": [\"above\",\"front\",\"far\",\"dc\"]}\n\nCheck ordering? Not required.\n\nThus final."
+    },
+    {
+      "q_id": 5,
+      "answer": [
+        "above",
+        "front",
+        "far",
+        "dc"
+      ],
+      "full_response": "{\"answer\": [\"above\",\"front\",\"far\",\"dc\"]}",
+      "cot": "We need to parse story.\n\nStory: \"There exist two blocks, named AAA and BBB. A small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\"\n\nInterpretation: Two blocks AAA and BBB. Small black triangle is within AAA (inside AAA). AAA is south of BBB, disconnected from BBB, and away from BBB. \"In front of this block there is block BBB\" - ambiguous: \"this block\" refers to AAA? The previous sentence: \"Block AAA is south of, disconnected from and away from block BBB.\" Then \"In front of this block there is block BBB\". Likely \"this block\" refers to AAA, so BBB is in front of AAA. So relative positions: BBB is north of AAA (since AAA south of BBB). Also BBB is in front of AAA (so AAA behind BBB). Also they are disconnected and far (away). The big shape: \"big blue circle\" is in block BBB. So big shape is the big blue circle. The small black triangle is in AAA.\n\nQuestion: Where is the big shape regarding the small black triangle? So we need relation of big blue circle relative to small black triangle.\n\nSince both are inside different blocks. The relation between blocks determines relation between shapes, assuming inside doesn't affect relative positions beyond block positions. The triangle is inside AAA; the circle is inside BBB. So relative positions: BBB is north of AAA (since AAA south of BBB). Also BBB is in front of AAA. Also they are disconnected and far (away). So the big shape (circle) is north (above) the triangle, also in front of it, also far, also disconnected. The answer options include: left, right, above, below, behind, front, near, far, dc (disconnected), ec (?? maybe \"enclosed\"?), po, tpp, ntpp, tppi, ntppi. We need to list all applicable relations? The question: \"Where is the big shape regarding the small black triangle?\" Usually we list multiple applicable relations. The answer type is single, but could be multiple? It says answer_type single, but we can output array if multi-answer? The instruction: \"For multi-answer questions, return an array of options.\" So we can output multiple.\n\nThus we need to include all relations that can be deduced: above (north), front (since BBB in front of AAA, so circle in front of triangle), far (away), dc (disconnected). Are there any other? left/right not given. behind is opposite of front, not applicable. near not. So answer list: [\"above\",\"front\",\"far\",\"dc\"].\n\nCheck rule: Provided rule: If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH. This is about vertical relation. Here we have triangle inside AAA, circle inside BBB. AAA is south of BBB, meaning AAA below BBB, so BBB is above AAA. So using rule: XXX (circle) inside YYY (BBB) and YYY is above ZZZ (AAA) and HHH is inside ZZZ (triangle). Then circle is above triangle. So above is correct.\n\nAlso front relation: Not covered by rule but given directly.\n\nThus answer JSON: {\"answer\": [\"above\",\"front\",\"far\",\"dc\"]}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 6,
+      "answer": [
+        "below",
+        "behind",
+        "far",
+        "dc"
+      ],
+      "full_response": "{\"answer\": [\"below\", \"behind\", \"far\", \"dc\"]}",
+      "cot": "We need to parse story.\n\nStory: Two blocks AAA and BBB. A small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\n\nInterpretation: \"In front of this block there is block BBB\" - \"this block\" refers to block AAA? The previous sentence: \"Block AAA is south of, disconnected from and away from block BBB.\" Then \"In front of this block there is block BBB\". Likely \"this block\" refers to block AAA again, meaning BBB is in front of AAA. So relative positions: AAA south of BBB, AAA disconnected from BBB, AAA away from BBB, BBB in front of AAA. So AAA is behind BBB (since if BBB is in front of AAA, AAA is behind BBB). Also AAA is south of BBB (so AAA below BBB). Also they are far (away) and disconnected.\n\nNow objects: small black triangle is within AAA. There are two medium yellow circles: one in BBB (the first mentioned) and another medium yellow circle also in BBB (\"Another medium yellow circle is in this block.\") So both medium yellow circles are in BBB.\n\nQuestion: Where is the small black triangle relative to medium yellow circle number two? Number two likely refers to the second medium yellow circle (the \"another\" one). Both are in BBB. So triangle is in AAA, circle2 is in BBB. Need relative spatial relation between triangle and circle2.\n\nWe have relations between blocks: AAA is south of BBB (so AAA below BBB). AAA is behind BBB (since BBB in front of AAA). AAA is away from BBB (far). AAA is disconnected (dc). So triangle inherits AAA's position relative to objects in BBB? Typically if object A is inside block AAA, and object B is inside block BBB, then relative positions are same as between blocks (assuming no other offsets). So triangle is south/below circle2, behind circle2, far from circle2, disconnected from circle2.\n\nWe need to choose from options: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nWe have multiple possible relations: below (south), behind, far, dc. The question likely expects all applicable? The answer_type is single, but could be multiple? It says answer_type single, but options list many. Usually they expect one relation that is most directly deducible? Might be \"below\" or \"behind\" or \"far\" or \"dc\". Which is most salient? The story explicitly says AAA is south of BBB, and also \"away from\" (far) and \"disconnected\". So triangle relative to circle2 is also south, far, disconnected. The question: \"Where is the small black triangle relative to medium yellow circle number two?\" Could be multiple answers; but answer_type single suggests one answer. Perhaps they want \"below\". Usually primary cardinal direction is used. Let's see typical tasks: they often ask for all applicable relations, but answer_type single maybe means one relation. However they list many possible relations including dc (disconnected) and far. Which one is considered? Might be they want \"below\" because that's the direct vertical relation.\n\nBut also rule: If XXX is in front of YYY then YYY is behind XXX. We have BBB in front of AAA, so AAA behind BBB. So triangle behind circle2. So behind is also deduced.\n\nWhich is more likely? Could be they want \"behind\". But also south relation is given directly: AAA is south of BBB. So triangle is south of circle2 (below). Both are true.\n\nMaybe they expect multiple answers as array? But answer_type single says single. However they said \"For multi-answer questions, return an array of options.\" So if multiple correct, we could return array. But they said answer_type single, maybe only one correct.\n\nWe need decide which relation is considered primary. In many spatial QA datasets, they ask \"Where is X relative to Y?\" and answer includes all applicable relations (like \"left, above, far, disconnected\"). But they have answer_type single maybe mis-specified.\n\nGiven options include \"dc\" for disconnected, \"far\" for away, \"behind\". I'd output all that apply: [\"below\",\"behind\",\"far\",\"dc\"].\n\nBut need to ensure ordering? Not specified. Could be any order.\n\nI'll output array.\n\n"
+    },
+    {
+      "q_id": 7,
+      "answer": [
+        "below",
+        "behind",
+        "far",
+        "dc"
+      ],
+      "full_response": "{\"answer\": [\"below\", \"behind\", \"far\", \"dc\"]}",
+      "cot": "We need to parse story.\n\nStory: \"There exist two blocks, named AAA and BBB. A small black triangle is within block AAA. Block AAA is south of, disconnected from and away from block BBB. In front of this block there is block BBB with a big blue circle and a medium yellow circle. Another medium yellow circle is in this block.\"\n\nInterpretation: There are two blocks AAA and BBB. AAA is south of BBB, disconnected from BBB, and away from BBB. Also \"In front of this block there is block BBB\" - \"this block\" likely refers to AAA? The phrase: \"In front of this block there is block BBB with a big blue circle and a medium yellow circle.\" So BBB is in front of AAA. So AAA is behind BBB. Also AAA is south of BBB. Also AAA is far from BBB (away). Also disconnected (dc). The medium yellow circle number one is in BBB (the first mentioned medium yellow circle). So we need location of AAA regarding medium yellow circle number one.\n\nSince the circle is inside BBB. AAA relative to BBB: AAA is south of BBB, behind BBB, far from BBB, disconnected. So relative to the circle (inside BBB), we can infer similar relations: If AAA is south of BBB, then AAA is south of the circle? Usually if AAA is south of BBB, and the circle is inside BBB, then AAA is south of the circle (since AAA is south of the container). The rule: If XXX contains YYY then YYY is inside XXX. Not directly helpful. But we can infer: If AAA is south of BBB, then AAA is south of any object inside BBB? Not given explicitly, but typical spatial reasoning: relative positions propagate: If A is south of B, and B contains C, then A is south of C. However not given rule. But we can use transitive reasoning: The circle is inside BBB, so BBB contains circle. So circle is inside BBB. AAA is south of BBB. So AAA is south of the container, thus AAA is south of the circle? Usually yes. But we need to see if any rule about \"far from\" also propagates: If AAA is far from BBB, then AAA is far from the circle? There's rule: If XXX is inside YYY and YYY is far from ZZZ then XXX is far from the ZZZ. That is: if object inside YYY, and YYY far from ZZZ, then object is far from ZZZ. Here AAA is far from BBB, but AAA is not inside something. The rule is about inside object being far from something else. Not applicable.\n\nBut we have rule: If XXX is far from YYY then YYY is far from XXX (symmetry). So AAA far from BBB implies BBB far from AAA. But we need AAA regarding circle. Since circle is inside BBB, and BBB far from AAA, we can infer circle far from AAA? Using rule: If XXX is inside YYY and YYY is far from ZZZ then XXX is far from ZZZ. Here XXX = circle, YYY = BBB, ZZZ = AAA. Since BBB far from AAA, circle far from AAA. So AAA far from circle (symmetry). So answer includes \"far\". Also \"behind\" because AAA behind BBB (BBB in front of AAA). So AAA is behind the circle. Also \"below\" because AAA south of BBB (south = below). So AAA is below the circle. Also \"dc\" (disconnected) because AAA disconnected from BBB, and circle inside BBB, so AAA disconnected from circle? Usually if two objects are disconnected, they are not touching. If AAA disconnected from BBB, and circle inside BBB, AAA is also disconnected from circle (since AAA not touching BBB, and circle inside BBB). Not given rule but plausible. However we have only options: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. We need to list all applicable? The question: \"Where is AAA regarding medium yellow circle number one?\" Could be multiple relations. The answer format allows array of strings. We should include all that are true: below, behind, far, dc. Also maybe \"left/right\"? Not given. No info about east/west. So we include those four.\n\nCheck if \"far\" is appropriate: AAA is away from BBB (away = far). So AAA far from BBB. Using rule, circle far from AAA. So AAA far from circle (symmetry). So include \"far\".\n\n\"dc\" stands for disconnected. AAA disconnected from BBB. Circle inside BBB, so AAA disconnected from circle? Usually if AAA disconnected from BBB, they are not touching. The circle is inside BBB, so AAA not touching circle either. So \"dc\" holds.\n\nThus answer list: [\"below\",\"behind\",\"far\",\"dc\"].\n\nOrder maybe not important. Provide JSON.\n\n"
+    }
+  ]
+}

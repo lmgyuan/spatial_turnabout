@@ -10,7 +10,7 @@ from openai import OpenAI
 def load_model(model, config_path="models.json"):
     """
     Load a model client based on the model name and configuration.
-    Currently supports OpenAI and Nebius models only.
+    Supports OpenAI, Nebius, and DeepInfra models.
     
     Args:
         model (str): Model name or identifier
@@ -20,7 +20,7 @@ def load_model(model, config_path="models.json"):
         tuple: (client, name) where client is the model client object and name is the model name
         
     Raises:
-        ValueError: If the model is not supported (not OpenAI or Nebius)
+        ValueError: If the model is not supported
     """
     with open(config_path, 'r') as file:
         config = json.load(file)
@@ -31,12 +31,13 @@ def load_model(model, config_path="models.json"):
     # Resolve model name from config
     model = config.get(model, model)
     
-    # Check if model is supported (OpenAI or Nebius only)
+    # Check if model is supported
     is_openai = any(m_name in original_model for m_name in ["gpt", "o3", "o4"])
     is_nebius = "nebius" in original_model
+    is_deepinfra = "deepinfra" in original_model
     
-    if not (is_openai or is_nebius):
-        supported_models = "OpenAI models (gpt-*, o3-*, o4-*) and Nebius models (nebius-*)"
+    if not (is_openai or is_nebius or is_deepinfra):
+        supported_models = "OpenAI (gpt-*, o3-*, o4-*), Nebius (nebius-*), DeepInfra (deepinfra-*)"
         raise ValueError(f"Unsupported model: '{original_model}'. Currently supported: {supported_models}")
     
     # Load environment variables
@@ -47,6 +48,8 @@ def load_model(model, config_path="models.json"):
         model_key = "openai"
     elif is_nebius:
         model_key = "nebius"
+    elif is_deepinfra:
+        model_key = "deepinfra"
     else:
         # This should never happen due to the check above, but keeping for safety
         raise ValueError(f"Unexpected model type: {original_model}")
@@ -60,6 +63,11 @@ def load_model(model, config_path="models.json"):
         "nebius": {
             "api_key": os.getenv("NEBIUS_API_KEY"),
             "base_url": "https://api.studio.nebius.com/v1/",
+            "name": model
+        },
+        "deepinfra": {
+            "api_key": os.getenv("DEEPINFRA_API_KEY"),
+            "base_url": "https://api.deepinfra.com/v1/openai",
             "name": model
         }
     }

@@ -1,0 +1,94 @@
+{
+  "case_id": "717-3",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "above"
+    },
+    {
+      "q_id": 5,
+      "answer": "near"
+    },
+    {
+      "q_id": 6,
+      "answer": "right"
+    },
+    {
+      "q_id": 7,
+      "answer": "right"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.162379",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\n*   If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH\n*   If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n\n**Applying the Rules:**\n\n1.  **Tiny orange dimond:** Inside box DDD.\n2.  **Large orange rectangle:** North of the tiny orange dimond (inside DDD).\n3.  **Midsize orange dimond:** Inside box DDD.\n4.  **Large orange rectangle:** Inside box EEE, touching the midsize white oval.\n5.  **Tiny white dimond:** Inside box EEE.\n\nNow, we need to determine if all orange dimonds are south of a large orange rectangle. The tiny orange dimond is inside DDD, and the large orange rectangle is *north* of it. Therefore, the tiny orange dimond is south of the large orange rectangle. The midsize orange dimond is also inside DDD, and the large orange rectangle is north of it. Thus, the midsize orange dimond is also south of the large orange rectangle.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and answer.\n\nThe question asks if a midsize green object (inside DDD) is farther from a large orange rectangle (also inside DDD).\n\nRelevant Rules:\n\n1.  If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH\n2.  If XXX is inside YYY and YYY is near to ZZZ then XXX is near to the ZZZ\n3.  If XXX is inside YYY and YYY is far from ZZZ and HHH is inside ZZZ then XXX is far from the HHH\n\nThe midsize green dimond is inside box DDD. The large orange rectangle is also inside box DDD. The question asks if the green dimond is farther from the orange rectangle.  Since the green dimond and orange rectangle are *inside* the same box (DDD), they are necessarily near to each other.  The rules about \"far\" and \"near\" require a separation between objects.  Because they are within the same box, they cannot be \"far\" from each other.\n\nTherefore, the midsize green object is not farther from the large orange rectangle.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\nThe question asks if DDD is south of the oval. The oval is inside box EEE. We know that box DDD is south of box EEE. Therefore, DDD is south of the oval.\n\nRelevant rule: If XXX is inside YYY and YYY is south of ZZZ then XXX is south of the ZZZ. In this case, DDD is inside EEE and EEE is south of the oval.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\nThe question asks: \"Is an orange dimond in front of a shape?\"\n\nRelevant Rules:\n*   If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n*   If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n*   If XXX is in front of YYY and YYY is in front of ZZZ then XXX is in front of ZZZ\n*   If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH\n\nNow let's apply the rules:\n\n1.  **Tiny orange dimond:** It's inside box DDD. Box DDD is south of box EEE. Box EEE is behind box DDD. Therefore, the tiny orange dimond is behind box DDD.\n2.  **Large orange rectangle:** It's north of the tiny orange dimond inside box DDD.\n3.  **Shapes:** The shapes mentioned are: large orange rectangle, midsize white oval, midsize green diamond, tiny white diamond.\n\nSince the tiny orange dimond is behind box DDD, and box DDD is south of box EEE, and box EEE is behind box DDD, the tiny orange dimond is behind the large orange rectangle and behind the box EEE.  Therefore, the tiny orange dimond is in front of a shape (the large orange rectangle).\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe question asks: \"Where is the tiny orange dimond relative to the large orange rectangle in DDD?\"\n\nHere's how we can break down the relevant information from the story:\n\n*   \"Box DDD contains a midsize green dimond and a tiny orange dimond.\"\n*   \"North of the tiny orange dimond there is the large orange rectangle.\"\n\nThis directly establishes the spatial relationship: the large orange rectangle is *above* the tiny orange dimond.\n\nNow let's consider the provided rules:\n\n*   \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\" - This rule perfectly matches our situation.\n\nTherefore, the tiny orange dimond is above the large orange rectangle.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "near",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe question asks: \"Where is the midsize green dimond regarding the large orange rectangle in EEE?\"\n\nHere's a breakdown of the relevant information:\n\n*   **DDD:** Contains a midsize green dimond and a tiny orange dimond.\n*   **EEE:** Contains a midsize white oval, a large orange rectangle, and a tiny white dimond.\n*   The large orange rectangle in EEE is *touching* the midsize green dimond inside DDD.\n\nNow let's consider the rules:\n\n*   \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule doesn't directly apply because we're not dealing with overlaps in the same space.\n*   \"If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH\" - This rule doesn't apply as we don't have information about left/right positioning relative to EEE.\n*   \"If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - This rule doesn't apply as we don't have information about front/back positioning.\n*   \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\" - This rule doesn't apply as we don't have information about up/down positioning.\n*   \"If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH\" - This rule doesn't apply as we don't have information about up/down positioning.\n*   \"If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - This rule doesn't apply as we don't have information about covering.\n*   \"If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\" - This rule doesn't apply as we don't have information about covering.\n*   \"If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\" - This rule doesn't apply as we don't have information about covering.\n\nSince the large orange rectangle in EEE is *touching* the midsize green dimond in DDD, the midsize green dimond is immediately adjacent to the large orange rectangle.  The closest option is \"near\".\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "right",
+      "full_response": "Let's analyze the story and the question to determine the position of DDD regarding the oval.\n\nThe story states: \"Box EEE contains a midsize white oval.\"  We also know \"Box DDD contains a midsize green dimond and a tiny orange dimond.\"  The key spatial relationship is that the large orange rectangle is *inside* and *touching* the midsize white oval in box EEE.\n\nNow let's consider the relevant rules:\n\n*   **If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ:** This rule isn't directly applicable here.\n*   **If XXX is inside YYY and YYY is behind ZZZ then XXX is behind the ZZZ:** This rule isn't directly applicable here.\n*   **If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH:** This rule isn't directly applicable here.\n*   **If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ:** This rule isn't directly applicable here.\n*   **If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH:** This rule isn't directly applicable here.\n*   **If XXX is inside YYY and YYY is behind ZZZ and HHH is inside ZZZ then XXX is behind the HHH:** This rule isn't directly applicable here.\n\nThe core relationship is that the large orange rectangle (which is *inside* the oval) is *in* box EEE. DDD is *south* of EEE.  Therefore, DDD is to the *right* of the oval.\n\n{\"answer\": \"right\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "right",
+      "full_response": "Let's analyze the story and the question to determine the relationship between the tiny orange dimond and the tiny white dimond.\n\nThe story states: \"Box EEE contains a midsize white oval. A large orange rectangle is inside and touching and a tiny white dimond is in this box.\"\n\nThis directly tells us that the tiny white dimond is *inside* box EEE.\n\nThe story also states: \"Box DDD contains a midsize green dimond and a tiny orange dimond.\"\n\nWe need to find the position of the tiny orange dimond relative to the tiny white dimond. Since box DDD is south of box EEE, and the tiny orange dimond is inside DDD, and the tiny white dimond is inside EEE, we can deduce that the tiny orange dimond is to the *right* of the tiny white dimond. (This is based on the general spatial reasoning that if one object is south of another, and the orange dimond is inside the box south of the white dimond, it must be to the right).\n\n{\"answer\": \"right\"}",
+      "cot": ""
+    }
+  ]
+}

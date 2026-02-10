@@ -1,0 +1,100 @@
+{
+  "case_id": "2082-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "above"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    },
+    {
+      "q_id": 7,
+      "answer": [
+        "left",
+        "right"
+      ]
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.235671",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is north of ZZZ and HHH is inside ZZZ then XXX is north of the HHH\n*   If XXX is inside YYY and YYY is to the north of ZZZ and HHH is inside ZZZ then XXX is north of the HHH\n\n**Applying the Rules:**\n\n1.  \"This shape [midsize orange rectangle] is north of and touches the midsize white rectangle.\" This directly states that the midsize orange rectangle is north of the midsize white rectangle.\n\n**Conclusion:**\n\nYes, a midsize rectangle is to the north of a midsize white rectangle.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if box EEE contains all things.\n\nThe story states:\n*   Box DDD has a midsize orange rectangle and covers a midsize white rectangle.\n*   Another midsize orange rectangle is inside DDD.\n*   This orange rectangle is south of the midsize orange rectangle number one.\n*   This object is north of and touches the midsize white rectangle.\n*   Box DDD contains box EEE with a midsize white rectangle.\n*   Another midsize white rectangle is inside EEE.\n*   Box EEE covers another midsize white rectangle.\n*   Midsize white rectangle number three touches midsize white rectangle number one.\n\nWe need to determine if EEE contains *all* the mentioned shapes (the three midsize white rectangles and the two midsize orange rectangles).\n\n*   EEEEE contains the first midsize white rectangle.\n*   EEEEE contains the second midsize white rectangle (because it's inside EEE).\n*   EEEEE contains the third midsize white rectangle (because it touches the first midsize white rectangle).\n*   EEEEE contains the first midsize orange rectangle (because DDD contains EEE).\n*   EEEEE contains the second midsize orange rectangle (because DDD contains EEE).\n\nTherefore, box EEE contains all the mentioned shapes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if midsize white rectangle number one is inside a box.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY then XXX is inside a box.\n\n**Applying the Rule:**\n\nThe story states: \"Box DDD has a midsize orange rectangle and covers a midsize white rectangle. Another midsize orange rectangle is inside this box. This shape is to the south of midsize orange rectangle number one. This object is north of and touches the midsize white rectangle. In box DDD is box EEE with a midsize white rectangle. Another midsize white rectangle is inside this box. Box EEE covers another midsize white rectangle. Midsize white rectangle number three touches midsize white rectangle number one.\"\n\nSpecifically, it states \"Box DDD has a midsize white rectangle\" and \"Another midsize orange rectangle is inside this box.\"  This directly implies that the midsize white rectangle is inside box DDD.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a midsize white rectangle is covered by EEE.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is inside ZZZ then XXX is inside ZZZ\n*   If XXX is covered by YYY and YYY is below ZZZ then XXX is below the ZZZ\n*   If XXX is inside YYY and YYY is covered by ZZZ then XXX is inside ZZZ\n\n**Applying the Rules:**\n\n1.  \"Box EEE covers another midsize white rectangle.\" This means the midsize white rectangle is *inside* box EEE.\n2.  \"Box EEE covers a midsize white rectangle.\" This means the midsize white rectangle is covered by EEE.\n\nTherefore, a midsize white rectangle is covered by EEE.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the position of midsize orange rectangle number one regarding the midsize white rectangle in DDD.\n\nThe story states: \"Box DDD has a midsize orange rectangle and covers a midsize white rectangle. Another midsize orange rectangle is inside this box. This shape is to the south of midsize orange rectangle number one. This object is north of and touches the midsize white rectangle.\"\n\nThe key information is:\n1. Box DDD has a midsize orange rectangle.\n2. A midsize white rectangle is covered by Box DDD.\n3. Another midsize orange rectangle is *inside* Box DDD.\n4. The orange rectangle is south of the first orange rectangle.\n5. The white rectangle touches the orange rectangle.\n\nWe need to determine the position of the *first* orange rectangle relative to the white rectangle.  Since the white rectangle is covered by DDD and touches the first orange rectangle, and the first orange rectangle is south of the first orange rectangle, the first orange rectangle must be *above* the white rectangle.\n\nNow let's check the provided rules:\n\n*   \"If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH\" - This rule applies perfectly. XXX is the first orange rectangle, YYY is the box DDD, ZZZ is the white rectangle, and HHH is the white rectangle.\n\nTherefore, the answer is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the position of box EEE relative to midsize white rectangle number two.\n\nThe story states: \"Box EEE with a midsize white rectangle. Another midsize white rectangle is inside this box. Box EEE covers another midsize white rectangle.\"\n\nThis means box EEE contains midsize white rectangle number two. Therefore, box EEE is *below* midsize white rectangle number two.\n\nRelevant rule: If XXX is inside YYY and YYY is below ZZZ and HHH is inside ZZZ then XXX is below the HHH. (Applying this to box EEE containing midsize white rectangle number two).\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relationship between midsize white rectangle number one and EEE.\n\nThe story states: \"In box DDD is box EEE with a midsize white rectangle.\" This directly tells us that EEE is *inside* DDD. It also states \"Midsize white rectangle number three touches midsize white rectangle number one.\" This means they are adjacent.\n\nNow let's consider the spatial reasoning rules:\n\n*   **If XXX is inside YYY and YYY is inside ZZZ then XXX is inside ZZZ:** This rule isn't directly applicable here because we're looking for the relative position of a rectangle *to* another box, not within a box.\n*   **If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH:** This rule isn't relevant.\n*   **If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH:** This rule isn't relevant.\n*   **If XXX is inside YYY and YYY is in front of ZZZ and HHH is inside ZZZ then XXX is in front of the HHH:** This rule isn't relevant.\n*   **If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH:** This rule isn't relevant.\n*   **If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH:** This rule isn't relevant.\n*   **If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH:** This rule isn't relevant.\n*   **If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH:** This rule isn't relevant.\n*   **If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH:** This rule isn't relevant.\n*   **If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ:** This rule isn't relevant.\n*   **If XXX is inside YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ:** This rule isn't relevant.\n\nSince EEE is inside DDD, and midsize white rectangle number one is *within* DDD, and EEE is *within* DDD, the most accurate description of the relationship is that midsize white rectangle number one is *inside* EEE. However, the options don't include \"inside\". The closest option is \"below\" because EEE is described as being *north* of the midsize white rectangle number one.\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": [
+        "left",
+        "right"
+      ],
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between midsize white rectangle number three and box EEE.\n\nThe story states: \"Midsize white rectangle number three touches midsize white rectangle number one.\" This directly establishes a spatial relationship: midsize white rectangle number three is adjacent to midsize white rectangle number one.\n\nNow, let's consider box EEE. The story says \"In box DDD is box EEE with a midsize white rectangle.\" and \"Box EEE covers another midsize white rectangle.\" This means box EEE contains a midsize white rectangle.\n\nSince midsize white rectangle number three touches midsize white rectangle number one, and midsize white rectangle number one is inside box DDD, and box DDD contains box EEE, then midsize white rectangle number three must be either to the left or to the right of box EEE.  We cannot determine which specifically. However, the options provided include \"left\" and \"right\".\n\nTherefore, the answer is \"left\" or \"right\".\n\n```json\n{\"answer\": [\"left\", \"right\"]}\n```",
+      "cot": ""
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "case_id": "1949-3",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "left"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:18:30.828262",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 3,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Determine all fruits and their positions relative to a medium orange watermelon. The question: \"Are all fruits west of a medium orange watermelon?\" Means: For each fruit in the story, is it west of a medium orange watermelon? There are possibly multiple medium orange watermelons (one in box one, one in box two). The question ambiguous: \"a medium orange watermelon\" maybe any? Usually they ask if all fruits are west of a medium orange watermelon (i.e., there exists a medium orange watermelon such that all fruits are west of it). Or they might ask if all fruits are west of a medium orange watermelon (any medium orange watermelon). Need to interpret.\n\nWe have two medium orange watermelons: one inside box one (contained) and one covered by box two. Also there is a medium orange watermelon mentioned as \"the fruit which was east of the big green apple\" (that's the same as the one east of big green apple in box one). So that is the medium orange watermelon in box one.\n\nPositions:\n\nBox one contains: medium orange watermelon (call MOW1), big orange melon, medium green melon. Also box one covers: medium yellow apple, big green apple. Also \"A medium orange melon is inside box one.\" (different fruit). So we have:\n\n- MOW1 (medium orange watermelon) inside box one.\n- Big orange melon (BOM) inside box one.\n- Medium green melon (MGM) inside box one.\n- Medium yellow apple (MYA) covered by box one.\n- Big green apple (BGA1) covered by box one.\n- Medium orange melon (MOM) inside box one.\n\nRelations:\n\n1. \"To the east of the big green apple is the medium orange watermelon.\" So MOW1 east of BGA1. So BGA1 west of MOW1.\n\n2. \"To the north of the medium yellow apple there is the big orange melon.\" So BOM north of MYA. So MYA south of BOM.\n\n3. \"The medium green melon is near to the fruit which was east of the big green apple.\" The fruit east of BGA1 is MOW1. So MGM near MOW1. Near doesn't give direction.\n\n4. \"To the south of the big orange melon is the big green apple.\" So BGA1 south of BOM. This matches earlier: BOM north of BGA1? Wait earlier we have BGA1 south of BOM (consistent). Also earlier we have BGA1 west of MOW1.\n\n5. \"The medium orange melon is west of the big orange melon.\" So MOM west of BOM.\n\nNow Box two:\n\n- Box two exists. A medium orange watermelon is covered by and a big green apple is in box two. So MOW2 covered by box two, BGA2 inside box two.\n\n- \"To the west of the big green apple there is the medium orange watermelon.\" So MOW2 west of BGA2. So BGA2 east of MOW2.\n\nNow question: Are all fruits west of a medium orange watermelon? Need to see if every fruit is west of some medium orange watermelon. Let's list all fruits:\n\nFruits: medium orange watermelon (MOW1, MOW2) - but they themselves cannot be west of themselves. The question likely asks about other fruits relative to a medium orange watermelon. Usually \"all fruits\" includes all fruit objects, including the watermelons themselves. Are they west of a medium orange watermelon? A fruit cannot be west of itself; but could be west of the other watermelon. Let's evaluate.\n\nWe need to see if each fruit is west of at least one medium orange watermelon.\n\nConsider each fruit:\n\n- MOW1: Is MOW1 west of a medium orange watermelon? It could be west of MOW2? No relation given between boxes. No spatial relation between MOW1 and MOW2. So we cannot infer MOW1 is west of any medium orange watermelon. So answer likely No.\n\nBut maybe they consider \"a medium orange watermelon\" meaning a specific one, maybe the one referenced earlier (the one east of big green apple). Then ask if all fruits are west of that watermelon. Let's test: Are all fruits west of MOW1? Let's see positions relative to MOW1.\n\nWe have BGA1 west of MOW1 (since MOW1 east of BGA1). So BGA1 is west of MOW1. Good.\n\nMOM is west of BOM, but we don't know relation to MOW1. No direct relation. Could be unknown.\n\nMGM near MOW1, but not direction.\n\nMYA south of BOM, unknown relative to MOW1.\n\nBOM north of MYA, also unknown relative to MOW1.\n\nThus we cannot assert all fruits are west of MOW1. So answer No.\n\nThus answer: No.\n\nReturn JSON."
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Identify medium orange watermelons. There are at least two: one in box one (contained) and one in box two (covered by box two). Let's list.\n\nStory: \"A box named one contain a medium orange watermelon, a big orange melon and a medium green melon. A medium yellow apple and a big green apple are covered by this box.\" So box one contains a medium orange watermelon (i.e., inside, not covered). Also later: \"A medium orange melon is inside box one.\" That's a different fruit (orange melon). So medium orange watermelon in box one is \"contain\" meaning box one contains it (i.e., the fruit is inside the box). Not covered.\n\nThen later: \"A box named two exists. A medium orange watermelon is covered by and a big green apple is in box two.\" So box two covers a medium orange watermelon. So there is a medium orange watermelon that is covered by box two.\n\nThus total medium orange watermelons: at least two (one in box one, one covered by box two). Are there any other medium orange watermelons? Not mentioned elsewhere. So there are exactly two.\n\nQuestion: Does box two cover all medium orange watermelons? That would require that every medium orange watermelon is covered by box two. But we have one medium orange watermelon that is only contained in box one, not covered by box two. So answer is No.\n\nCheck rule: \"If XXX is covered by YYY then YYY is covers XXX\". This is just a restatement. So box two covers the medium orange watermelon (since it's covered by box two). But does box two cover the other medium orange watermelon? No.\n\nThus answer No.\n\nReturn JSON: {\"answer\": \"No\"}"
+    },
+    {
+      "q_id": 2,
+      "answer": "left",
+      "full_response": "{\"answer\": \"left\"}",
+      "cot": "We need to parse story. Determine relation between big green apple in box one and medium orange watermelon in box one.\n\nStory details:\n\nBox one contains: medium orange watermelon, big orange melon, medium green melon. Also a medium yellow apple and a big green apple are covered by this box. So big green apple is covered by box one (i.e., touches box? but not needed). Also \"To the east of the big green apple is the medium orange watermelon.\" So medium orange watermelon is east of big green apple. That means big green apple is west of medium orange watermelon. So relation: big green apple is left of the medium orange watermelon (since left = west). Options include left. Also maybe near? There's also \"The medium green melon is near to the fruit which was east of the big green apple.\" The fruit east of big green apple is the medium orange watermelon. So medium green melon is near to the medium orange watermelon. That doesn't affect big green apple.\n\nThus answer: left.\n\nCheck other statements: \"To the south of the big orange melon is the big green apple.\" That gives vertical relation between big orange melon and big green apple, not needed.\n\nThus answer left.\n\nReturn JSON: {\"answer\": \"left\"}"
+    }
+  ]
+}

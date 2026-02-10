@@ -1,0 +1,44 @@
+{
+  "case_id": "3080-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "front"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:21:43.699064",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 3,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the spatial reasoning propositions to determine if a box contains a medium orange apple.\n\nRelevant Propositions:\n* Prop 5: If a box contains an object, then the object is located inside the box.\n* Prop 6: If a box covers an object, then the object is located beneath the box.\n* Prop 9: If a box contains an object and the object is within the box, then the object is located beneath the other object.\n\nNow let's apply these propositions to the story:\n* Box three contains a medium orange apple (stated directly).\n* Since box three contains the medium orange apple, the medium orange apple is located inside box three.\n\nTherefore, a box (box three) contains a medium orange apple.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if a medium yellow apple is inside and touching box three.\n\n**Relevant Propositions:**\n\n*   Prop 7: If a container contains an object and another container overlaps the first container, then the object is overlapping with the second container.\n*   Prop 8: If an object is covered by a container, then the object is positioned beneath the container.\n*   Prop 9: If a container covers an object and another container covers the first container, then the object is covered by the second container.\n\n**Applying Propositions:**\n\n1.  Box three covers a medium yellow apple (Prop 8).\n2.  Box one covers a medium yellow apple (given).\n3.  Box three contains a medium orange apple (given).\n4.  The medium orange apple is to the north of the medium yellow apple (given).\n5.  Box three overlaps box one (implied by the fact that box three contains box two, and box two contains box three).\n\nSince box three covers a medium yellow apple, and box three contains a medium orange apple, and box three overlaps box one, it implies that the medium yellow apple is beneath box three.  The question asks if it's *inside and touching* box three.  While it's beneath it, the story doesn't explicitly state it's touching.\n\n**Conclusion:**\n\nNo.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "front",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between box two and the medium orange apple within box three.\n\nThe story states: \"Inside and touching box two there is box three. A medium orange apple is within this box.\" and \"Box three covers a medium yellow apple.\"\n\nThis means box three is *inside* box two.  The medium orange apple is *within* box three, which is inside box two. Therefore, the medium orange apple is inside box two, and box three is inside box two.\n\nNow let's consider the provided propositions:\n\n*   **Prop 7:** If one object is inside another object and the second object overlaps a third object, and the third object contains a fourth object, then the first object overlaps the fourth object. - This isn't directly relevant as we don't have an overlapping third object or fourth object.\n*   **Prop 9:** If one object is inside another object and the second object is covered by a third object, then the first object is inside the third object. - This is relevant, as box three is inside box two.\n*   **Prop 10:** If one object is covered by another object and the second object is below a third object, and the third object is covered by a fourth object, then the first object is below the fourth object. - Not relevant.\n\nBased on Prop 9, box three is inside box two. The medium orange apple is *within* box three. Therefore, the medium orange apple is inside box two.\n\nThe question asks \"Where is box two regarding the medium orange apple in box three?\". Since box three is inside box two, box two is *front* of the medium orange apple.\n\n```json\n{\"answer\": \"front\"}\n```",
+      "cot": ""
+    }
+  ]
+}

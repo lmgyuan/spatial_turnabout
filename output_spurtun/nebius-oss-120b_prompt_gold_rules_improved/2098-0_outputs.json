@@ -1,0 +1,84 @@
+{
+  "case_id": "2098-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:18:30.874456",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 7,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story.\n\nObjects: blocks HHH and LLL.\n\n- A medium red hexagon is in block HHH. So red hexagon inside HHH.\n\n- Block HHH covers a medium purple hexagon. So purple hexagon is covered by HHH (i.e., HHH covers it, meaning purple hexagon is inside HHH? Usually \"covers\" means the block covers the shape, i.e., shape is inside block and touching border? In spatial reasoning tasks, \"covers\" means the block contains the shape (shape is inside block). So we can treat as inside.\n\n- Above the medium purple hexagon is the medium red hexagon. So red is above purple.\n\n- In block LLL is block HHH. Means HHH is inside LLL.\n\n- Block LLL has a medium purple hexagon which is over a medium grey hexagon. So LLL has a purple hexagon (inside LLL). That purple is over a grey hexagon.\n\n- Block LLL covers the medium grey hexagon. So grey hexagon is inside LLL.\n\nQuestion: Is the red shape within LLL? Red shape = medium red hexagon.\n\nWe know red hexagon is in block HHH. HHH is in block LLL. Using rule: If XXX is inside YYY and YYY is inside ZZZ then XXX is inside ZZZ. So red hexagon inside HHH, HHH inside LLL => red hexagon inside LLL. So answer Yes.\n\nThus output JSON: {\"answer\": \"Yes\"}.\n\nMake sure no extra text before."
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Identify hexagons and which are covered by blocks.\n\nStory:\n\n- Two blocks: HHH and LLL.\n- A medium red hexagon is in block HHH. (In means inside, not necessarily covered)\n- Block HHH covers a medium purple hexagon. So HHH covers that purple hexagon. By rule, that purple hexagon is covered by HHH.\n- Above the medium purple hexagon is the medium red hexagon. (spatial relation, not about covering)\n- In block LLL is block HHH. So HHH is inside LLL.\n- Block LLL has a medium purple hexagon which is over a medium grey hexagon. So LLL has a medium purple hexagon (inside, not covered). That purple hexagon is over a medium grey hexagon.\n- Block LLL covers the medium grey hexagon. So LLL covers the grey hexagon. By rule, grey hexagon is covered by LLL.\n\nNow question: \"Are all hexagons covered by any block?\" Means: For each hexagon mentioned, is it covered by some block? Let's list hexagons:\n\n1. medium red hexagon (in block HHH). Not covered. It's just \"in\". So not covered.\n2. medium purple hexagon covered by HHH. Yes covered.\n3. medium purple hexagon in LLL (has). Not covered (just has). So not covered.\n4. medium grey hexagon covered by LLL. Yes covered.\n\nThus not all hexagons are covered. So answer: No.\n\nReturn JSON: {\"answer\": \"No\"}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story.\n\nObjects:\n\nBlocks: HHH, LLL.\n\n- A medium red hexagon is in block HHH.\n- Block HHH covers a medium purple hexagon. So purple hexagon (call Purple1) is covered by HHH (i.e., inside and touching? but location relative to HHH not needed).\n- Above the medium purple hexagon is the medium red hexagon. So red hexagon is above Purple1.\n\n- In block LLL is block HHH. So HHH is inside LLL.\n\n- Block LLL has a medium purple hexagon which is over a medium grey hexagon. So there is another medium purple hexagon (Purple2) in LLL, over a medium grey hexagon (Grey). \"has\" likely means inside but not touching? Not important.\n\n- Block LLL covers the medium grey hexagon. So Grey is covered by LLL.\n\nThus we have two medium purple hexagons: Purple1 (inside HHH) and Purple2 (inside LLL). The question: \"Are all medium purple hexagons under the medium red hexagon?\" Under means below. Using rule: If X is above Y then Y is below X. We know red hexagon is above Purple1 (explicit). So Purple1 is below red hexagon. For Purple2, we have no direct relation. We know Purple2 is over Grey (i.e., Purple2 above Grey). No relation to red. Could we infer relative positions via block containment? HHH is inside LLL. Red hexagon is in HHH, thus also inside LLL (since HHH inside LLL). Purple2 is also in LLL. But no vertical relation given. So we cannot conclude Purple2 is under red. Therefore not all purple hexagons are under red. So answer: No.\n\nReturn JSON: {\"answer\": \"No\"}"
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Entities: blocks HHH and LLL. Medium red hexagon in block HHH. Block HHH covers a medium purple hexagon. So purple hexagon is covered by HHH (i.e., inside and touching? but location relative to block not needed). Above the medium purple hexagon is the medium red hexagon. So red is above purple.\n\nIn block LLL is block HHH. So HHH is inside LLL.\n\nBlock LLL has a medium purple hexagon which is over a medium grey hexagon. So LLL contains a medium purple hexagon (different from the one covered by HHH? Could be separate). That purple is over a medium grey hexagon. Block LLL covers the medium grey hexagon.\n\nQuestion: \"Is any medium hexagon on the left side of a medium purple hexagon?\" We need to see if any medium hexagon (any color) is left of a medium purple hexagon. The story mentions only vertical relationships (above/below). No left/right relationships are given. So we cannot infer any left side relationship. The rule only about above/below. So answer is No.\n\nThus output JSON: {\"answer\": \"No\"}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp",
+      "full_response": "{\"answer\": \"ntpp\"}",
+      "cot": "We need to parse story.\n\nObjects: blocks HHH and LLL. A medium red hexagon is in block HHH. Block HHH covers a medium purple hexagon. Above the medium purple hexagon is the medium red hexagon. In block LLL is block HHH. So HHH is inside LLL. Block LLL has a medium purple hexagon which is over a medium grey hexagon. Block LLL covers the medium grey hexagon.\n\nQuestion: Where is the red shape regarding block LLL? Red shape = medium red hexagon.\n\nWe need spatial relation of red hexagon relative to block LLL.\n\nGiven: red hexagon is in block HHH. HHH is inside LLL. So red hexagon is inside HHH which is inside LLL. Using rule: If XXX is inside YYY and YYY is inside ZZZ then XXX is inside ZZZ. So red hexagon is inside LLL.\n\nThus answer: \"inside\". But options list: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. None of these is \"inside\". However maybe \"dc\" stands for \"disconnected\"? \"ec\" maybe \"contains\"? \"po\" maybe \"overlaps\"? \"tpp\" maybe \"touching\"? Not sure. The typical set of RCC8 relations: dc (disconnected), ec (externally connected), po (partial overlap), tpp (tangential proper part), ntpp (non-tangential proper part), tppi (tangential proper part inverse), ntppi (non-tangential proper part inverse). In this context, \"inside\" corresponds to \"tpp\" (tangential proper part) if the shape is inside but touching boundary? Or \"ntpp\" if inside not touching. The story says \"in block HHH\" meaning inside but not touching? Usually \"in\" means inside (not touching). \"covers\" means block covers shape (shape touches boundary). So red hexagon is \"in\" HHH => inside not touching. HHH is \"in block LLL\" => HHH inside LLL not touching. So red hexagon is inside LLL not touching => non-tangential proper part (ntpp). So answer should be \"ntpp\". Let's verify: The options include ntpp. Yes.\n\nThus answer: {\"answer\": \"ntpp\"}"
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to parse story.\n\nStory: Two blocks HHH and LLL. A medium red hexagon is in block HHH. Block HHH covers a medium purple hexagon. Above the medium purple hexagon is the medium red hexagon. So red hexagon is above purple hexagon. So purple is below red.\n\nQuestion: Where is the medium purple hexagon in HHH relative to the medium red hexagon? So relative position of purple to red. Since red is above purple, purple is below red. Options include \"below\". So answer \"below\". Provide JSON.\n\nThus final line: {\"answer\": \"below\"}"
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to parse story.\n\nStory: Two blocks HHH and LLL. A medium red hexagon is in block HHH. Block HHH covers a medium purple hexagon. Above the medium purple hexagon is the medium red hexagon. In block LLL is block HHH. So HHH is inside LLL. Block LLL has a medium purple hexagon which is over a medium grey hexagon. Block LLL covers the medium grey hexagon.\n\nQuestion: Where is the grey object relative to the medium purple hexagon in LLL?\n\nWe have a medium purple hexagon in LLL, and a medium grey hexagon also in LLL. The statement: \"Block LLL has a medium purple hexagon which is over a medium grey hexagon.\" Means the purple hexagon is over the grey hexagon. Over means above. So purple is above grey. Therefore grey is below purple. Using rule: If XXX is above YYY then YYY is below XXX. Here XXX = purple, YYY = grey. So grey is below purple. So answer: below.\n\nOption list includes \"below\". So answer is \"below\".\n\nReturn JSON: {\"answer\": \"below\"}"
+    }
+  ]
+}

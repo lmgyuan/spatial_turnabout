@@ -1,0 +1,44 @@
+{
+  "case_id": "3080-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "inside"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.304379",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 3,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a box contains a medium orange apple.\n\n**Relevant Rules:**\n\n*   If XXX contains YYY and YYY contains ZZZ then XXX contains ZZZ (This rule isn't directly applicable here, but helps understand containment relationships)\n*   If XXX is inside YYY and YYY is covered by ZZZ then XXX is inside ZZZ (This rule isn't directly applicable here)\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH (Not applicable)\n*   If XXX is covered by YYY and YYY is below ZZZ and HHH is covered by ZZZ then XXX is below the HHH (Not applicable)\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH (Not applicable)\n*   If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH (Not applicable)\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH (Not applicable)\n*   If XXX contains YYY then YYY is inside XXX (This rule is relevant)\n\n**Applying the Rules:**\n\nThe story states: \"A medium orange apple is within this box.\"  \"This box\" refers to box three.  The rule \"If XXX contains YYY then YYY is inside XXX\" applies.  Since the orange apple is *within* box three, box three contains the orange apple.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n\n**Applying the Rules:**\n\n1.  Box three covers a medium yellow apple.\n2.  A medium orange apple is within box three.\n3.  To the north of the medium yellow apple is the medium orange apple.\n\nThis means the medium yellow apple is *under* the medium orange apple *inside* box three.  Therefore, a medium yellow apple is inside and touching box three.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "inside",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\n**Story Summary:**\n\n*   Box one contains a medium yellow apple and another medium yellow apple.\n*   Box two contains a medium yellow apple and box three (which covers a medium yellow apple).\n*   Box three contains a medium orange apple, positioned north of the medium yellow apple.\n\n**Question:** Where is box two regarding the medium orange apple in box three?\n\n**Relevant Rules:**\n\n*   \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule is relevant because box three overlaps a medium yellow apple and box three contains the medium orange apple.\n*   \"If XXX is inside YYY and YYY is covered by ZZZ then XXX is inside ZZZ\" - This rule is relevant because box three covers the medium yellow apple.\n\n**Applying the Rules:**\n\nBox three contains the medium orange apple. Box three overlaps a medium yellow apple. Therefore, box two is inside box three.\n\n**Answer:**\n\ninside\n\n```json\n{\"answer\": \"inside\"}\n```",
+      "cot": ""
+    }
+  ]
+}

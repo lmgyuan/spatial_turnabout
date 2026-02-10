@@ -1,0 +1,74 @@
+{
+  "case_id": "2729-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "above"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.221956",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if a box has a medium green apple number two.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\n*   If XXX is covered by YYY and YYY is below ZZZ and HHH is covered by ZZZ then XXX is below the HHH\n*   If XXX is covered by YYY and YYY is to the right of ZZZ and HHH is covered by ZZZ then XXX is to the right of the HHH\n*   If XXX contains YYY and YYY covers ZZZ then XXX contains ZZZ\n\n**Applying the Rules:**\n\n1.  The story states \"The medium green apple is above a medium orange apple.\" This implies the medium green apple is *above* the medium orange apple.\n2.  The story states \"The medium orange apple is covered by box three.\" This means box three covers the medium orange apple.\n3.  The story states \"Another medium green apple and a medium yellow apple are inside box three.\" This means box three contains both a medium green apple and a medium yellow apple.\n\nSince box three contains a medium green apple, and the question asks if *a* box has a medium green apple number two, we can infer that there is at least one box with a medium green apple. The question asks if *a* box has a medium green apple number two. We are given that box three contains a medium green apple. We are not given any information about a second medium green apple.\n\n**Answer:**\n\nNo\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a box is disconnected from a medium yellow apple.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is disconnected from ZZZ and HHH is inside ZZZ then XXX is disconnected from the HHH\n*   If XXX is inside YYY and YYY is disconnected from ZZZ then XXX is disconnected from the ZZZ\n*   If XXX is disconnected from YYY then YYY is disconnected from XXX\n\n**Applying the Rules:**\n\n1.  **The medium yellow apple is in box one.** Box one is a box.\n2.  **Box one covers the medium orange apple.** This means the medium orange apple is *inside* box one.\n3.  **The medium yellow apple touches the medium orange apple.** This indicates they are close, but not necessarily disconnected.\n4.  **Box three has a medium green apple above the medium orange apple.** This doesn't directly relate to the yellow apple's disconnection.\n5.  **Box three contains two medium green apples and a medium yellow apple.** This is the key. Box three contains the medium yellow apple.\n6.  **Box three is to the left of box two, and box two is to the left of box three.** This establishes a spatial arrangement.\n7.  **Box one covers the medium orange apple.** Box one is disconnected from the medium orange apple.\n\nSince box three contains the medium yellow apple, and box one is disconnected from the medium orange apple (which is covered by box three), we can infer that box one is disconnected from the medium yellow apple.\n\n**Answer:**\n\nYes\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\nThe question asks if all medium orange apples are to the right of all fruits.\n\nHere's a breakdown of the spatial relationships:\n\n1.  **Box one covers a medium orange apple:** This means the medium orange apple is inside box one.\n2.  **Medium orange apple touches a medium yellow apple:** The medium yellow apple is adjacent to the medium orange apple.\n3.  **Medium yellow apple is in box one:** This confirms the medium orange apple is in box one.\n4.  **To the left-hand side of box one there is another box named two:** This establishes a left-right relationship.\n5.  **To the left-hand side of this box is another box named three with a medium green apple:** This further defines the left-right relationship.\n6.  **Medium green apple is above a medium orange apple:** The medium orange apple is *under* the medium green apple.\n7.  **Medium orange apple is covered by box three:** This means box three is above the medium orange apple.\n\nNow let's consider if all medium orange apples are to the right of all fruits.  Since the medium orange apple is inside box one, and box one is to the right of box three, the medium orange apple is to the right of the medium green apple.  The medium yellow apple is also to the right of the medium orange apple.  Therefore, all medium orange apples are to the right of all fruits.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if box three contains any fruit.\n\nRelevant Rules:\n*   If XXX contains YYY then XXX contains YYY (This rule is always relevant when considering containment)\n*   If XXX is inside YYY then XXX is inside YYY (This rule is relevant for checking if something is inside another object)\n\nApplying the rules:\n\n1.  The story states: \"Another medium green apple and a medium yellow apple are inside box three.\" This directly indicates that box three contains both a medium green apple and a medium yellow apple.\n\nTherefore, box three contains fruit.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe question asks: \"Where is box three regarding medium green apple number two?\"\n\nHere's a breakdown of the relevant information from the story:\n\n*   \"The medium green apple is above a medium orange apple.\"\n*   \"The medium orange apple is covered by box three.\"\n*   \"Another medium green apple and a medium yellow apple are inside box three.\"\n\nThis means box three contains two medium green apples and a medium yellow apple.  The first medium green apple is above the medium orange apple, and the second medium green apple is *inside* box three.  We need to determine the relative position of box three with respect to the second medium green apple.\n\nRule 1: \"If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\" - This rule doesn't directly apply.\nRule 2: \"If XXX is covered by YYY and YYY is below ZZZ and HHH is covered by ZZZ then XXX is below the HHH\" - This rule doesn't directly apply.\nRule 3: \"If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\" - This rule doesn't directly apply.\nRule 4: \"If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\" - This rule doesn't directly apply.\nRule 5: \"If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - This rule doesn't directly apply.\nRule 6: \"If XXX is covered by YYY and YYY is below ZZZ and HHH is covered by ZZZ then XXX is below the HHH\" - This rule doesn't directly apply.\nRule 7: \"If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\" - This rule doesn't directly apply.\nRule 8: \"If XXX is covered by YYY and YYY is to the right of ZZZ and HHH is covered by ZZZ then XXX is to the right of the HHH\" - This rule doesn't directly apply.\nRule 9: \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule doesn't directly apply.\nRule 10: \"If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\" - This rule doesn't directly apply.\n\nSince the second medium green apple is *inside* box three, and box three is covering the medium orange apple, the second green apple is within the confines of box three.  The question asks about the *location* of box three *regarding* the second green apple.  Because the second green apple is inside box three, box three is above the second green apple.\n\n{\"answer\": \"above\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the position of the medium orange apple in box one relative to the medium orange apple in box three.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\n*   If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n*   If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\n*   If XXX is covered by YYY and YYY is to the right of ZZZ and HHH is covered by ZZZ then XXX is to the right of the HHH\n*   If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\n*   If XXX is inside YYY and YYY is to the left of ZZZ and HHH is inside ZZZ then XXX is to the left of the HHH\n\n**Analysis:**\n\n*   The medium orange apple is *covered* by box three.\n*   Box three contains a medium green apple and a medium yellow apple.\n*   The medium green apple is *above* the medium orange apple.\n\nThis means the medium orange apple is *below* the medium green apple.  Since box three covers the medium orange apple, and the green apple is above it, the orange apple is below the green apple.\n\n**Answer:**\n\nbelow\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

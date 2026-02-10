@@ -1,0 +1,94 @@
+{
+  "case_id": "3864-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "above"
+    },
+    {
+      "q_id": 5,
+      "answer": "above"
+    },
+    {
+      "q_id": 6,
+      "answer": "above"
+    },
+    {
+      "q_id": 7,
+      "answer": "near"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:45:33.864370",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the spatial relationships to determine if all fruits are over all medium orange apples.\n\n1. **Box one:** Contains a medium orange apple and a medium yellow apple.\n2. **Below the medium orange apple:** is the medium yellow apple. This implies the medium orange apple is *above* the medium yellow apple.\n3. **Box two:** Contains a medium green apple and a medium orange apple.\n4. **Under a medium yellow apple:** is the medium green apple. This implies the medium yellow apple is *above* the medium green apple.\n5. **Box two has the medium yellow apple:** This is redundant with point 4.\n6. **The medium orange apple is under the medium green apple:** This implies the medium green apple is *above* the medium orange apple.\n7. **Box three:** Covers box two and contains a medium yellow apple, a medium orange apple.\n8. **Another medium yellow apple is inside and touching and a medium orange apple is in this box:** This adds more fruits to box three.\n9. **Medium yellow apple number two are below medium yellow apple number one and the medium orange apple:** This implies medium yellow apple number one and the medium orange apple are *above* medium yellow apple number two.\n10. **Above the medium orange apple there is medium yellow apple number one:** This confirms the relationship in point 9.\n\nNow let's list all fruits mentioned:\n- Medium yellow apple (multiple instances - let's call them Y1, Y2, Y3)\n- Medium orange apple (multiple instances - let's call them O1, O2, O3)\n- Medium green apple\n\nLet's consider the positions relative to *all* medium orange apples (O1, O2, O3).\n\n*   **Y1:** Above O1 (from point 10)\n*   **Y2:** Below Y1 and O1 (from point 9)\n*   **Y3:** Inside box three, which covers box two. Box two contains O2. So Y3 is above O2.\n*   **Green Apple:** Below Y1 (from point 4), and below O3 (from point 6).\n\nTherefore, not all fruits are over all medium orange apples. The green apple is *under* O3.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the boxes' contents.\n\n*   **Box one:** Contains a medium orange apple and covers a medium yellow apple.\n*   **Box two:** Contains a medium green apple and a medium orange apple. It also has a medium yellow apple.\n*   **Box three:** Covers box two and contains a medium yellow apple and a medium orange apple.\n\nNow let's see if all boxes have all apples.\n\n*   Box one has a medium orange apple and a medium yellow apple.\n*   Box two has a medium green apple, a medium orange apple, and a medium yellow apple.\n*   Box three has a medium yellow apple and a medium orange apple.\n\nBox one does not have a green apple. Box two has a green apple, but box three does not. Therefore, not all boxes have all apples.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story to determine if all boxes cover any yellow apple.\n\n*   **Box one:** Covers a medium yellow apple.\n*   **Box two:** Has a medium yellow apple.\n*   **Box three:** Covers box two, which has a medium yellow apple. Therefore, box three also covers a yellow apple.\n\nSince all three boxes (one, two, and three) cover a yellow apple, the answer is Yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the spatial relationships described in the story to determine if all medium green apples are above a medium orange apple.\n\n1. \"Below the medium orange apple is the medium yellow apple.\" This implies the medium orange apple is *above* the medium yellow apple.\n2. \"Under a medium yellow apple is the medium green apple.\" This implies the medium yellow apple is *above* the medium green apple.\n3. \"The medium orange apple is under the medium green apple.\" This implies the medium green apple is *above* the medium orange apple.\n4. \"The medium orange apple is under the medium green apple.\" This implies the medium green apple is *above* the medium orange apple.\n\nFrom these statements, we can deduce that the medium green apple is above the medium orange apple. Since there is only one mention of a medium green apple, and it is above the medium orange apple, the statement \"Are all medium green apples above a medium orange apple?\" is true.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "above",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to answer the question.\n\nThe story states: \"A medium green apple is within and a medium orange apple is inside and touching box two.\" Also, \"Box two has the medium yellow apple.\" and \"The medium orange apple is under the medium green apple.\"\n\nThis means:\n1. Box two contains a medium green apple, a medium orange apple, and a medium yellow apple.\n2. The medium orange apple is *under* the medium green apple.\n3. The medium orange apple is *touching* box two.\n\nSince the orange apple is *under* the green apple, and both are inside box two, the yellow apple must be *above* the orange apple.\n\nTherefore, the medium yellow apple in box two is *above* the medium orange apple in box two.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "above",
+      "full_response": "Okay, let's break down the spatial relationships described in the story and determine the relative position of box three to the medium yellow apple in box two.\n\n1. **Box two has the medium yellow apple:** This establishes that the medium yellow apple is inside box two.\n2. **Another box called three with a medium yellow apple covers box two:** This means box three completely surrounds box two.\n3. **A medium yellow apple is inside and touching and a medium orange apple is in this box:** This tells us that box three contains a medium yellow apple and a medium orange apple.\n\nSince box three *covers* box two, and box two *contains* the medium yellow apple, box three is *above* the medium yellow apple in box two.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "above",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to determine the position of box three relative to medium yellow apple number two.\n\nHere's what we know:\n\n1. **Box three covers box two.** This is a crucial relationship.\n2. **Box two has the medium yellow apple.**\n3. **Medium yellow apple number two are below medium yellow apple number one and the medium orange apple.**\n4. **Above the medium orange apple there is medium yellow apple number one.**\n\nFrom these points, we can deduce the following:\n\n*   Medium yellow apple number one is above the medium orange apple.\n*   Medium yellow apple number two is below both medium yellow apple number one and the medium orange apple.\n*   Box two contains the medium yellow apple.\n*   Box three covers box two.\n\nTherefore, since box three covers box two, and box two contains the medium yellow apple, box three must be *above* medium yellow apple number two.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "near",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to answer the question.\n\nThe story states: \"A medium green apple is within and a medium orange apple is inside and touching box two.\" This directly tells us that the medium green apple and the medium orange apple are *within* box two and that the medium orange apple is *touching* box two. The question asks about the relative position of the medium green apple to the medium orange apple *within* box two. Since the orange apple is touching box two, and the green apple is *within* box two, and the story doesn't give any other positional information, we can infer that they are next to each other. The options provided include \"near\" and \"touching\". Since \"touching\" isn't an option, \"near\" is the closest and most appropriate answer.\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    }
+  ]
+}

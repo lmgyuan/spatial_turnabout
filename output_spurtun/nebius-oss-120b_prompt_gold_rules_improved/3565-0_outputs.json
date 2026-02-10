@@ -1,0 +1,74 @@
+{
+  "case_id": "3565-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntppi"
+    },
+    {
+      "q_id": 5,
+      "answer": "ntpp"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:18:31.022934",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Determine boxes and fruits.\n\nBoxes: one, two, three.\n\nFruits: medium orange apple (multiple), medium green apple, medium yellow apple (multiple). Let's list.\n\nBox one: \"A box named one has a medium orange apple. Under the medium orange apple there is a medium green apple. This fruit is in box one. Another medium orange apple is in box one.\"\n\nInterpretation: Box one contains a medium orange apple (call orange1). Under that orange apple is a medium green apple (green1). \"This fruit is in box one.\" So green1 is in box one. Another medium orange apple (orange2) is in box one. So box one contains: orange1, orange2, green1. No mention of yellow apples in box one.\n\nBox two: \"We have a box named two. A medium green apple and a medium yellow apple are in box two. Another medium yellow apple is inside and touching box two. The medium green apple is under medium yellow apple number one. Over medium yellow apple number two is it.\"\n\nInterpretation: Box two contains a medium green apple (green2) and a medium yellow apple (yellow1). Another medium yellow apple (yellow2) is inside and touching box two (so also in box two). The green2 is under yellow1. Over yellow2 is it (green2 is over yellow2). So box two contains green2, yellow1, yellow2.\n\nBox three: \"Box two covers another box called three. Box three has a medium orange apple and covers a medium yellow apple.\"\n\nInterpretation: Box three is inside box two (since box two covers box three). Box three has a medium orange apple (orange3) and covers a medium yellow apple (yellow3). \"covers\" means the box contains the fruit? The rule: If XXX is inside YYY then YYY contains XXX. But \"covers\" is a relation where the box covers the fruit, meaning fruit is inside and touching the box? Usually \"covers\" means the box is covering the fruit, i.e., fruit is inside and touching the box. So box three contains orange3 and yellow3 (the yellow apple is covered by box three, so inside box three). So box three contains orange3, yellow3.\n\nNow question: \"Do all boxes have all fruits?\" Means: Does each box contain all fruits? Or does each box have all fruits (i.e., each box contains every fruit mentioned)? Likely they ask if every box contains all fruits (i.e., each box has all fruits). Obviously not: Box one does not have yellow apples, etc. So answer is No.\n\nWe must output JSON: {\"answer\": \"No\"}.\n\nMake sure no extra text before."
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story. Identify \"medium orange apple number one\". The story mentions: \"A box named one has a medium orange apple.\" That's likely medium orange apple number one. Then later: \"Another medium orange apple is in box one.\" That's medium orange apple number two. Also box three has a medium orange apple (maybe third). The question: \"Is medium orange apple number one in a box?\" We need to answer Yes or No.\n\nWe have rule: If XXX contains YYY then YYY is inside XXX. The story says \"A box named one has a medium orange apple.\" The verb \"has\" likely means contains? Usually \"has\" indicates inside. So box one contains the apple, thus apple is inside box one. So answer Yes.\n\nThus output JSON: {\"answer\": \"Yes\"}.\n\nMake sure no extra text before JSON."
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story. Identify all medium orange apples and see if each is inside a box.\n\nStory:\n\n- Box named one has a medium orange apple. So there is a medium orange apple in box one. \"has\" likely means inside. So it's inside box one.\n\n- Under the medium orange apple there is a medium green apple. This fruit is in box one. So the medium orange apple is in box one.\n\n- Another medium orange apple is in box one. So second orange apple also in box one.\n\n- Box two: contains medium green apple and medium yellow apple. Another medium yellow apple is inside and touching box two. So box two has apples.\n\n- Box two covers another box called three. Box three has a medium orange apple and covers a medium yellow apple.\n\nThus third medium orange apple is in box three. Box three is covered by box two. \"covers another box called three\" means box two covers box three. So box three is inside box two? Usually \"covers\" means box two is covering box three, i.e., box three is inside box two and touching? The rule: If XXX contains YYY then YYY is inside XXX. But we have \"covers\". Not given rule for covers. However typical semantics: \"covers\" means the container touches the inner object? But we need to decide if the orange apple in box three is inside a box. Box three is a box, so the orange apple is inside box three. Box three is itself inside box two (since box two covers box three). So the orange apple is inside box three, which is a box. So yes, it's inside a box.\n\nThus all medium orange apples (three of them) are inside a box. So answer Yes.\n\nWe must output JSON: {\"answer\": \"Yes\"}.\n\nMake sure no extra text before."
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story.\n\nStory details:\n\n- Box one has a medium orange apple. Under the medium orange apple there is a medium green apple. This fruit is in box one. Another medium orange apple is in box one.\n\n- Box two: A medium green apple and a medium yellow apple are in box two. Another medium yellow apple is inside and touching box two. The medium green apple is under medium yellow apple number one. Over medium yellow apple number two is it. (So medium green apple is over medium yellow apple number two? Actually \"Over medium yellow apple number two is it.\" The \"it\" refers to medium green apple? The previous sentence: \"The medium green apple is under medium yellow apple number one. Over medium yellow apple number two is it.\" So medium green apple is over medium yellow apple number two.)\n\n- Box two covers another box called three.\n\n- Box three has a medium orange apple and covers a medium yellow apple.\n\nThus we have a medium yellow apple that is covered by box three (since box three covers a medium yellow apple). Also there are medium yellow apples in box two: one is \"in box two\" (not touching), another is \"inside and touching box two\" (so that one touches box two). The question: \"Is a medium yellow apple covered by any box?\" Yes, because box three covers a medium yellow apple. Also maybe box two covers box three, but that doesn't directly cover the apple. The rule: If XXX covers YYY then YYY is covered by XXX. So we have \"Box three covers a medium yellow apple\" => the medium yellow apple is covered by box three. So answer Yes.\n\nThus output JSON: {\"answer\": \"Yes\"}.\n\nMake sure it's last line."
+    },
+    {
+      "q_id": 4,
+      "answer": "ntppi",
+      "full_response": "{\"answer\": \"ntppi\"}",
+      "cot": "We need to parse story. Identify \"box one\" and \"medium orange apple number two\". Determine spatial relation of box one relative to that apple.\n\nStory: \"A box named one has a medium orange apple. Under the medium orange apple there is a medium green apple. This fruit is in box one. Another medium orange apple is in box one.\"\n\nSo box one contains a medium orange apple (call it #1) and another medium orange apple (#2). Both are \"in box one\". The phrase \"in box one\" means inside box one (not touching). So the apples are inside box one. The question: Where is box one relative to medium orange apple number two? If apple #2 is inside box one, then box one contains apple #2. The rule: If XXX is inside YYY then YYY contains XXX. So box one contains apple #2. The relation \"contains\" corresponds to which option? The options list: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. These are typical RCC/Directional relations? \"dc\" = disconnected, \"ec\" = externally connected, \"po\" = partial overlap, \"tpp\" = tangential proper part, \"ntpp\" = non-tangential proper part, \"tppi\" = tangential proper part inverse, \"ntppi\" = non-tangential proper part inverse. \"contains\" is the inverse of \"inside\". In RCC, if A contains B, then B is inside A. The relation \"contains\" corresponds to \"tppi\" (tangential proper part inverse) if B is tangential proper part of A (touching). But here apple is \"in\" box one, not touching. That is \"inside\" but not touching, which is \"ntpp\" (non-tangential proper part). The inverse of ntpp is \"ntppi\" (non-tangential proper part inverse). So box one relative to apple #2 is \"ntppi\". However we need to be careful: The story says \"Another medium orange apple is in box one.\" The phrase \"in\" indicates inside but not touching. So apple #2 is a non-tangential proper part of box one. So box one is the \"non-tangential proper part inverse\" of apple #2, i.e., box one contains apple #2 without touching. So answer: ntppi.\n\nCheck options: ntppi is present. So answer is ntppi.\n\nThus output JSON.\n\n"
+    },
+    {
+      "q_id": 5,
+      "answer": "ntpp",
+      "full_response": "{\"answer\": \"ntpp\"}",
+      "cot": "We need to parse story. Identify \"medium orange apple number one\". There are multiple medium orange apples. Let's list.\n\nStory: \"A box named one has a medium orange apple. Under the medium orange apple there is a medium green apple. This fruit is in box one. Another medium orange apple is in box one.\"\n\nSo box one contains two medium orange apples: first mentioned \"a medium orange apple\" (call it orange apple #1). Then later \"Another medium orange apple\" (orange apple #2). Both are in box one.\n\nQuestion: \"Where is medium orange apple number one relative to box one?\" So we need relation of orange apple #1 to box one.\n\nWe have rule: If XXX contains YYY then YYY is inside XXX. So if box one contains the apple, then apple is inside box one. The story says \"A box named one has a medium orange apple.\" The phrase \"has\" likely means contains. Also later \"Another medium orange apple is in box one.\" So both are inside.\n\nThus relation: inside. Options list includes: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. None of these is \"inside\". However maybe \"dc\" stands for \"disconnected\"? \"ec\" maybe \"externally connected\"? \"po\" maybe \"partial overlap\"? \"tpp\" \"tppi\"? These are RCC8 relations? Actually RCC8 includes: DC (disconnected), EC (externally connected), PO (partial overlap), TPP (tangential proper part), NTPP (non-tangential proper part), TPPi (inverse), NTPPi (inverse). So \"inside\" corresponds to \"tpp\" (tangential proper part) if touching boundary? Or \"ntpp\" if not touching. The story says \"has\" maybe means inside but not touching? Not specified. Usually \"in\" means inside (not touching). \"inside and touching\" is used for \"inside and touching\". For box two: \"Another medium yellow apple is inside and touching box two.\" So they differentiate. So \"in\" or \"has\" likely means inside but not touching (i.e., non-tangential proper part, NTPP). So medium orange apple #1 is \"in\" box one (or \"has\" maybe same). So relation is NTPP (non-tangential proper part). Options include \"ntpp\". So answer: ntpp.\n\nThus output JSON: {\"answer\": \"ntpp\"}"
+    }
+  ]
+}

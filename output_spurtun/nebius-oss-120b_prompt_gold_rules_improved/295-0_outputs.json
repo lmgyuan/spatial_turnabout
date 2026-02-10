@@ -1,0 +1,74 @@
+{
+  "case_id": "295-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "left"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp"
+    },
+    {
+      "q_id": 5,
+      "answer": "tppi"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:18:30.945579",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 6,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story.\n\nEntities: box one contains medium green melon (MGM) and big orange apple (BOA). The big orange apple is south of the medium green melon and is west of a medium orange melon (MOM). Box one covers a big green watermelon (BGW) which is east of the medium green melon. Box one covers the medium orange melon. The medium orange melon is south of the big orange apple and is east of the big green watermelon. West of the big orange apple is the medium green melon. Another box named two contains box one.\n\nWe need to answer: Is the medium green melon west of the medium orange melon? So we need to determine relative east-west.\n\nWe have statements:\n\n- \"The big orange apple is ... west of a medium orange melon.\" So BOA west of MOM. So MOM east of BOA.\n\n- \"West of the big orange apple is the medium green melon.\" So MGM west of BOA. So BOA east of MGM.\n\nThus chain: MGM west of BOA, BOA west of MOM. So MGM is west of BOA, and BOA is west of MOM, so MGM is west of MOM? Let's apply transitive rule: If X is to the right of Y and Y is to the right of Z then X is to the right of Z. That's for right (east). We need left (west). But we have rule: If X is to the right of Y then Y is to the left of X. So we can convert.\n\nWe have: BOA west of MOM => MOM east of BOA. So we have \"MOM is to the right of BOA\". Also \"BOA east of MGM\" (since MGM west of BOA) => BOA is to the right of MGM. So we have: MOM right of BOA, BOA right of MGM. By transitive rule: If X right of Y and Y right of Z then X right of Z. So MOM right of MGM. That means MGM left of MOM (west). So answer Yes.\n\nThus answer Yes.\n\nReturn JSON: {\"answer\": \"Yes\"}"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story. Entities: box one, box two. Box one contains a medium green melon and a big orange apple. Also box one covers a big green watermelon (east of medium green melon). Box one covers the medium orange melon. Box one also contains medium orange melon? Actually \"Box one covers the medium orange melon.\" So medium orange melon is covered by box one (i.e., box one covers it). Also \"Another box named two contains box one.\" So box two contains box one.\n\nQuestion: \"Is any medium green melon inside all boxes?\" Means: Is there a medium green melon that is inside every box? Boxes present: box one, box two (maybe also others? only these). The medium green melon is inside box one (since box one contains it). Also box two contains box one, so by containment transitivity, box two contains box one, and box one contains the medium green melon, so by rule: If XXX contains YYY and YYY contains ZZZ then XXX contains ZZZ. So box two contains the medium green melon. So the medium green melon is inside both box one and box two. Are there any other boxes? No. So yes, there is a medium green melon inside all boxes (i.e., inside both boxes). So answer Yes.\n\nThus output JSON: {\"answer\": \"Yes\"}.\n\nMake sure it's last line."
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "{\"answer\": \"Yes\"}",
+      "cot": "We need to parse story. Entities: box one, medium green melon, big orange apple, medium orange melon, big green watermelon. Box one contains medium green melon and big orange apple. The big orange apple is south of medium green melon and west of medium orange melon. Box one covers a big green watermelon which is east of the medium green melon. Box one covers the medium orange melon. The medium orange melon is south of the big orange apple and east of the big green watermelon. West of the big orange apple is the medium green melon. Another box named two contains box one.\n\nQuestion: Are all orange melons covered by a box? Orange melons: there is a medium orange melon (orange). Also big orange apple (orange) but apple not melon. So only orange melons: medium orange melon. Also maybe \"big orange apple\" is apple not melon. So we consider orange melons: medium orange melon. Is it covered by a box? Story says \"Box one covers the medium orange melon.\" So yes, it is covered by box one. Are there any other orange melons? No. So all orange melons (the only one) are covered by a box. So answer Yes.\n\nWe must output JSON: {\"answer\": \"Yes\"}.\n\nMake sure no extra text before."
+    },
+    {
+      "q_id": 3,
+      "answer": "left",
+      "full_response": "{\"answer\": \"left\"}",
+      "cot": "We need to parse story.\n\nObjects: box one contains medium green melon (MGM) and big orange apple (BOA). The big orange apple is south of the medium green melon and is west of a medium orange melon (MOM). Box one covers a big green watermelon (BGW) which is east of the medium green melon. Box one covers the medium orange melon. The medium orange melon is south of the big orange apple and is east of the big green watermelon. West of the big orange apple is the medium green melon. Another box named two contains box one.\n\nWe need location of medium green melon regarding the medium orange melon.\n\nWe have relations:\n\n- BOA south of MGM. So MGM north of BOA.\n- BOA west of MOM. So MOM east of BOA.\n- BGW east of MGM. So MGM west of BGW.\n- MOM south of BOA. So BOA north of MOM.\n- MOM east of BGW. So BGW west of MOM.\n- Also \"West of the big orange apple is the medium green melon.\" That's same as MGM west of BOA (consistent with earlier: BOA west of MOM, but also MGM west of BOA). So MGM is west of BOA.\n\nWe need MGM relative to MOM.\n\nWe have chain: MGM west of BOA, BOA west of MOM? Actually BOA is west of MOM (given). So BOA west of MOM => MOM east of BOA. So MGM west of BOA, and BOA west of MOM. So MGM is further west? Let's apply transitive rule: If X is to the right of Y and Y is to the right of Z then X is to the right of Z. That's for right direction. For left direction we can invert: If X is left of Y and Y is left of Z then X is left of Z. But we have only rule for right. However we can use symmetry: If X is to the right of Y then Y is to the left of X. So we can convert.\n\nWe have MGM west of BOA => BOA east of MGM. So BOA is to the right of MGM. Also BOA west of MOM => MOM east of BOA => MOM is to the right of BOA.\n\nThus chain: BOA is right of MGM, MOM is right of BOA. By transitive rule: If X is right of Y and Y is right of Z then X is right of Z. Here X = MOM, Y = BOA, Z = MGM. So MOM is right of MGM. Therefore MGM is left of MOM.\n\nThus answer: left.\n\nCheck any vertical relation? MGM north of BOA (since BOA south of MGM). BOA north of MOM (since MOM south of BOA). So chain: MGM north of BOA, BOA north of MOM => MGM north of MOM (transitive for north? Not given rule but we can infer similar but not needed). However question asks location regarding medium orange melon. Could be both left and above. But we need single answer? Options list includes left, right, above, below, etc. If multiple applicable, maybe need list? The question: \"Where is the medium green melon regarding the medium orange melon?\" Could be both left and above. The answer type is single, but could be multiple? It says answer_type single. So we must choose one? Usually they expect the most specific? In such tasks, if multiple relations hold, they might expect all that are directly deducible. But answer_type single suggests one answer. Which one is more directly deduced? We have left via chain. Also above via chain: MGM north of BOA, BOA north of MOM => MGM north of MOM. Using same transitive logic for \"above\". Not given rule but likely similar. However they only gave rules for right/left. So maybe they only consider left/right. So answer left.\n\nThus output JSON.\n\n"
+    },
+    {
+      "q_id": 4,
+      "answer": "ntpp",
+      "full_response": "{\"answer\": \"ntpp\"}",
+      "cot": "We need to parse story. Entities: box one, box two. Box one contains a medium green melon and a big orange apple. Also box one covers a big green watermelon (east of medium green melon). Box one covers the medium orange melon. The medium orange melon is south of the big orange apple and east of the big green watermelon. West of the big orange apple is the medium green melon. Another box named two contains box one.\n\nWe need location of medium green melon relative to box two.\n\nRelations: Box two contains box one. Box one contains medium green melon (explicit: \"A box called one contain a medium green melon\"). So medium green melon is inside box one. Since box one is inside box two (box two contains box one). Using rule: If XXX contains YYY then YYY is inside XXX. So box two contains box one => box one is inside box two. Also box one contains medium green melon => medium green melon is inside box one. Then using rule: If XXX contains YYY and YYY contains ZZZ then XXX contains ZZZ. So box two contains box one, and box one contains medium green melon => box two contains medium green melon. So medium green melon is inside box two. The options list includes \"dc\", \"ec\", \"po\", \"tpp\", etc. Need to map \"inside\" to one of these codes. Usually in spatial reasoning tasks, \"inside\" is \"dc\" (disconnected?) No. Let's recall typical mapping: In some datasets, relations: \"inside\" = \"tpp\" (touching? Actually \"tpp\" stands for \"topological proper part\"? Wait typical RCC-8: \"tpp\" = \"tangential proper part\" (inside and touching boundary). \"ntpp\" = \"non-tangential proper part\" (strictly inside, not touching). \"po\" = \"partial overlap\". \"ec\" = \"externally connected\". \"dc\" = \"disconnected\". So \"inside\" could be either ntpp (if not touching) or tpp (if touching). The story says \"contain\" vs \"covers\". Usually \"contain\" means inside but not touching boundaries (i.e., inside). \"covers\" means the box covers the object, meaning the object is partially overlapped? Actually \"covers\" often means the box covers the object, i.e., the object is partially overlapped? In spatial reasoning tasks, \"covers\" means the container touches the object? Let's think: In typical dataset (CLEVR-Rel?), \"contain\" vs \"cover\": \"contain\" means object is inside container (not touching). \"cover\" means container covers object (object touches container's border). So \"contain\" => inside (non-tangential proper part) = ntpp. \"cover\" => object is inside and touching = tpp. So medium green melon is \"contain\" by box one, so it's inside box one non-touching. Box one is \"contain\" by box two? Actually \"contains box one\" means box two contains box one (box two contains box one). So box one is inside box two non-touching. So medium green melon is inside box one, which is inside box two. So medium green melon is inside box two, likely also non-touching (ntpp). So answer should be \"ntpp\". Options include ntpp. So answer: {\"answer\": \"ntpp\"}.\n\nCheck if any other relation like left/right etc? No. So final."
+    },
+    {
+      "q_id": 5,
+      "answer": "tppi",
+      "full_response": "{\"answer\":\"tppi\"}",
+      "cot": "We need to determine relation of medium orange melon relative to box one. In story: \"Box one covers the medium orange melon.\" So medium orange melon is covered by box one. The rule: If XXX covers YYY then YYY is covered by XXX. So relation is \"covered by\". The options list includes: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. Which corresponds to RCC or directional? \"covered by\" likely corresponds to \"tpp\"? Wait typical spatial relations: \"covers\" means container covers object (object touches boundary?). In RCC8: \"covers\" is not standard; but \"tpp\" = \"tangential proper part\" (object inside and touching boundary). \"ntpp\" = non-tangential proper part (inside not touching). \"tppi\" is inverse of tpp (i.e., \"covered by\"). So \"covered by\" corresponds to \"tppi\". So answer should be \"tppi\". Check options: tppi is present. So answer: {\"answer\":\"tppi\"}"
+    }
+  ]
+}

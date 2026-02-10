@@ -6,7 +6,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 class SimpleRAG:
-    def __init__(self, rules_file="../Rules/RuleText3.txt", top_k=5):
+    def __init__(self, rules_file="../Rules/RuleText5.txt", top_k=5):
         self.rules_file = rules_file
         self.top_k = top_k
         self.rules = []

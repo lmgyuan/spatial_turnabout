@@ -1,0 +1,94 @@
+{
+  "case_id": "600-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "No"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "front"
+    },
+    {
+      "q_id": 5,
+      "answer": "far"
+    },
+    {
+      "q_id": 6,
+      "answer": "south"
+    },
+    {
+      "q_id": 7,
+      "answer": "far"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:17:08.081991",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and propositions to answer the question \"Is a thing in front of a block?\".\n\nThe story states:\n1. A small black triangle is within block AAA.\n2. Block AAA is south of, disconnected from and away from block BBB.\n3. Block BBB is in front of block AAA.\n4. Block BBB has a big blue circle and a medium yellow circle.\n5. Another medium yellow circle is in block BBB.\n\nWe need to determine if any \"thing\" is in front of any \"block\".\n\nFrom the story, we know that block BBB is in front of block AAA.  The small black triangle is inside block AAA.  Therefore, block BBB is in front of the small black triangle (using Prop 1, but reversed).  The big blue circle and medium yellow circles are inside block BBB.  Therefore, block BBB is in front of the big blue circle and the medium yellow circles.\n\nSo, yes, things are in front of blocks.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the propositions to answer the question.\n\nThe question asks if the \"big thing\" (big blue circle) is north of the \"small black triangle.\"\n\nWe know:\n1. The small black triangle is inside block AAA.\n2. Block AAA is south of block BBB.\n3. Block AAA is disconnected from block BBB.\n4. Block BBB has a big blue circle and a medium yellow circle.\n\nSince block AAA is south of block BBB, and the small black triangle is inside block AAA, the small black triangle is also south of block BBB. The big blue circle is inside block BBB. Therefore, the big blue circle is north of the small black triangle.\n\nRelevant propositions:\nProp 2: If an object is inside a container and the container is near another container, then the object is near the other container. (Not directly applicable here)\nProp 3: If an object is inside a container and the container is in front of another container, then the object is in front of the other container. (Not directly applicable here)\nProp 9: If an object is inside a container and the container is south of another container, then the object is south of the other container. (Applicable to the triangle's position relative to BBB)\n\nBased on the spatial relationship \"south of,\" we can conclude that the big blue circle (inside BBB) is north of the small black triangle (inside AAA).\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the propositions to determine if the small black triangle is behind a medium yellow circle.\n\nThe story states:\n- A small black triangle is within block AAA.\n- Block AAA is south of, disconnected from, and away from block BBB.\n- Block BBB has a big blue circle, a medium yellow circle, and another medium yellow circle.\n\nWe need to determine the spatial relationship between the small black triangle and a medium yellow circle.\n\nProp 7 states: \"If an object is inside a block and the block is behind another block, then the object is behind the other block.\" However, we don't know if block AAA (containing the triangle) is behind block BBB (containing the circles).\n\nProp 9 states: \"If an object is inside a block and the block is disconnected from another block, then the object is disconnected from anything inside the other block.\"  Since AAA is disconnected from BBB, the triangle is disconnected from the circles inside BBB. This doesn't directly answer the question of whether the triangle is *behind* a circle.\n\nThe story establishes that AAA is south of BBB, away from BBB, and disconnected from BBB.  It does *not* state that AAA is behind BBB.  Therefore, we cannot conclude that the triangle is behind any of the circles in BBB.\n\nTherefore, the answer is No.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the propositions to determine if AAA is close to all objects.\n\nThe story states:\n- AAA is south of BBB.\n- AAA is disconnected from BBB.\n- AAA is away from BBB.\n- BBB contains a big blue circle, a medium yellow circle, and another medium yellow circle.\n- A small black triangle is within AAA.\n\nWe need to determine if AAA is close to the big blue circle, the medium yellow circles, and the small black triangle.\n\nProp 4 states: If an object is inside a box and the box is near another box, then the object is near the other box.\nProp 2 states: If an object is inside a box and the box is far from another box, then the object is far from the other box.\n\nSince AAA is \"away from\" BBB, and BBB contains the circles, AAA is far from the big blue circle and the two medium yellow circles.  Therefore, AAA is *not* close to all objects. The small black triangle is inside AAA, so its proximity to other objects depends on AAA's proximity. Since AAA is far from BBB, the triangle is also far from the circles in BBB.\n\nTherefore, the answer is No.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "front",
+      "full_response": "Okay, let's break this down.\n\nThe question asks about the location of the big blue circle relative to AAA.\n\nWe know:\n1. Block AAA is south of block BBB.\n2. Block AAA is disconnected from block BBB.\n3. Block AAA is away from block BBB.\n4. Block BBB is in front of AAA.\n5. The big blue circle is inside block BBB.\n\nTherefore, since the big blue circle is inside block BBB, and block BBB is in front of AAA, the big blue circle is in front of AAA.\n\n```json\n{\"answer\": \"front\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "far",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Information:**\n\n*   The small black triangle is *within* block AAA.\n*   Block AAA is *south of*, *disconnected from*, and *away from* block BBB.\n*   Block BBB has a big blue circle and a medium yellow circle. Another medium yellow circle is also in BBB.\n\n**2. Determine the Question's Focus:**\n\nThe question asks \"Where is the big shape (big blue circle) regarding the small black triangle?\"\n\n**3. Apply Spatial Reasoning Propositions (or reason directly):**\n\n*   We know the small black triangle is inside block AAA.\n*   We know block AAA is *away from* block BBB.\n*   The big blue circle is inside block BBB.\n*   Since AAA is *away from* BBB, the small black triangle is also *away from* the big blue circle.\n\n**4. Select the Best Option:**\n\nThe option that best describes the relationship is \"far\".\n\n```json\n{\"answer\": \"far\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "south",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Propositions:**\n\nWe need to determine the spatial relationship between the small black triangle and the second medium yellow circle. The story tells us:\n\n*   The small black triangle is *inside* block AAA.\n*   Block AAA is south of, disconnected from, and away from block BBB.\n*   Block BBB has a big blue circle and two medium yellow circles.\n\nPropositions 2, 3, and 6-7 are relevant because they describe how the position of an object inside a block relates to the position of another block. However, we need to connect the triangle to the *circles* within block BBB.\n\n**2. Reasoning:**\n\nSince the triangle is inside block AAA, and block AAA is south of block BBB, we can use Prop 2 to say the triangle is south of block BBB.  Block BBB contains the medium yellow circles. Therefore, the triangle is south of the medium yellow circles.\n\n**3. Answer Selection:**\n\nThe options include \"below\" and \"south\". \"Below\" is a more general term, while \"south\" is more specific to the story's description. Since the story explicitly states \"south of\", we should use that.\n\n```json\n{\"answer\": \"south\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "far",
+      "full_response": "Okay, let's break this down.\n\n**1. Identify Relevant Propositions:**\n\nWe need to determine the spatial relationship between AAA and a medium yellow circle. The story states that a medium yellow circle is *in* block BBB, and block AAA is south of, disconnected from, and away from block BBB.  Prop 2, 3, 4, 5, 8, 9, 10 are potentially relevant, but we need to see if we can chain them together.\n\n**2. Reasoning:**\n\n*   AAA is south of BBB (Story).\n*   AAA is disconnected from BBB (Story).\n*   AAA is away from BBB (Story).\n*   A medium yellow circle is inside BBB (Story).\n\nSince AAA is disconnected from BBB, and a medium yellow circle is inside BBB, we can apply Prop 1: If an object is inside a block and the block is disconnected from another block, then the object is disconnected from the other block. This means the medium yellow circle is disconnected from AAA.\n\nSince AAA is away from BBB, and a medium yellow circle is inside BBB, we can apply Prop 10: If an object is inside a block and the block is away from another block, then the object is away from the other block. This means the medium yellow circle is away from AAA.\n\nThe options include \"far\" and \"away\". \"Far\" is a more general term, while \"away\" is more specific to the story. Since the story explicitly states AAA is \"away\" from BBB, and the medium yellow circle is inside BBB, \"far\" is the most appropriate answer.\n\n**3. Answer:**\n\n```json\n{\"answer\": \"far\"}\n```",
+      "cot": ""
+    }
+  ]
+}

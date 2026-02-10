@@ -1,0 +1,94 @@
+{
+  "case_id": "3341-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "above"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "near"
+    },
+    {
+      "q_id": 7,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:45:33.858307",
+    "processing_mode": "per_question",
+    "pipeline": "gold_rules",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story to determine if a midsize green rectangle is to the north of all other midsize green rectangles.\n\n1. **Box DDD:** Contains a midsize green rectangle, a midsize orange rectangle, and another midsize green rectangle. The orange rectangle is south of another green rectangle.\n2. **Box EEE:** Contains box DDD and two midsize green rectangles. Green rectangle number two is south of green rectangle number one.\n3. **Box JJJ:** Contains midsize orange rectangle number one, another midsize green rectangle, and midsize orange rectangle number two. Midsize orange rectangle number two touches midsize green rectangle number two.\n\nFrom the story, we know:\n*   Green rectangle number two is south of green rectangle number one (in box EEE). This means green rectangle number one is *north* of green rectangle number two.\n*   There's a green rectangle inside box DDD.\n*   There's another green rectangle inside box JJJ.\n\nSince green rectangle number one is north of green rectangle number two, it's not true that *a* midsize green rectangle is to the north of *all* midsize green rectangles.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the spatial relationships described in the story.\n\n1. **Box DDD contains:** a midsize green rectangle, a midsize orange rectangle, and another midsize green rectangle (let's call it green rectangle 2).\n2. **Green rectangle 2 is south of:** a midsize green rectangle (green rectangle 1).\n3. **Box DDD is within:** Box EEE.\n4. **Box EEE contains:** a midsize green rectangle and another midsize green rectangle.\n5. **Two midsize orange rectangles are north of:** a midsize green rectangle.\n6. **Midsize orange rectangle 1 is north of:** midsize orange rectangle 2.\n7. **Box JJJ contains:** a midsize green rectangle, midsize orange rectangle 1, another midsize green rectangle, and midsize orange rectangle 2.\n8. **Midsize orange rectangle 2 touches:** midsize green rectangle 2.\n\nWe want to know if green rectangle 1 is south of orange rectangle 1.\n\nFrom the story, we know that orange rectangle 1 is north of orange rectangle 2. Also, orange rectangle 2 touches green rectangle 2. Green rectangle 2 is south of green rectangle 1. Therefore, green rectangle 1 is above green rectangle 2, and green rectangle 2 is touching orange rectangle 2, which is below orange rectangle 1. This implies that green rectangle 1 is above orange rectangle 1.\n\nTherefore, green rectangle 1 is *not* south of orange rectangle 1.\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "The story states: \"Midsize orange rectangle number two touches midsize green rectangle number two.\"\n\nTherefore, the answer is Yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the spatial relationships to determine if midsize green rectangle number one is in EEE.\n\n1. **Box DDD contains a midsize green rectangle.**\n2. **A midsize green rectangle is inside box DDD.**\n3. **Box DDD is within box EEE.**  Therefore, anything inside DDD is also inside EEE.\n4. **South of midsize green rectangle number two is midsize green rectangle number one.**\n5. **A midsize green rectangle is inside and touching and another midsize green rectangle is in box EEE.** This refers to green rectangle number two and another green rectangle.\n6. **Box JJJ covers the midsize green rectangle.**\n7. **Midsize orange rectangle number two touches midsize green rectangle number two.**\n\nFrom (2) and (3), we know a midsize green rectangle is inside DDD, and DDD is inside EEE. This means a midsize green rectangle is inside EEE.  From (4), we know that midsize green rectangle number one is south of midsize green rectangle number two.  From (5), we know that a midsize green rectangle (number two) is inside EEE.  Therefore, midsize green rectangle number one is also inside EEE.\n\nSo, the answer is Yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "above",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to answer the question.\n\n1. **Box DDD within Box EEE:** This establishes a containment relationship. Everything inside DDD is also inside EEE.\n2. **Midsize green rectangle number one and two in box EEE:** Both rectangles are within EEE.\n3. **South of midsize green rectangle number two is midsize green rectangle number one:** This is the crucial relationship. It tells us that midsize green rectangle number one is *below* midsize green rectangle number two.  Applying the rule \"If XXX is below YYY then YYY is above XXX\", we can say that midsize green rectangle number two is *above* midsize green rectangle number one.\n\nTherefore, midsize green rectangle number two is above midsize green rectangle number one in box EEE.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to answer the question.\n\n1. **Box DDD contains:** A midsize green rectangle, a midsize orange rectangle, and another midsize green rectangle (let's call it green rectangle 2).\n2. **Spatial relationship within DDD:** The midsize green rectangle is south of the midsize orange rectangle.\n3. **Box DDD is within Box EEE:** This means everything inside DDD is also inside EEE.\n4. **Box EEE contains:** Two midsize green rectangles and two midsize orange rectangles. Green rectangle 2 is inside EEE.\n5. **Spatial relationship within EEE:** Green rectangle 2 is south of green rectangle 1.\n6. **Spatial relationship within EEE:** Two midsize orange rectangles are north of a midsize green rectangle.\n7. **Spatial relationship within EEE:** Orange rectangle 1 is north of orange rectangle 2.\n8. **Box JJJ contains:** A midsize green rectangle, orange rectangle 1, another midsize green rectangle, and orange rectangle 2.\n9. **Spatial relationship within JJJ:** Orange rectangle 2 touches green rectangle 2.\n\nNow, let's focus on the question: \"What is the position of midsize green rectangle number one in JJJ regarding midsize orange rectangle number one?\"\n\nWe know:\n*   Green rectangle 1 is south of green rectangle 2.\n*   Orange rectangle 2 touches green rectangle 2.\n*   Orange rectangle 1 is north of orange rectangle 2.\n\nTherefore, green rectangle 1 is south of green rectangle 2, and orange rectangle 2 is touching green rectangle 2. Since orange rectangle 1 is north of orange rectangle 2, green rectangle 1 must be below orange rectangle 1.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "near",
+      "full_response": "Okay, let's break down the spatial relationships described in the story to answer the question.\n\n1. **Box DDD contains:** A midsize green rectangle, a midsize orange rectangle, and another midsize green rectangle.\n2. **Spatial relationship within DDD:** The midsize green rectangle is south of the midsize orange rectangle.\n3. **Box DDD is within Box EEE.**\n4. **Box EEE contains:** A midsize green rectangle and another midsize green rectangle.\n5. **Spatial relationship within EEE:** South of midsize green rectangle number two is midsize green rectangle number one.\n6. **Two midsize orange rectangles are to the north of a midsize green rectangle.**\n7. **Spatial relationship between orange rectangles:** To the north of midsize orange rectangle number two is midsize orange rectangle number one.\n8. **Box JJJ contains:** A midsize green rectangle, midsize orange rectangle number one, another midsize green rectangle, and midsize orange rectangle.\n9. **Spatial relationship within JJJ:** Midsize orange rectangle number two touches midsize green rectangle number two.\n\nThe question asks about the relative position of midsize green rectangle number two in JJJ relative to midsize orange rectangle number two. The story explicitly states \"Midsize orange rectangle number two touches midsize green rectangle number two.\"  Therefore, the correct answer is \"touches\". However, \"touches\" is not an option. The closest option is \"near\".\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "below",
+      "full_response": "Okay, let's break down the spatial relationships to determine the position of midsize green rectangle number one in box DDD regarding box EEE.\n\n1. **Box DDD is within box EEE:** This establishes that box DDD is inside box EEE.\n\n2. **A midsize green rectangle is inside box DDD:** This tells us that midsize green rectangle number one (since it's south of another green rectangle) is inside box DDD.\n\n3. **Combining 1 and 2:** Since box DDD is inside box EEE, and midsize green rectangle number one is inside box DDD, then midsize green rectangle number one is also inside box EEE.\n\n4. **South of midsize green rectangle number two is midsize green rectangle number one:** This tells us the relative position of the two green rectangles.\n\nThe question asks about the position of midsize green rectangle number one *in box DDD* regarding box EEE. Since DDD is *inside* EEE, and green rectangle number one is inside DDD, it must be *inside* EEE as well. The options provided don't directly address \"inside\" or \"within\". However, the most appropriate single option to describe the relationship is \"below\" because it is south of another green rectangle.\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

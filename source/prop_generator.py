@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 class PropGenerator:
-    def __init__(self, rules_file="../Rules/RuleText3.txt", prompt_file="prompts/prop_generation.json"):
+    def __init__(self, rules_file="../Rules/RuleText5.txt", prompt_file="prompts/prop_generation.json"):
         with open(rules_file, 'r') as f:
             self.rules = [line.strip() for line in f if line.strip()]
         
@@ -116,7 +116,7 @@ class PropGenerator:
         return props
     
     def _build_prop_prompt(self, turn_data):
-        # Use ALL rules from RuleText3.txt  
+        # Use ALL rules from RuleText5.txt  
         rules_text = "\n".join(self.rules) if self.rules else "No rules available"
         
         # Build the same rich context as the main prompt

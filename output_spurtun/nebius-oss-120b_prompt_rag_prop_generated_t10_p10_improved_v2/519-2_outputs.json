@@ -1,0 +1,34 @@
+{
+  "case_id": "519-2",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T14:42:48.362523",
+    "processing_mode": "per_question",
+    "pipeline": "rag_prop",
+    "total_questions": 2,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to answer: Is a tiny orange oval above all green things? Need to see if tiny orange oval is above every green object mentioned.\n\nList objects: tiny orange rectangle (orange), tiny green diamond, tiny orange oval, tiny green oval, large green oval, large white diamond.\n\nGreen things: tiny green diamond, tiny green oval, large green oval. Possibly also large white diamond is white, not green. So we need to check if tiny orange oval is above each green thing.\n\nFrom story:\n\n- \"A tiny orange rectangle and a tiny green dimond are inside box DDD.\" So tiny green diamond is inside DDD.\n\n- \"Box DDD contain a tiny orange oval and a tiny green oval.\" So tiny orange oval and tiny green oval are inside DDD.\n\n- \"It covers a large green oval which is under the tiny orange oval.\" So DDD covers large green oval, and large green oval is under the tiny orange oval. So we have direct relation: large green oval is under tiny orange oval => tiny orange oval is above large green oval.\n\n- \"A large white dimond is covered by box DDD.\"\n\n- \"The tiny orange oval is under the tiny green dimond and is in front of the rectangle.\" So tiny orange oval is under tiny green diamond => tiny orange oval is below tiny green diamond. So tiny orange oval is not above tiny green diamond; it's below it. So the statement \"tiny orange oval above all green things\" would be false because tiny green diamond is a green thing and tiny orange oval is under it.\n\n- \"Above the large white dimond there is the tiny green oval.\" So tiny green oval is above large white diamond. Not directly about orange oval.\n\n- \"Over the white shape there is the tiny green dimond.\" So tiny green diamond is over white shape (large white diamond). So tiny green diamond is above large white diamond.\n\nThus we have: tiny orange oval is under tiny green diamond, so not above that green thing. Therefore answer is No.\n\nWe need to identify relevant propositions: Prop 5 (if X covered by Y and Y below Z then X below Z) maybe not needed. But we can just use direct statements.\n\nThus answer: No.\n\nReturn JSON: {\"answer\": \"No\"}"
+    },
+    {
+      "q_id": 1,
+      "answer": "above",
+      "full_response": "{\"answer\": \"above\"}",
+      "cot": "We need to parse story.\n\nStory: One box DDD. Inside DDD: tiny orange rectangle, tiny green diamond. Box DDD contain a tiny orange oval and a tiny green oval. It covers a large green oval which is under the tiny orange oval. A large white diamond is covered by box DDD. The tiny orange oval is under the tiny green diamond and is in front of the rectangle. Above the large white diamond there is the tiny green oval. Over the white shape there is the tiny green diamond.\n\nWe need relation of tiny orange oval regarding the large green oval.\n\nWe have direct statement: \"It covers a large green oval which is under the tiny orange oval.\" The \"It\" refers to box DDD. So large green oval is covered by DDD and is under the tiny orange oval. So tiny orange oval is above the large green oval. So relation: tiny orange oval is above large green oval.\n\nThus answer: above.\n\nCheck if any other relations like front/behind? Not needed.\n\nThus answer \"above\". Use JSON.\n\n"
+    }
+  ]
+}

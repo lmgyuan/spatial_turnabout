@@ -1,0 +1,94 @@
+{
+  "case_id": "2082-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "near"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "near"
+    },
+    {
+      "q_id": 7,
+      "answer": "below"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T02:08:52.505692",
+    "processing_mode": "per_question",
+    "pipeline": "rules_generated",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this:\n\n1. **Identify Relevant Rules:**\n   - \"If YYY has ZZZ then ZZZ is within YYY.\"\n   - \"If XXX contains YYY then YYY is within XXX.\"\n   - \"If YYY is within XXX and XXX contains ZZZ then ZZZ is within XXX.\"\n\n2. **Apply Rules to the Story:**\n   - \"Box two has box one\" implies \"Box one is within box two.\"\n   - \"Box one contain a medium orange apple and a medium yellow apple\" implies \"A medium orange apple is within box one\" and \"A medium yellow apple is within box one.\"\n   - \"A medium orange apple is within and another medium yellow apple is inside and touching this box\" refers to box one. So, \"A medium orange apple is within box one\" and \"A medium yellow apple is within box one.\"\n   - \"A medium green apple is covered by and a medium yellow apple is within box two.\" implies \"A medium green apple is within box two\" and \"A medium yellow apple is within box two.\"\n   - \"Box two contains medium green apple.\" implies \"Medium green apple is within box two.\"\n\n3. **Determine the Answer:**\n   Since we have multiple fruits (medium orange apple, medium yellow apple, medium green apple) within box two, the answer is \"Yes.\"\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Okay, let's break this down. The question asks if a fruit is \"over\" all yellow fruits. This implies a hierarchical relationship where one fruit is positioned above all other yellow fruits. We need to analyze the spatial relationships described in the story to see if this is possible.\n\nHere's a breakdown of the relevant information and how it applies:\n\n*   **\"Medium yellow apple number two is under medium yellow apple number one.\"** This establishes a vertical relationship: yellow apple number two is below yellow apple number one.\n*   **\"Medium orange apple number two touches and this thing is under medium orange apple number one.\"** This tells us that something (medium orange apple number two) is adjacent to and below medium orange apple number one.\n*   **\"A medium green apple is covered by and a medium yellow apple is within box two.\"** This tells us that a medium green apple is below a medium yellow apple.\n*   **\"Medium green apple number one and the medium yellow apple are under another medium green apple.\"** This tells us that both medium green apple number one and a medium yellow apple are below another medium green apple.\n\nFrom these relationships, we can infer that there are multiple yellow apples and multiple green apples. The question asks if *a* fruit is over *all* yellow fruits.  We know yellow apple number two is under yellow apple number one. We also know a yellow apple is under a green apple. However, we don't have information that establishes a single fruit being above *all* yellow fruits. It's possible that there are more yellow apples not mentioned, or that the green apple is not above all yellow apples.\n\nTherefore, the answer is No.\n\n```json\n{\"answer\": \"No\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this:\n\n1. **Identify Relevant Rules:**\n   - \"If YYY contains ZZZ then ZZZ is within YYY.\" - This is the key rule to determine if box one has medium orange apple number two.\n\n2. **Analyze the Story:**\n   - \"Box one contain a medium orange apple and a medium yellow apple.\" - This tells us box one contains at least one medium orange apple.\n   - \"Another medium orange apple is within and another medium yellow apple is inside and touching this box.\" - \"this box\" refers to box one. So, another medium orange apple is within box one.\n   - \"Medium orange apple number two touches and this thing is under medium orange apple number one.\" - \"this thing\" refers to medium orange apple number two. This implies that medium orange apple number two is within box one.\n\n3. **Apply the Rules and Reasoning:**\n   - Since \"Box one contain a medium orange apple\" and \"another medium orange apple is within box one\" and \"medium orange apple number two is within box one\", we can conclude that box one has medium orange apple number two.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Here's how we can solve this:\n\n1. **Identify Relevant Rules:** The question asks if two objects \"touch.\" The rule \"If XXX touches YYY then XXX and YYY are adjacent\" is directly relevant.\n\n2. **Apply the Story to the Rule:** The story states: \"Medium orange apple number two touches and this thing is under medium orange apple number one.\" This implies that medium orange apple number two touches medium orange apple number one.\n\n3. **Determine the Answer:** Since the story explicitly states that medium orange apple number two touches medium orange apple number one, the answer is \"Yes.\"\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "near",
+      "full_response": "Okay, let's break down this spatial reasoning problem.\n\n**1. Identify Relevant Rules:**\n\n*   \"If YYY has ZZZ then ZZZ is within YYY.\" - This is a key rule for understanding containment.\n*   \"If XXX contains YYY then YYY is inside XXX.\" - Another containment rule.\n*   \"If YYY touches XXX then YYY is adjacent to XXX.\" - This rule deals with adjacency.\n\n**2. Analyze the Story and Apply Rules:**\n\n*   \"Box two has box one.\"  => Box one is within Box two.\n*   \"Box one contain a medium orange apple and a medium yellow apple.\" => Medium orange apple and medium yellow apple are inside box one.\n*   \"Another medium orange apple is within and another medium yellow apple is inside and touching this box.\" => This refers to box one. So, another medium orange apple is inside box one, and another medium yellow apple is inside and touching box one.\n*   \"Medium yellow apple number two is under medium yellow apple number one.\" => Medium yellow apple number two is below medium yellow apple number one.\n*   \"Medium orange apple number two touches and this thing is under medium orange apple number one.\" => \"This thing\" refers to medium orange apple number two, and it touches box one and is below medium orange apple number one.\n*   \"A medium green apple is covered by and a medium yellow apple is within box two.\" => Medium green apple is covered by something, and a medium yellow apple is inside box two.\n*   \"Medium green apple number one and the medium yellow apple are under another medium green apple.\" => Medium green apple number one and the medium yellow apple are below another medium green apple.\n*   \"Box two contains medium green apple.\" => Medium green apple is inside box two.\n\n**3. Determine the Relationship between Medium Orange Apple Number One and Box Two:**\n\nFrom the story, we know:\n\n*   Box two has box one.\n*   Box one contains medium orange apple number one.\n\nTherefore, medium orange apple number one is within box one, which is within box two. This means medium orange apple number one is inside box two.  The options provided don't directly state \"inside\", but \"near\" is the closest and most reasonable option given the choices.\n\n**4. Final Answer:**\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Okay, let's break down this spatial reasoning problem.\n\n**1. Identify Relevant Rules:**\n\nThe question asks about the relative position of \"medium yellow apple number one\" and \"medium yellow apple number two.\" The story states: \"Medium yellow apple number two is under medium yellow apple number one.\"\n\nThe rule \"If XXX is under YYY then XXX is below YYY\" directly applies.\n\n**2. Apply the Rule:**\n\nBased on the rule and the story, medium yellow apple number two is below medium yellow apple number one.\n\n**3. Select the Answer:**\n\nThe provided options include \"below.\"\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "near",
+      "full_response": "Okay, let's break down this spatial reasoning problem.\n\n**1. Identify Relevant Rules:**\n\n*   \"If YYY touches XXX then YYY and XXX are adjacent.\" - This is the most directly relevant rule.\n*   \"If YYY is under XXX then YYY is below XXX.\" - This rule might be useful if we can establish a \"under\" relationship.\n\n**2. Analyze the Story:**\n\nThe story states: \"Medium orange apple number two touches and this thing is under medium orange apple number one.\"  \"This thing\" refers to box one. Therefore, box one touches medium orange apple number two.\n\n**3. Apply the Rules:**\n\nBased on the rule \"If YYY touches XXX then YYY and XXX are adjacent,\" since box one touches medium orange apple number two, they are adjacent. The options include \"adjacent\" but not directly. The closest option is \"near\".\n\n**4. Determine the Answer:**\n\nThe question asks for the position of box one regarding medium orange apple number two. Since they touch, they are near each other.\n\n```json\n{\"answer\": \"near\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "below",
+      "full_response": "Okay, let's break down this spatial reasoning problem.\n\n**1. Identify Relevant Rules:**\n\nThe question asks about the position of medium orange apple number one relative to medium orange apple number two. The story states: \"Medium orange apple number two touches and this thing is under medium orange apple number one.\"\n\nThis directly relates to the rule: \"If XXX touches YYY and YYY is under ZZZ then XXX is adjacent to and below ZZZ.\"\n\nIn our case:\n*   XXX = Medium orange apple number two\n*   YYY = \"this thing\" (which is medium orange apple number one)\n*   ZZZ = medium orange apple number one\n\n**2. Apply the Rule:**\n\nThe rule states that if medium orange apple number two touches medium orange apple number one, and medium orange apple number one is under medium orange apple number one, then medium orange apple number two is adjacent to and below medium orange apple number one.\n\n**3. Determine the Answer:**\n\nThe question asks for the position of medium orange apple number one relative to medium orange apple number two. Since medium orange apple number two is *below* medium orange apple number one, the correct answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "case_id": "2082-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "below"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    },
+    {
+      "q_id": 7,
+      "answer": "right"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.246901",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if any fruit is within box two.\n\nThe story states: \"Box two contains medium green apple.\"\n\nRule 1: If XXX contains YYY then XXX contains ZZZ.  We can apply this to \"Box two contains medium green apple\" - Box two contains the green apple.\n\nTherefore, yes, fruit is within box two.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine if a fruit is over all yellow fruits.\n\n**Relevant Spatial Reasoning Rules:**\n\n*   If XXX contains YYY and YYY covers ZZZ then XXX contains ZZZ\n*   If XXX contains YYY and YYY covers ZZZ then XXX contains ZZZ\n*   If XXX is overlaps YYY then YYY is overlaps XXX\n\n**Identifying Yellow Fruits:**\n\nThe story mentions the following yellow fruits:\n\n*   Medium yellow apple (number 1)\n*   Medium yellow apple (number 2)\n*   Medium yellow apple (within box two)\n\n**Analyzing Spatial Relationships:**\n\n1.  **Box one:** Contains medium yellow apple number 1 and medium yellow apple number 2.\n2.  **Box two:** Contains medium green apple and a medium yellow apple. The medium yellow apple within box two is under the medium yellow apple number one.\n3.  **Medium yellow apple number 2:** Touches a medium orange apple and is under a medium orange apple.\n\nNow, let's consider if any fruit is \"over\" all yellow fruits.  We need to determine if any fruit is positioned such that it completely covers all the other yellow fruits.\n\n*   The medium green apple is *covered by* a medium yellow apple (within box two). This means the medium yellow apple (within box two) is *under* the medium green apple.\n*   The medium yellow apple number 2 is *under* the medium orange apple.\n\nSince the medium green apple covers the medium yellow apple within box two, and the medium yellow apple number 2 is below the medium orange apple, no fruit is positioned to completely cover all the other yellow fruits.\n\n**Answer:**\n\nNo\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if box one has medium orange apple number two.\n\nRelevant Rules:\n*   If XXX contains YYY then XXX contains ZZZ (This rule is relevant because we need to see if box one *contains* apple number two).\n\nApplying the Rule:\nThe story states: \"Medium orange apple number two touches and this thing is under medium orange apple number one.\"  It also states \"Box one contain a medium orange apple and a medium yellow apple.\"  Since apple number two \"touches\" something within box one, and box one contains a medium orange apple, it implies that apple number two is within box one.\n\nTherefore, box one has medium orange apple number two.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the relevant rules to determine if medium orange apple number one touches medium orange apple number two.\n\nRelevant Rules:\n1. If XXX is touches YYY then YYY is touches XXX\n\nThe story states: \"Medium orange apple number two touches and this thing is under medium orange apple number one.\" This directly translates to \"Medium orange apple number two touches medium orange apple number one.\"\n\nTherefore, medium orange apple number one touches medium orange apple number two.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the spatial relationship between medium orange apple number one and box two.\n\nThe story states: \"Box two has box one. ... Medium orange apple number two touches and this thing is under medium orange apple number one.\" This implies that medium orange apple number one is *inside* box one, which is *inside* box two.  Therefore, medium orange apple number one is located within box two.\n\nNow let's consider the provided rules:\n\n*   \"If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\" - Not relevant.\n*   \"If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\" - Not relevant.\n*   \"If XXX is touches YYY then YYY is touches XXX\" - Not relevant.\n*   \"If XXX is covered by YYY and YYY is below ZZZ and HHH is covered by ZZZ then XXX is below the HHH\" - Not relevant.\n*   \"If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\" - Not relevant.\n*   \"If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\" - Not relevant.\n*   \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - Relevant, as medium orange apple number one is inside box two.\n*   \"If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\" - Not relevant.\n*   \"If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\" - Not relevant.\n*   \"If XXX is covered by YYY and YYY is below ZZZ then XXX is below the ZZZ\" - Not relevant.\n\nBased on the analysis, medium orange apple number one is inside box two. The most appropriate option from the given choices is \"below\".  Since the apple is inside box two, it is inherently below the exterior of box two.\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the relationship between the two medium yellow apples.\n\nThe story states: \"Medium yellow apple number two is under medium yellow apple number one.\" This directly describes their spatial relationship.\n\nRule: If XXX is covered by YYY and YYY is below ZZZ then XXX is below the ZZZ.  This rule can be adapted to say if XXX is covered by YYY and YYY is below ZZZ then XXX is below the ZZZ.\n\nApplying this rule:\n*   Medium yellow apple number two (XXX) is covered by medium yellow apple number one (YYY).\n*   Medium yellow apple number one (YYY) is below another medium green apple (ZZZ).\n*   Therefore, medium yellow apple number two (XXX) is below medium yellow apple number one (YYY).\n\nSince medium yellow apple number two is *under* medium yellow apple number one, the answer is \"below\".\n\n```json\n{\"answer\": \"below\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "Let's analyze the story and the question to determine the position of box one regarding medium orange apple number two.\n\nThe story states: \"Medium orange apple number two touches and this thing is under medium orange apple number one.\" This directly tells us that medium orange apple number two is *under* medium orange apple number one.  We are also told that box one contains a medium orange apple and a medium yellow apple.\n\nNow let's consider the provided rules:\n\n*   \"If XXX is covered by YYY and YYY is touches ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule doesn't apply.\n*   \"If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\" - This rule doesn't apply.\n*   \"If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - This rule doesn't apply.\n*   \"If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\" - This rule doesn't apply.\n*   \"If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ\" - This rule doesn't apply.\n*   \"If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\" - This rule doesn't apply.\n*   \"If XXX is touches YYY then YYY is touches XXX\" - This rule doesn't apply.\n*   \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule doesn't apply.\n*   \"If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\" - This rule doesn't apply.\n*   \"If XXX is covered by YYY and YYY is below ZZZ then XXX is below the ZZZ\" - This rule *does* apply.  Since box one contains the medium orange apple and medium orange apple number two is *under* the medium orange apple in box one, box one is below medium orange apple number two.\n\nTherefore, the correct answer is \"below\".\n\n{\"answer\": \"below\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 7,
+      "answer": "right",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the position of medium orange apple number one relative to medium orange apple number two.\n\nThe story states: \"Medium orange apple number two touches and this thing is under medium orange apple number one.\" This directly describes the relationship between the two apples.\n\nRule 1: If XXX is touches YYY then YYY is touches XXX.  This rule applies here, as \"Medium orange apple number two touches medium orange apple number one.\"\n\nTherefore, medium orange apple number one is to the *right* of medium orange apple number two.\n\n```json\n{\"answer\": \"right\"}\n```",
+      "cot": ""
+    }
+  ]
+}

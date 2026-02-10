@@ -1,0 +1,84 @@
+{
+  "case_id": "3776-0",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "No"
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 4,
+      "answer": "above"
+    },
+    {
+      "q_id": 5,
+      "answer": "left"
+    },
+    {
+      "q_id": 6,
+      "answer": "above"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-12-02T01:54:21.153148",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 7,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "No",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\n*   If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\n*   If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\n*   If XXX is covered by YYY and YYY is to the right of ZZZ and HHH is covered by ZZZ then XXX is to the right of the HHH\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n\n**Applying the Rules:**\n\n1.  \"Box two has a medium orange apple which is to the south of a medium yellow apple.\" - This establishes a south relationship between the orange apple and the yellow apple.\n2.  \"Medium orange apple number two is to the south of medium orange apple number one.\" - This further defines the south relationship between the two orange apples.\n3.  \"The thing which was to the south of the medium yellow apple touches this fruit.\" - This confirms that the orange apple is touching the yellow apple.\n\nFrom these statements, we can conclude that the medium yellow apple is *not* south of any medium orange apple. The medium orange apples are south of the medium yellow apple.\n\n**Answer:**\n\nNo\n\n{\"answer\": \"No\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 1,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine if a medium yellow apple is within box two.\n\n**Relevant Rules:**\n\n*   If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\n*   If XXX is inside YYY and YYY is covers ZZZ then XXX is inside ZZZ\n*   If XXX is touches YYY then YYY is touches XXX\n\n**Applying the Rules:**\n\n1.  \"Box one covers a medium yellow apple. In box two is it.\" This states that the medium yellow apple *is* in box two.\n2.  \"Box two has a medium orange apple which is to the south of a medium yellow apple.\" This tells us the relative position of the orange apples.\n3.  \"Box two has the medium yellow apple.\" This reinforces that the yellow apple is in box two.\n4.  \"Another medium orange apple is inside and touching this box.\" This confirms the presence of another orange apple within box two.\n\nSince the story explicitly states that the medium yellow apple is *in* box two, the answer is yes.\n\n```json\n{\"answer\": \"Yes\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question using the provided spatial reasoning rules.\n\nThe question asks if all medium fruits are within a box.\n\n*   **Rule 1:** If XXX is touches YYY then YYY is touches XXX. This rule isn't directly relevant to determining if fruits are *within* a box.\n*   **Rule 2:** If XXX is inside YYY and YYY is covered by ZZZ then XXX is inside ZZZ. This is relevant.\n*   **Rule 3:** If XXX inside YYY and YYY covered by ZZZ then XXX inside ZZZ. This is the same as Rule 2.\n*   **Rule 4:** If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH. This is not relevant.\n*   **Rule 5:** If XXX is inside YYY and YYY is inside ZZZ then XXX is inside ZZZ. This is relevant.\n*   **Rule 6:** If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH. This is not relevant.\n*   **Rule 7:** If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ. This is not relevant.\n*   **Rule 8:** If XXX is inside YYY and YYY is above ZZZ then XXX is above the ZZZ. This is not relevant.\n*   **Rule 9:** If XXX is inside YYY and YYY is above ZZZ and HHH is inside ZZZ then XXX is above the HHH. This is not relevant.\n*   **Rule 10:** If XXX is covered by YYY and YYY is above ZZZ then XXX is above the ZZZ. This is not relevant.\n\nNow let's analyze the story:\n\n*   \"Box one covers a medium yellow apple.\" - The yellow apple is *inside* box one.\n*   \"In box two is it.\" - The yellow apple is *inside* box two.\n*   \"Box two has a medium orange apple which is to the south of a medium yellow apple.\" - The orange apple is *inside* box two.\n*   \"Box two has the medium yellow apple.\" - The yellow apple is *inside* box two.\n*   \"Another medium orange apple is inside and touching this box.\" - The orange apple is *inside* box two.\n*   \"Medium orange apple number two is to the south of medium orange apple number one.\" - The orange apples are *inside* box two.\n\nSince all the medium fruits (yellow and orange apples) are described as being *inside* boxes, the answer is \"Yes\".\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 3,
+      "answer": "Yes",
+      "full_response": "Let's analyze the story and the question to determine the answer.\n\n**Relevant Rules:**\n\n*   If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\n*   If XXX is touches YYY then YYY is touches XXX\n*   If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\n*   If XXX is covered by YYY and YYY is near to ZZZ and HHH is covered by ZZZ then XXX is near to the HHH\n*   If XXX is covered by YYY and YYY is in front of ZZZ and HHH is covered by ZZZ then XXX is in front of the HHH\n*   If XXX is covered by YYY and YYY is overlaps ZZZ and HHH is covered by ZZZ then XXX is overlaps the HHH\n*   If XXX is covered by YYY and YYY is in front of ZZZ then XXX is in front of the ZZZ\n*   If XXX is covered by YYY and YYY is above ZZZ and HHH is covered by ZZZ then XXX is above the HHH\n*   If XXX is covered by YYY and YYY is to the right of ZZZ and HHH is covered by ZZZ then XXX is to the right of the HHH\n*   If XXX is covered by YYY and YYY is near to ZZZ then XXX is near to the ZZZ\n\n**Applying the Rules:**\n\n1.  \"Box two has a medium orange apple which is to the south of a medium yellow apple.\" This tells us the medium yellow apple is *north* of the medium orange apple.\n2.  \"Medium orange apple number two is to the south of medium orange apple number one.\" This confirms the relative positions of the two orange apples.\n3.  \"The thing which was to the south of the medium yellow apple touches this fruit.\" This means the medium orange apple is touching the medium yellow apple.\n\nSince the medium yellow apple is north of the medium orange apple, and the orange apple is touching the yellow apple, the answer is yes.\n\n{\"answer\": \"Yes\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 4,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states: \"Box two has a medium orange apple which is to the south of a medium yellow apple. Box two has the medium yellow apple. Another medium orange apple is inside and touching this box.\"\n\nThe question asks: \"Where is the medium yellow apple in box two regarding medium orange apple number two?\"\n\nRelevant Rules:\n\n1.  \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule could be relevant if we consider the box as the 'YYY' and the apples as 'XXX'.\n2.  \"If XXX is touches YYY then YYY is touches XXX\" - This rule is relevant because the medium yellow apple and the medium orange apple are touching.\n3. \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule is relevant because the medium yellow apple is inside box two and box two overlaps the medium orange apple.\n\nThe key information is that the medium yellow apple is *inside* box two and the medium orange apple is *touching* box two.  Since the medium orange apple is to the south of the medium yellow apple, and the medium orange apple is touching the box, the yellow apple must be located *above* the orange apple.\n\nTherefore, the answer is \"above\".\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    },
+    {
+      "q_id": 5,
+      "answer": "left",
+      "full_response": "Let's analyze the story and the question to determine the position of the medium yellow apple in box one regarding box two.\n\nThe story states: \"Box one covers a medium yellow apple. In box two is it. Box two has a medium orange apple which is to the south of a medium yellow apple. Box two has the medium yellow apple.\"\n\nThis tells us:\n1. Box one contains the medium yellow apple.\n2. The medium yellow apple is *in* box two.\n3. The medium orange apple in box two is south of the medium yellow apple.\n4. Box two *also* has the medium yellow apple.\n\nFrom these statements, we can deduce that the medium yellow apple is inside box two.  The question asks about the position of the medium yellow apple *in box one* *regarding* box two. Since box one *covers* the medium yellow apple, and the apple is in box two, box one is to the left of box two.\n\nRelevant rule: \"If XXX is covered by YYY and YYY is to the left of ZZZ then XXX is to the left of the ZZZ\" - While not a direct match, the concept of 'covered by' and 'to the left of' applies.  We can interpret 'to the left of' as a relative spatial position.\n\n{\"answer\": \"left\"}",
+      "cot": ""
+    },
+    {
+      "q_id": 6,
+      "answer": "above",
+      "full_response": "Let's analyze the story and the question to determine the relevant spatial reasoning rules and the answer.\n\nThe story states: \"Box two has a medium orange apple which is to the south of a medium yellow apple. Box two has the medium yellow apple. Another medium orange apple is inside and touching this box.\"\n\nThe question asks: \"Where is the medium yellow apple in box two relative to medium orange apple number one?\"\n\nRelevant Rules:\n\n1.  \"If XXX is covered by YYY and YYY is to the south of ZZZ and HHH is covered by ZZZ then XXX is to the south of the HHH\" - This rule isn't directly applicable as we don't have covering relationships.\n2.  \"If XXX is inside YYY and YYY is overlaps ZZZ and HHH is inside ZZZ then XXX is overlaps the HHH\" - This rule isn't directly applicable.\n3. \"If XXX is inside YYY and YYY is near to ZZZ and HHH is inside ZZZ then XXX is near to the HHH\" - This rule isn't directly applicable.\n4. \"If XXX is touches YYY then YYY is touches XXX\" - This rule isn't directly applicable.\n5. \"If XXX is to the south of YYY and YYY is to the south of ZZZ and HHH is to the south of ZZZ then XXX is to the south of the HHH\" - This rule isn't directly applicable.\n6.  The key information is that the medium orange apple number one is *to the south* of the medium yellow apple.  Therefore, the medium yellow apple is *north* of the medium orange apple number one.\n7.  The medium orange apple number two is *inside* box two and *touching* box two. This doesn't directly relate to the position of the yellow apple relative to the first orange apple.\n\nConsidering the information, the medium yellow apple is north of the medium orange apple number one. The available options are: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\n\"above\" is the most accurate description of the spatial relationship.\n\n```json\n{\"answer\": \"above\"}\n```",
+      "cot": ""
+    }
+  ]
+}

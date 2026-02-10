@@ -1,0 +1,94 @@
+{
+  "case_id": "2935-1",
+  "answers": [
+    {
+      "q_id": 0,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 1,
+      "answer": "No"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes"
+    },
+    {
+      "q_id": 3,
+      "answer": "No"
+    },
+    {
+      "q_id": 4,
+      "answer": "below"
+    },
+    {
+      "q_id": 5,
+      "answer": "ntpp"
+    },
+    {
+      "q_id": 6,
+      "answer": "below"
+    },
+    {
+      "q_id": 7,
+      "answer": "tpp"
+    }
+  ],
+  "metadata": {
+    "timestamp": "2025-11-04T15:03:21.296302",
+    "processing_mode": "per_question",
+    "pipeline": "rag",
+    "total_questions": 8,
+    "errors": 0
+  },
+  "detailed_responses": [
+    {
+      "q_id": 0,
+      "answer": "Yes",
+      "full_response": "{\"answer\":\"Yes\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called one have a medium green thing and a medium yellow apple. This box covers another medium yellow apple. Medium yellow apple number one are north of the green fruit and medium yellow apple number two. The green thing is to the north of medium yellow apple number two. Another box named two has box one. This box covers a medium yellow apple.\"\n\nInterpret entities:\n\nBox one contains: a medium green thing, a medium yellow apple (call this apple #1). Box one also covers another medium yellow apple (apple #2). So apple #2 is covered by box one (i.e., inside and touching box one). Apple #1 is \"have\" (i.e., inside but not necessarily touching). The green thing is also inside box one.\n\nRelations:\n\n- \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" So apple #1 is north of green thing and north of apple #2.\n\n- \"The green thing is to the north of medium yellow apple number two.\" So green thing north of apple #2.\n\nThus we have vertical ordering: Apple #1 north of green, green north of apple #2. So apple #1 is north of apple #2 (already given). So apple #2 is south of apple #1. Also green is south of apple #1? Actually apple #1 north of green, so green south of apple #1.\n\nQuestion: \"Is a thing south of medium yellow apple number one?\" Options Yes/No.\n\nWe need to determine if there exists any thing that is south of apple #1. From story, we have green thing and apple #2 both are south of apple #1 (since apple #1 north of them). So answer is Yes.\n\nWe need to see if any rule needed? The rules are about covered relationships and relative positions. But we can answer directly.\n\nThus output JSON: {\"answer\":\"Yes\"}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 1,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story. Entities: box one, box two, medium green thing (call green), medium yellow apple #1 (in box one), medium yellow apple #2 (covered by box one). Also box two contains box one (has box one). Box two covers a medium yellow apple (maybe #3). Relationships: \"A box called one have a medium green thing and a medium yellow apple.\" Means box one contains (has) green thing and apple #1 (inside? \"have\" likely means contains, i.e., inside). \"This box covers another medium yellow apple.\" So box one covers apple #2 (i.e., apple #2 is partially overlapped? In typical spatial reasoning tasks, \"covers\" means the box covers the object, i.e., the object is partially inside and partially outside? But we treat as relation: object is covered by box. So apple #2 is covered by box one.\n\n\"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" So apple #1 north of green and north of apple #2.\n\n\"The green thing is to the north of medium yellow apple number two.\" So green north of apple #2.\n\n\"Another box named two has box one.\" Means box two contains box one (box one inside box two). \"This box covers a medium yellow apple.\" So box two covers apple #3.\n\nQuestion: Is any medium green thing disconnected from all boxes? So we need to see if the green thing is disconnected from all boxes (i.e., from box one and box two). The green thing is inside box one (since box one \"have\" green thing). So it's inside box one, not disconnected. Also box one is inside box two, so green thing is also inside box two? Actually if an object is inside box one, and box one is inside box two, then the object is also inside box two (by transitivity of inside? Not given but typical). But we can reason: If X inside Y and Y inside Z, then X inside Z. Not given as rule, but we can infer logically. However the question: \"disconnected from all boxes\" means not connected to any box. Since it's inside box one, it's not disconnected. So answer No.\n\nRelevant rules: The rules about disconnected relationships. But we have no disconnected statements. So none relevant. Use reasoning.\n\nThus answer: No.\n\nReturn JSON.\n\n"
+    },
+    {
+      "q_id": 2,
+      "answer": "Yes",
+      "full_response": "{\"answer\":\"Yes\"}",
+      "cot": "We need to parse story. Entities: box one, contains a medium green thing (fruit?) and a medium yellow apple (call apple1). Box one covers another medium yellow apple (apple2). So apple1 and apple2 are both medium yellow apples. \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" So apple1 is north of green thing and north of apple2. \"The green thing is to the north of medium yellow apple number two.\" So green is north of apple2. So ordering north-south: apple1 at top, then green, then apple2 at bottom. Another box named two has box one. This box covers a medium yellow apple. So box two contains box one, and box two covers another medium yellow apple (apple3). Not sure about relative positions of apple3.\n\nQuestion: \"Is a medium yellow apple to the south of any medium fruit?\" Medium fruit: we have a medium green thing (fruit). Also maybe other medium fruit? Only green thing is fruit. So we ask: Is there a medium yellow apple that is south of any medium fruit? We have apple2 is south of green (since green north of apple2). So yes, apple2 is south of green fruit. Also apple3? Not given relation. So answer Yes.\n\nWe need to consider rules: The rules are about covered relationships and directional relations. Could be relevant: apple2 is covered by box one. Box one is inside box two? Actually box two has box one (contains). So box one is inside box two. Box two covers apple3. So apple3 is covered by box two. Could we infer relation between apple2 and apple3 via rules? Possibly not needed.\n\nBut we have direct statement: green north of apple2 => apple2 south of green. So answer Yes.\n\nThus output JSON: {\"answer\":\"Yes\"}.\n\nMake sure last line only JSON."
+    },
+    {
+      "q_id": 3,
+      "answer": "No",
+      "full_response": "{\"answer\": \"No\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called one have a medium green thing and a medium yellow apple. This box covers another medium yellow apple. Medium yellow apple number one are north of the green fruit and medium yellow apple number two. The green thing is to the north of medium yellow apple number two. Another box named two has box one. This box covers a medium yellow apple.\"\n\nInterpret entities:\n\nBox one: contains a medium green thing and a medium yellow apple (call this apple #1). Box one also covers another medium yellow apple (call apple #2). So apple #2 is covered by box one (i.e., box one covers apple #2). Apple #1 is \"have\" (i.e., inside? The phrasing \"have\" likely means contains? Usually \"have\" means inside but not necessarily touching. We'll assume box one contains apple #1 (maybe not covered). The green thing is also inside box one.\n\nRelations: Apple #1 north of green fruit and apple #2. Green thing north of apple #2.\n\nAnother box named two has box one. Means box two contains box one. This box (box two) covers a medium yellow apple (call apple #3). So box two covers apple #3.\n\nQuestion: \"Is a medium yellow apple covered by all boxes?\" Means: Is there a medium yellow apple that is covered by every box in the scenario? Boxes are box one and box two. We need to see if there exists a medium yellow apple that is covered by both box one and box two.\n\nWe have apple #2 covered by box one. Is apple #2 also covered by box two? Not mentioned. Box two covers apple #3, not apple #2. Apple #3 is covered by box two. Is apple #3 also covered by box one? Not mentioned. Box one contains apple #1 (not covered). So no single apple is covered by both boxes.\n\nThus answer: No.\n\nCheck rules: The rules are about transitive relationships with covered/contains etc. Could we infer that because box two contains box one, and box one covers apple #2, then box two also covers apple #2? Let's see rule: \"If XXX is covered by YYY and YYY is to the left of ZZZ and HHH is covered by ZZZ then XXX is to the left of the HHH\" etc. Not relevant. There's rule: \"If XXX is covered by YYY then YYY is covers XXX\". That's just inverse. Also \"If XXX contains YYY and YYY covers ZZZ then XXX contains ZZZ\". That's relevant: If box two contains box one, and box one covers apple #2, then box two contains apple #2 (not covers). The rule says contains, not covers. So box two contains apple #2, not covers. So apple #2 is not covered by box two. Similarly, apple #3 is covered by box two, but box one does not contain box two, so no relation.\n\nThus no apple covered by all boxes. Answer No.\n\nReturn JSON."
+    },
+    {
+      "q_id": 4,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called one have a medium green thing and a medium yellow apple. This box covers another medium yellow apple. Medium yellow apple number one are north of the green fruit and medium yellow apple number two. The green thing is to the north of medium yellow apple number two. Another box named two has box one. This box covers a medium yellow apple.\"\n\nInterpretation: Box one contains a medium green thing and a medium yellow apple (call this apple #1). Box one also covers another medium yellow apple (apple #2). So apple #2 is covered by box one (i.e., inside and touching box one). Apple #1 is \"have\" (i.e., inside but not necessarily touching). Then statements: \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" So apple #1 is north of green thing and north of apple #2. The green thing is to the north of medium yellow apple number two. So green is north of apple #2. So relative positions:\n\n- Apple #1 north of green.\n- Apple #1 north of apple #2.\n- Green north of apple #2.\n\nThus ordering north-south: Apple #1 is highest, then green, then apple #2 (since apple #1 north of green, green north of apple #2). So green is south of apple #1. The question: \"Where is the green thing relative to medium yellow apple number one?\" So relative position of green to apple #1: green is south/below apple #1.\n\nOptions include \"below\". So answer \"below\". Need to see if any rule needed? The rules are about covered relationships, but we have direct statements. So answer \"below\".\n\nReturn JSON: {\"answer\": \"below\"}"
+    },
+    {
+      "q_id": 5,
+      "answer": "ntpp",
+      "full_response": "{\"answer\": \"ntpp\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called one have a medium green thing and a medium yellow apple. This box covers another medium yellow apple. Medium yellow apple number one are north of the green fruit and medium yellow apple number two. The green thing is to the north of medium yellow apple number two. Another box named two has box one. This box covers a medium yellow apple.\"\n\nInterpretation: Box one contains a medium green thing and a medium yellow apple (call apple1). Box one also covers another medium yellow apple (apple2). So apple2 is covered by box one (i.e., inside and touching box one). Apple1 is north of the green fruit and apple2. The green thing is north of apple2. So relative positions: apple1 north of green, apple1 north of apple2. Green north of apple2.\n\nBox two \"has box one\". Means box two contains box one (box one is inside box two). Box two also covers a medium yellow apple (apple3). So apple3 is covered by box two.\n\nQuestion: Where is the medium green thing relative to box two?\n\nWe need spatial relation between green thing (inside box one) and box two (container). Box one is inside box two (has). So green thing is inside box one, which is inside box two. So green thing is inside box two (but not necessarily touching). The options list includes: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi.\n\nWe need to map \"inside\" to one of these codes. The typical spatial reasoning tasks use these codes: \"dc\" = disconnected, \"ec\" = externally connected (touching), \"po\" = partial overlap, \"tpp\" = tangential proper part (inside and touching), \"ntpp\" = non-tangential proper part (inside not touching), \"tppi\" = tangential proper part inverse (container touching), \"ntppi\" = non-tangential proper part inverse (container not touching). So we need relation of green thing relative to box two: green thing is inside box two, not touching (since box one is inside box two, but we don't know if box one touches box two. The story says \"Another box named two has box one.\" Usually \"has\" means contains (inside, not touching). So box one is inside box two, not touching. Therefore green thing is inside box one, which is inside box two, also not touching box two. So relation is \"ntpp\" (non-tangential proper part). So answer: ntpp.\n\nCheck if any rule needed? The rules given are about covered relationships and left/right etc. Not needed.\n\nThus output JSON.\n\n"
+    },
+    {
+      "q_id": 6,
+      "answer": "below",
+      "full_response": "{\"answer\": \"below\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called one have a medium green thing and a medium yellow apple. This box covers another medium yellow apple. Medium yellow apple number one are north of the green fruit and medium yellow apple number two. The green thing is to the north of medium yellow apple number two. Another box named two has box one. This box covers a medium yellow apple.\"\n\nInterpretation: Box one contains a medium green thing and a medium yellow apple (call this apple #1). Box one also covers another medium yellow apple (call this apple #2). So apple #2 is covered by box one (i.e., inside and touching box one). Apple #1 is \"have\" (i.e., inside but not touching?) The phrasing \"have\" likely means contains (inside but not touching). Not needed.\n\nRelations: \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" So apple #1 is north of green thing and north of apple #2.\n\n\"The green thing is to the north of medium yellow apple number two.\" So green thing north of apple #2.\n\nThus we have: apple #2 is south of green thing (since green north of apple #2). Also apple #1 north of green, so green south of apple #1.\n\nQuestion: Where is medium yellow apple number two regarding the green thing? So relative position of apple #2 with respect to green thing.\n\nGiven green north of apple #2 => apple #2 is south (below) of green. So answer: below.\n\nCheck options: \"below\" is present.\n\nThus answer is \"below\". No need for rules about covered etc. But we could note rule: If X covered by Y and Y ... but not needed.\n\nThus final JSON: {\"answer\": \"below\"}"
+    },
+    {
+      "q_id": 7,
+      "answer": "tpp",
+      "full_response": "{\"answer\": \"tpp\"}",
+      "cot": "We need to parse story.\n\nStory: \"A box called one have a medium green thing and a medium yellow apple. This box covers another medium yellow apple. Medium yellow apple number one are north of the green fruit and medium yellow apple number two. The green thing is to the north of medium yellow apple number two. Another box named two has box one. This box covers a medium yellow apple.\"\n\nInterpretation:\n\nBox one contains a medium green thing and a medium yellow apple (call this apple #1). Box one also covers another medium yellow apple (call this apple #2). So apple #2 is covered by box one (i.e., box one covers apple #2). Apple #1 is inside box one (not covered). The relations: \"Medium yellow apple number one are north of the green fruit and medium yellow apple number two.\" So apple #1 is north of green thing and north of apple #2. Also \"The green thing is to the north of medium yellow apple number two.\" So green thing north of apple #2. So ordering vertical: apple #1 north of green, green north of apple #2. So apple #1 is highest, then green, then apple #2.\n\nQuestion: Where is medium yellow apple number two relative to box one?\n\nApple #2 is covered by box one. So relative position: covered by means apple is inside and touching the boundary? In spatial reasoning tasks, \"covered by\" indicates the object is inside and touching the container's border. The relation of object to container is \"inside and touching\" which is often expressed as \"inside\" or \"center\"? The options list: left, right, above, below, behind, front, near, far, dc, ec, po, tpp, ntpp, tppi, ntppi. These are typical RCC/Directional relations: dc (disconnected), ec (externally connected), po (partial overlap), tpp (tangential proper part), ntpp (non-tangential proper part), tppi (tangential proper part inverse), ntppi (non-tangential proper part inverse). For \"covered by\", the relation is \"tpp\" (tangential proper part) where the object is inside and touching the container. Actually in RCC, \"tpp\" is tangential proper part: A is a proper part of B and shares part of the boundary. That's like \"inside and touching\". So apple #2 relative to box one is tpp (apple is tpp of box). However the question asks \"relative to box one\". So we need relation of apple #2 to box one. That is \"tpp\". Options include tpp. So answer: tpp.\n\nCheck if any rule needed: The rules given are about covered by relationships and left/right etc. Not needed.\n\nThus output JSON with answer \"tpp\"."
+    }
+  ]
+}
