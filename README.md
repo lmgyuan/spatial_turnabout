@@ -1,60 +1,95 @@
-# Turnabout LLM
+# Complex Spatial Reasoning over Narratives
 
-This project benchmarks LLMs' deductive reasoning ability using interactive detective novel games such as [Ace Attorney](https://en.wikipedia.org/wiki/Ace_Attorney) and [Danganronpa](https://en.wikipedia.org/wiki/Danganronpa). This repo includes our datasets, scripts, and analyses.
+Code and data for reproducing the experiments in this paper.
 
-![Objection!](images/objection.jpg)
+**Task:** Given evidence and witness testimonies, identify the contradicting pair. Models must extract implicit spatial relationships from prose and detect geometric impossibilities. We evaluate on Turnabout (narrative-embedded spatial reasoning) and SpaRTUN (explicit spatial reasoning).
 
-> The name "Turnabout" is a naming convention from Ace Attorney as a nod to the playable character's knack for completely changing the direction of a trial, against all odds.
+## Setup
 
-## Why interactive detective novels?
+```bash
+pip install -r requirements.txt
+```
 
-Detective stories contain some of the most difficult reasoning problems, which are meticulously crafted to be intriguing and obscure. Moreover, such deduction requires diverse reasoning ability and may require information retrieval from long passages of context. Therefore, evaluating LLMs on detective stories brings about unique challenges. 
+Create a `.env` file in the project root with your API keys:
+```
+OPENAI_API_KEY=your_key
+NEBIUS_API_KEY=your_key
+```
 
-Most detective novels like Sherlock Holmes can hardly be used for evaluation because they do not contain explicit questions to pose to models. However, games like Ace Attorney surprasses this constraint, as the interactive gameplay provides a natural interface with LLMs. Specifically, the core gameplay mechanism is to read through a story, examine existing evidences, listen to witness testimonies, and find a **contradiction** between an evidence and a testimony. In essence, this is multiple choice question where the action space is `num_evidences x num_testimonies` which is usually hundreds.
+## Project Structure
 
-Despite possible subjectivity ([is Ace Attorney rigorous in logic?](https://chatgpt.com/share/67e588ca-b800-800b-ab6b-c34e6ed96d1a)), games like Ace Attorney are critically acclaimed with a sizeable player community that generally agree upon the validity of the contradictions. While challenging even for human players, an attentive player should be able to find most contradictions. However, as of the time of writing, no LLM  could achieve more than 40\% accuracy.
+```
+source/                  # All pipeline code
+  run_models_spatial.py  # Turnabout inference (parallel)
+  run_models_parallel.py # Turnabout inference (parallel, alt)
+  run_spartun_parallel.py# SpaRTUN inference
+  evaluate_spatial.py    # Turnabout evaluation
+  evaluate_spartun.py    # SpaRTUN evaluation
+  generate_plots.py      # Generate result plots
+  models.json            # Model name mappings
+  prompts/               # Turnabout prompt templates
+  prompts_spartun/       # SpaRTUN prompt templates
+data/
+  aceattorney_data/final/     # Ace Attorney cases (133 JSON files)
+  danganronpa_data/final/     # Danganronpa cases (7 JSON files)
+  SPARTUN/                    # SpaRTUN dataset
+Rules/
+  RuleText5.txt          # Hand-curated spatial rules for Turnabout (130 rules)
+  RuleText.txt           # Hand-curated spatial rules for SpaRTUN (73 rules)
+output_spatial/          # Turnabout model outputs
+output_spurtun/          # SpaRTUN model outputs
+eval/                    # Turnabout evaluation reports
+eval_spurtun/            # SpaRTUN evaluation reports
+```
 
-![An example from the Turnabout LLM dataset](images/aa_example.png)
+## Running Experiments
 
-## Dataset
+All commands run from the `source/` directory.
 
-Detailed information about the Turnabout LLM dataset can be found at [data/](data/); **see the README there for more information**. We pose this dataset to evaluate LLMs' deductive reasoning ability. The game data is crawled and parsed from [an Ace Attorney Wiki](https://aceattorney.fandom.com/wiki/Category:Transcripts) and [a Danganronpa archive](https://lparchive.org/Danganronpa-Trigger-Happy-Havoc/). We make the following design choices:
-- We only consider the textual elements, which are core to reasoning in most cases. Whenver visuals are needed for reasoning, they are captioned, though a multimodal evaluation might come in future work.
-- For Ace Attorney, we only consider the cross-examination gameplay during trials, neglecting other gameplay elements such as investigation, psyche-locks, etc.
-- For Danganronpa, we only consider the non-stop debate gameplay during trials, neglecting other gameplay elements such as socializing, hangman gambit, etc.
-- While our dataset is mostly faithful to the original games, we made various edits (change to wording, removing loose contradictions, adding information for logic leaps, etc.) to improve the rigorousness of reasoning.
+### Turnabout
 
-For each turn (either a cross-examination or a non-stop debate), the input to a model is:
+```bash
+# Inference — run a model with a prompt on the spatial subset
+python run_models_spatial.py -m nebius-llama3.3-70b -p base --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rulesv5_improved --context sum --label spatial
+python run_models_spatial.py -m nebius-llama3.3-70b -p rules_generated_r10_improved_v2 --context sum --label spatial
 
-1. A list of evidences (Ace Attorney) or truth bullets (Danganronpa) and their descriptions
-2. A list of testimonies
-3. The story context (only in some settings)
+# Evaluation
+python evaluate_spatial.py -m nebius-llama3.3-70b --data aceattorney --label spatial
+python evaluate_spatial.py --all --data aceattorney    # evaluate all runs
+```
 
-The output a model is a contradicting pair of evidence and a testimony. While most turns are self-contained, some require specific information from the story context. This becomes a needle-in-a-haystack information retrieval problem that is particularly challenging for LLMs.
+**Key arguments:**
+- `-m MODEL` — model name from `models.json` (e.g., `nebius-llama3.3-70b`, `nebius-qwen3-32b`, `nebius-kimi-k2`)
+- `-p PROMPT` — prompt template name from `prompts/` (without `.json`)
+- `--context sum` — include summarized story context
+- `--label spatial` — filter to spatial reasoning turns only
 
-## Evaluation
+### SpaRTUN
 
-For a complete explanation on how to evaluate the models, see [this README](source/README.md).
+```bash
+# Inference
+python run_spartun_parallel.py -m nebius-llama3.3-70b -p base --case ALL
+python run_spartun_parallel.py -m nebius-llama3.3-70b -p rulesv5_improved --case ALL
+python run_spartun_parallel.py -m nebius-llama3.3-70b -p rules_generated_r10_improved_v2 --case ALL
 
-In short, to use an LLM with a prompt to make inference on the dataset, go to `/source` and run
+# Evaluation
+python evaluate_spartun.py -m nebius-llama3.3-70b -p base
+```
 
-> python run_models.py --model MODEL --prompt PROMPT --context CONTEXT
+**Key arguments:**
+- `--case ALL` — run all 666 cases (default: first 20)
+- `--case N` — run first N cases
 
-*   `MODEL` is the name of a HuggingFace model such as `deepseek-ai/DeepSeek-R1` or an API model such as `deepseek-reasoner` or `gpt-4.1`. You can also customize acronyms in `/source/model_names.json`. 
+### Available Pipelines (Prompt Names)
 
-*   `PROMPT` is the name of a prompt stored in `/source/prompts`. 
-
-*   `CONTEXT` is either left blank, or `full` to provide the full context, or `sum` to provide a context summary.
-
-Running this command will produce `/output/MODEL_PROMPT`, storing models' output.
-
-To evaluate said output, run
-> python evaluate.py --model MODEL --prompt PROMPT --context CONTEXT
-
-This will create a `MODEL_PROMPT_report.json` in `/eval`. 
-
-## License
-Following the source of our data, [fandom.com](https://www.fandom.com/licensing), our resources are licensed under Creative Commons Attribution-Share Alike License 3.0 (Unported) (CC BY-SA). 
-
-## Citation
-If you find our work useful, please cite TODO.
+| Pipeline | Turnabout Prompt | SpaRTUN Prompt |
+|---|---|---|
+| B0 (Baseline) | `base` | `base` |
+| C0 (Spatial Cue) | `base_spatial_ablation` | — |
+| RC-Static (All Rules) | `rulesv5_improved` | `rulesv5_improved` |
+| RC-RAG@k (Retrieved Rules) | `rulesv5_rag_t{k}_improved` | `rulesv5_rag_t10_improved` |
+| PA@p (Propositions) | `prop_generated_p{p}_improved_v2` | `prop_generated_p10_improved_v2` |
+| RC+PA-RAG (Combined) | `rulesv5_rag_prop_t15_p{p}_improved_v2` | `rag_prop_generated_t10_p10_improved_v2` |
+| AR@k (Auto-Generated Rules) | `rules_generated_r{k}_improved_v2` | `rules_generated_r10_improved_v2` |
+| Gold (Oracle) | use `--reasoning props` | `gold_rules_improved` |
